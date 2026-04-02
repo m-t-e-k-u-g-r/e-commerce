@@ -7,7 +7,7 @@ CREATE TABLE `products` (
     `description` TEXT,
     `price` DECIMAL(10,2) NOT NULL,
     `image_url` VARCHAR(255),
-    `created_at` TIMESTAMP NOT NULL
+    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
 CREATE TABLE `categories` (
