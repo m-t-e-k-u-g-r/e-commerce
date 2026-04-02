@@ -4,13 +4,12 @@ import ch.mk.backend.dtos.ProductDto;
 import ch.mk.backend.mappers.ProductMapper;
 import ch.mk.backend.repositories.ProductRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/products")
@@ -20,8 +19,14 @@ public class ProductController {
     private final ProductRepository productRepository;
 
     @GetMapping
-    public List<ProductDto> findAllProducts() {
-        return productRepository.findAll()
+    public List<ProductDto> findAllProducts(
+            @RequestParam(required = false) String sort
+    ) {
+        if (sort == null || !Set.of("name", "price", "id").contains(sort)) {
+            sort = "id";
+        }
+
+        return productRepository.findAll(Sort.by(sort))
                 .stream()
                 .map(productMapper::toDto)
                 .toList();
