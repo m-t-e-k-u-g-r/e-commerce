@@ -1,3 +1,9 @@
+.home {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
 .product_list {
   display: grid;
   grid-template-columns: 1fr;
@@ -5,6 +11,9 @@
 }
 
 @media (min-width: 576px) {
+  .home {
+    flex-direction: row;
+  }
   .product_list {
     grid-template-columns: repeat(2, 1fr);
   }
