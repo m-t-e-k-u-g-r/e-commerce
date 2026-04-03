@@ -9,8 +9,10 @@ import { Product } from '../../models/product.type';
     <div class="product">
       <img
         ngSrc="{{ product.imageUrl }}"
+        priority
         width="800"
         height="450"
+        alt="{{ product.name }}"
       />
       <div class="product_detail">
         <h2>{{ product.name }}</h2>
