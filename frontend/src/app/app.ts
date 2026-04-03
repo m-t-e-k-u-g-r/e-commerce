@@ -1,6 +1,7 @@
 import { Component, inject, effect } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { ProductService } from './services/product.service';
+import { CategoryService } from './services/category.service';
 
 @Component({
   selector: 'app-root',
@@ -14,6 +15,7 @@ import { ProductService } from './services/product.service';
 })
 export class App {
   productService = inject(ProductService);
+  categoryService = inject(CategoryService);
 
   constructor() {
     effect(() => {
@@ -23,5 +25,6 @@ export class App {
 
   private loadData() {
     this.productService.getProducts();
+    this.categoryService.getCategories();
   }
 }
