@@ -1,10 +1,18 @@
 .sidebar {
   display: flex;
   flex-direction: column;
-  width: 100%;
+  min-width: 200px;
 }
 
-@media (min-width: 576px) {
+button {
+  padding: 1rem;
+  text-align: left;
+  :hover {
+    background-color: #f0f0f0;
+  }
+}
+
+@media (min-width: 768px) {
   .sidebar {
     width: auto;
   }

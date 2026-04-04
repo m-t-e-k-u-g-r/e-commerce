@@ -1,0 +1,28 @@
+nav {
+  display: flex;
+  flex-direction: row;
+  justify-content: left;
+  align-items: center;
+  width: 100%;
+  height: 50px;
+  gap: 2rem;
+  padding: 1rem;
+  margin-bottom: 2rem;
+  background-color: #f0f0f0;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.cart_info {
+  display: flex;
+  flex-direction: row;
+}
+
+a {
+  color: #303030;
+  text-decoration: none;
+  :hover {
+    color: black;
+  }
+}

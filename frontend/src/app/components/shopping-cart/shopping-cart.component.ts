@@ -12,9 +12,12 @@ import { CartService } from '../../services/cart.service';
       <table>
         <tr class="divided">
           <td colspan="2">
-            You have {{ this.cartService.totalItems() }} items in your shopping cart
+            You have {{ this.cartService.totalItems() }} item{{
+              this.cartService.totalItems() == 1 ? '' : 's'
+            }}
+            in your shopping cart
           </td>
-          <td colspan="2">
+          <td colspan="2" class="right">
             <button (click)="this.cartService.clearCart()" class="clear">
               Clear Shopping Cart
             </button>
@@ -26,8 +29,8 @@ import { CartService } from '../../services/cart.service';
         <tr class="head divided">
           <td></td>
           <td>Product</td>
-          <td>Quantity</td>
-          <td>Price</td>
+          <td class="center">Quantity</td>
+          <td class="right">Price</td>
         </tr>
         <tr>
           <td colspan="4" class="buffer"></td>
@@ -36,23 +39,32 @@ import { CartService } from '../../services/cart.service';
           @if (cartItem.product) {
             <tr class="divided">
               <td>
-                <img
-                  [ngSrc]="cartItem.product.imageUrl"
-                  priority
-                  width="200"
-                  height="200"
-                  [alt]="cartItem.product.name"
-                />
+                <div class="img_wrapper">
+                  <img
+                    [ngSrc]="cartItem.product.imageUrl"
+                    priority
+                    width="100"
+                    height="100"
+                    [alt]="cartItem.product.name"
+                  />
+                </div>
               </td>
               <td>{{ cartItem.product.name }}</td>
-              <td></td>
-              <td>{{ cartItem.quantity }} in cart</td>
-              <td>{{ (cartItem.product.price * cartItem.quantity).toFixed(2) }}</td>
+              <td>
+                <div class="quantity_controls">
+                  <button (click)="this.cartService.reduceQuantity(cartItem.productId)">-</button>
+                  <span class="quantity_value">{{ cartItem.quantity }} in cart</span>
+                  <button (click)="this.cartService.addItem(cartItem.productId)">+</button>
+                </div>
+              </td>
+              <td class="right">$ {{ (cartItem.product.price * cartItem.quantity).toFixed(2) }}</td>
             </tr>
           }
         }
         <tr class="divided">
-          <td colspan="4" class="total_amount">Total: $ {{ this.cartService.totalAmount() }}</td>
+          <td colspan="4">
+            <p class="total_amount">Total: $ {{ this.cartService.totalAmount() }}</p>
+          </td>
         </tr>
         <tr>
           <td colspan="4">

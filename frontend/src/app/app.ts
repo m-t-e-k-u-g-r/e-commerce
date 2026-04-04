@@ -9,8 +9,8 @@ import { CartService } from './services/cart.service';
   selector: 'app-root',
   imports: [RouterOutlet, NavbarComponent],
   template: `
+    <app-navbar/>
     <main>
-      <app-navbar/>
       <router-outlet/>
     </main>
   `,
