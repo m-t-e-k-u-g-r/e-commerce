@@ -10,18 +10,35 @@ import { CartService } from '../../services/cart.service';
     <h1>Shopping Cart</h1>
     <div class="shopping_cart">
       <table>
+        <tr class="divided">
+          <td colspan="2">
+            You have {{ this.cartService.totalItems() }} items in your shopping cart
+          </td>
+          <td colspan="2">
+            <button (click)="this.cartService.clearCart()" class="clear">
+              Clear Shopping Cart
+            </button>
+          </td>
+        </tr>
         <tr>
-          <td>Image</td>
+          <td colspan="4" class="buffer"></td>
+        </tr>
+        <tr class="head divided">
+          <td></td>
           <td>Product</td>
           <td>Quantity</td>
           <td>Price</td>
         </tr>
+        <tr>
+          <td colspan="4" class="buffer"></td>
+        </tr>
         @for (cartItem of computedCartItems(); track cartItem.productId) {
           @if (cartItem.product) {
-            <tr>
+            <tr class="divided">
               <td>
                 <img
                   [ngSrc]="cartItem.product.imageUrl"
+                  priority
                   width="200"
                   height="200"
                   [alt]="cartItem.product.name"
@@ -34,6 +51,14 @@ import { CartService } from '../../services/cart.service';
             </tr>
           }
         }
+        <tr class="divided">
+          <td colspan="4" class="total_amount">Total: $ {{ this.cartService.totalAmount() }}</td>
+        </tr>
+        <tr>
+          <td colspan="4">
+            <button (click)="checkout()" class="checkout">Check out</button>
+          </td>
+        </tr>
       </table>
     </div>
   `,
@@ -55,4 +80,8 @@ export class ShoppingCartComponent {
       };
     });
   });
+
+  checkout() {
+    console.log('Checkout not yet implemented');
+  }
 }

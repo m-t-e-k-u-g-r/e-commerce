@@ -1,0 +1,39 @@
+table {
+  width: 75%;
+  border: 1px solid black;
+  padding: 0.5rem;
+}
+
+tr.divided td {
+  border-bottom: 1px solid #ccc;
+}
+
+.head {
+  font-weight: bolder;
+}
+
+.buffer {
+  height: 15px;
+}
+
+.clear {
+  padding: 0.3rem;
+  background-color: #fafafa;
+  border: none;
+  border-radius: 0.25rem;
+}
+
+.total_amount {
+  font-weight: bold;
+  text-align: right;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+.checkout {
+  background-color: blue;
+  color: white;
+  padding: 0.75rem;
+  border-radius: 0.25rem;
+  border: none;
+}
