@@ -1,4 +1,10 @@
 /* You can add global styles to this file, and also import other style files */
+:root {
+  --form-bg: #ffffff;
+  --form-border: #ccc;
+  --link-color: #007bff;
+}
+
 main {
   margin-left: 2rem;
   margin-right: 5rem;
