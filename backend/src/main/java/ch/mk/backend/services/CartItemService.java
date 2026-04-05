@@ -30,6 +30,7 @@ public class CartItemService {
 
     public void createCartItem(Integer userId, Integer productId) {
         var cartItem = new CartItem();
+        cartItem.setQuantity(1);
         if (userRepository.findById(userId).isPresent() && productRepository.findById(productId).isPresent()) {
             cartItem.setUser(userRepository.findById(userId).get());
             cartItem.setProduct(productRepository.findById(productId).get());

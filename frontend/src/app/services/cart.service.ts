@@ -112,9 +112,10 @@ export class CartService {
 
   clearCart() {
     if (this.authService.isLoggedIn()) {
-      return this.http.delete(this.baseUrl,
+      this.http.delete(this.baseUrl,
         { withCredentials: true }
       ).subscribe();
+      this.getCartItems();
     } else {
       this._cart.set([]);
       this.saveToLocalStorage();
