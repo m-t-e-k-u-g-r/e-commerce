@@ -1,4 +1,15 @@
 /* You can add global styles to this file, and also import other style files */
+:root {
+  --form-bg: #ffffff;
+  --form-border: #ccc;
+  --link-color: #007bff;
+  --info-menu-bg: #ffffff;
+  --info-menu-border: #ccc;
+  --info-menu-shadow: rgba(0, 0, 0, 0.15);
+  --info-menu-hover: #f0f0f0;
+  --profile-button-color: #000000;
+}
+
 main {
   margin-left: 2rem;
   margin-right: 5rem;

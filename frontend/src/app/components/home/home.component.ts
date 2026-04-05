@@ -31,7 +31,6 @@ export class HomeComponent implements OnInit {
   ngOnInit() {
     this.route.paramMap.subscribe((params) => {
       const categorySlug = params.get('slug') ?? undefined;
-      console.log('categorySlug: ', categorySlug)
       if (categorySlug == undefined) return (this.categoryId = undefined);
       const parts = categorySlug.split('-');
       this.categoryId = Number(parts[parts.length - 1]);
