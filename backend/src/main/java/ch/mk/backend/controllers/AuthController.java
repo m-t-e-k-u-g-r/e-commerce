@@ -2,8 +2,11 @@ package ch.mk.backend.controllers;
 
 import ch.mk.backend.dtos.LoginRequest;
 import ch.mk.backend.dtos.TokenDto;
+import ch.mk.backend.dtos.UserDto;
 import ch.mk.backend.entities.RefreshToken;
+import ch.mk.backend.mappers.UserMapper;
 import ch.mk.backend.repositories.RefreshTokenRepository;
+import ch.mk.backend.repositories.UserRepository;
 import ch.mk.backend.services.CookieService;
 import ch.mk.backend.services.JWTService;
 import ch.mk.backend.services.UserService;
@@ -35,6 +38,28 @@ public class AuthController {
     private CookieService cookieService;
     @Autowired
     private RefreshTokenRepository refreshTokenRepository;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private UserMapper userMapper;
+
+    @GetMapping("/me")
+    public ResponseEntity<UserDto> getUser(
+            @CookieValue("accessToken") String accessToken
+    ) {
+        try {
+            var claims = jwtService.checkAccessToken(accessToken);
+            Integer userId = Integer.valueOf(claims.getPayload().getSubject());
+            return userRepository.findById(userId)
+                    .map(userMapper::toDto)
+                    .map(ResponseEntity::ok)
+                    .orElse(ResponseEntity.notFound().build());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+    }
 
     @PostMapping("/register")
     public ResponseEntity<TokenDto> registerUser(@RequestBody LoginRequest request) {
@@ -68,6 +93,20 @@ public class AuthController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
+    }
+
+    @DeleteMapping("/logout")
+    public ResponseEntity<Void> logoutUser() {
+        var emptyRefreshCookie = cookieService.deleteCookie("refreshToken");
+        var emptyAccessTokenCookie = cookieService.deleteCookie("accessToken");
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.SET_COOKIE, emptyRefreshCookie.toString());
+        headers.add(HttpHeaders.SET_COOKIE, emptyAccessTokenCookie.toString());
+
+        return ResponseEntity.noContent()
+                .headers(headers)
+                .build();
     }
 
     private String refreshAccessToken(String token) {

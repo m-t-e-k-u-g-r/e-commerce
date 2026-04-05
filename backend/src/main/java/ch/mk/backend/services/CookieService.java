@@ -25,4 +25,11 @@ public class CookieService {
                 .sameSite("Strict")
                 .build();
     }
+
+    public ResponseCookie deleteCookie(String cookieName) {
+        return ResponseCookie.from(cookieName, null)
+                .path("/")
+                .maxAge(0)
+                .build();
+    }
 }
