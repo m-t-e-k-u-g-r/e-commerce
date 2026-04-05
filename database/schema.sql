@@ -51,3 +51,18 @@ CREATE TABLE `cart_items` (
     FOREIGN KEY `cartItems_idfk2` (`product_id`) REFERENCES products (`id`),
     UNIQUE (`user_id`, `product_id`)
 );
+
+CREATE TABLE `addresses` (
+    `id` INT PRIMARY KEY AUTO_INCREMENT,
+    `user_id` INT NOT NULL,
+    `type` ENUM('BILLING', 'SHIPPING') NOT NULL,
+    `salutation` ENUM('MR', 'MS') NOT NULL,
+    `forename` VARCHAR(255) NOT NULL,
+    `surname` VARCHAR(255) NOT NULL,
+    `street` VARCHAR(255) NOT NULL,
+    `house_number` VARCHAR(20) NOT NULL,
+    `zip_code` VARCHAR(20) NOT NULL,
+    `city` VARCHAR(255) NOT NULL,
+    `country` ENUM('DE', 'AT', 'CH'),
+    FOREIGN KEY `addresses_idfk` (`user_id`) REFERENCES users (`id`)
+);
