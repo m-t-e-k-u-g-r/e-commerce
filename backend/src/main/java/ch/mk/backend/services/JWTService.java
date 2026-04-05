@@ -20,6 +20,11 @@ public class JWTService {
     @Value("${jwt.access-token-secret}")
     private String accessTokenSecret;
 
+    public Integer getUserIdFromAccessToken(String accessToken) {
+        var claims = checkAccessToken(accessToken);
+        return Integer.valueOf(claims.getPayload().getSubject());
+    }
+
     public String generateAccessToken(String userId) {
         Map<String, Object> claims = new HashMap<>();
 

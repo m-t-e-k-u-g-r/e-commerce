@@ -23,7 +23,7 @@ import { CartService } from '../../services/cart.service';
         @if (itemInCart() !== undefined) {
           <button (click)="decreaseQuantityByOne()"><h3>-</h3></button>
           <p class="quantity">{{ itemInCart()?.quantity }} in cart</p>
-          <button (click)="increaseQuantityByOne()"><h3>+</h3></button>
+          <button (click)="addToCart()"><h3>+</h3></button>
         } @else {
           <button (click)="addToCart()" class="full_width"><h3>ADD TO CART</h3></button>
         }
@@ -40,10 +40,6 @@ export class ProductComponent {
   );
 
   addToCart() {
-    this.cartService.addItem(this.product.id);
-  }
-
-  increaseQuantityByOne() {
     this.cartService.addItem(this.product.id);
   }
 

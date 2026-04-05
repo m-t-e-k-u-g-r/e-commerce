@@ -33,6 +33,6 @@ export class App {
   private loadData() {
     this.productService.getProducts();
     this.categoryService.getCategories();
-    this.cartService.loadFromLocalStorage();
+    this.cartService.getCartItems();
   }
 }
