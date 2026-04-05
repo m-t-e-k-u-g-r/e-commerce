@@ -19,6 +19,40 @@ nav {
   flex-direction: row;
 }
 
+.user_info {
+  position: relative;
+}
+
+.profile_button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--profile-button-color);
+  margin-top: 0.5rem;
+}
+
+.info_menu {
+  position: absolute;
+  min-width: 8rem;
+  top: 100%;
+  left: 1rem;
+  margin: 0;
+  padding: 0.5rem 0;
+  list-style: none;
+  background: var(--info-menu-bg);
+  border: 1px solid var(--info-menu-border);
+  box-shadow: 0 2px 8px var(--info-menu-shadow);
+}
+
+.info_menu li {
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+}
+
+.info_menu li:hover {
+  background-color: var(--info-menu-hover);
+}
+
 a {
   color: #303030;
   text-decoration: none;

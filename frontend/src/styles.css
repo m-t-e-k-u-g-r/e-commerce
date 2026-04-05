@@ -3,6 +3,11 @@
   --form-bg: #ffffff;
   --form-border: #ccc;
   --link-color: #007bff;
+  --info-menu-bg: #ffffff;
+  --info-menu-border: #ccc;
+  --info-menu-shadow: rgba(0, 0, 0, 0.15);
+  --info-menu-hover: #f0f0f0;
+  --profile-button-color: #000000;
 }
 
 main {
