@@ -10,8 +10,8 @@ import java.time.Instant;
 @Getter
 @Setter
 @Entity
-@Table(name = "cart_items")
-public class CartItem {
+@Table(name = "addresses")
+public class Address {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
@@ -21,12 +21,35 @@ public class CartItem {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "product_id", nullable = false)
-    private Product product;
+    @Lob
+    @Column(name = "type", nullable = false)
+    private String type;
 
-    @Column(name = "quantity", nullable = false)
-    private Integer quantity;
+    @Lob
+    @Column(name = "salutation", nullable = false)
+    private String salutation;
+
+    @Column(name = "forename", nullable = false)
+    private String forename;
+
+    @Column(name = "surname", nullable = false)
+    private String surname;
+
+    @Column(name = "street", nullable = false)
+    private String street;
+
+    @Column(name = "house_number", nullable = false, length = 20)
+    private String houseNumber;
+
+    @Column(name = "zip_code", nullable = false, length = 20)
+    private String zipCode;
+
+    @Column(name = "city", nullable = false)
+    private String city;
+
+    @Lob
+    @Column(name = "country")
+    private String country;
 
     @ColumnDefault("current_timestamp()")
     @Column(name = "created_at", nullable = false)
