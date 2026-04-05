@@ -96,7 +96,17 @@ public class AuthController {
     }
 
     @DeleteMapping("/logout")
-    public ResponseEntity<Void> logoutUser() {
+    public ResponseEntity<Void> logoutUser(
+            @CookieValue("refreshToken") String refreshToken
+    ) {
+        var dbEntry = refreshTokenRepository.findByToken(refreshToken);
+        if (dbEntry.isPresent()) {
+            dbEntry.get().setRevoked(true);
+            refreshTokenRepository.save(dbEntry.get());
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
         var emptyRefreshCookie = cookieService.deleteCookie("refreshToken");
         var emptyAccessTokenCookie = cookieService.deleteCookie("accessToken");
 
