@@ -39,3 +39,15 @@ CREATE TABLE `refresh_tokens` (
     `revoked` TINYINT(1) NOT NULL DEFAULT 0,
     FOREIGN KEY `refresh_tokens_idfk` (`user_id`) REFERENCES users (`id`)
 );
+
+CREATE TABLE `cartItems` (
+    `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    `user_id` INT NOT NULL,
+    `product_id` INT NOT NULL,
+    `quantity` INT NOT NULL,
+    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY `cartItems_idfk` (`user_id`) REFERENCES users (`id`),
+    FOREIGN KEY `cartItems_idfk2` (`product_id`) REFERENCES products (`id`),
+    UNIQUE (`user_id`, `product_id`)
+);
