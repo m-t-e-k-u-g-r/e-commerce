@@ -40,7 +40,7 @@ CREATE TABLE `refresh_tokens` (
     FOREIGN KEY `refresh_tokens_idfk` (`user_id`) REFERENCES users (`id`)
 );
 
-CREATE TABLE `cartItems` (
+CREATE TABLE `cart_items` (
     `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     `user_id` INT NOT NULL,
     `product_id` INT NOT NULL,
