@@ -40,14 +40,14 @@ export class ProductComponent {
   );
 
   addToCart() {
-    this.cartService.addItem(this.product.id);
+    // TODO: add to cart
   }
 
   increaseQuantityByOne() {
-    this.cartService.addItem(this.product.id);
+    // TODO: increase quantity by one
   }
 
   decreaseQuantityByOne() {
-    this.cartService.reduceQuantity(this.product.id);
+    // TODO: decrease quantity by one
   }
 }

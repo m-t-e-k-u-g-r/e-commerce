@@ -32,4 +32,9 @@ public class CartController {
                 .map(cartItemMapper::toDto)
                 .toList();
     }
+
+    // TODO: POST /cart/items - Add item to cart
+    // TODO: PUT /cart/items/{id} - Update item quantity
+    // TODO: DELETE /cart/items/{id} - Remove item from cart
+    // TODO: DELETE /cart - Clear cart
 }
