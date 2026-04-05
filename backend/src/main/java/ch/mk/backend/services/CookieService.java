@@ -20,7 +20,7 @@ public class CookieService {
         return ResponseCookie.from("refreshToken", token)
                 .httpOnly(true)
                 .secure(false)
-                .path("/auth/refresh")
+                .path("/")
                 .maxAge(7 * 24 * 60 * 60)
                 .sameSite("Strict")
                 .build();
