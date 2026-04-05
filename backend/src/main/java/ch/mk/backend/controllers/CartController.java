@@ -22,6 +22,8 @@ public class CartController {
     private final CartItemRepository cartItemRepository;
     private final JWTService jwtService;
 
+    public record UpdateQuantityRequest(int quantity) {}
+
     @GetMapping("/items")
     public List<CartItemDto> getCart(
             @CookieValue("accessToken") String accessToken
@@ -57,10 +59,11 @@ public class CartController {
     public ResponseEntity<Void> updateCartItemQuantity(
             @CookieValue("accessToken") String accessToken,
             @PathVariable int id,
-            @RequestBody int quantity
+            @RequestBody UpdateQuantityRequest request
     ) {
         var userId = Integer.valueOf(jwtService.checkAccessToken(accessToken).getPayload().getSubject());
         var cartItem = cartItemRepository.findById(id);
+        int quantity = request.quantity();
 
         if (cartItem.isPresent() && cartItemService.cartItemBelongsToUser(cartItem.get(), userId)) {
             if (quantity <= 0) {

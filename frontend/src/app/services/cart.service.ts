@@ -60,6 +60,7 @@ export class CartService {
       });
       this.saveToLocalStorage();
     }
+    return;
   }
 
   reduceQuantity(productId: number) {
@@ -78,7 +79,6 @@ export class CartService {
           this.getCartItems();
         }
       }
-      return;
     } else {
       this._cart.update((items) => {
         const index = items.findIndex((i) => i.productId === productId);
@@ -92,6 +92,7 @@ export class CartService {
       });
       this.saveToLocalStorage();
     }
+    return;
   }
 
   removeItem(productId: number) {
@@ -102,11 +103,11 @@ export class CartService {
           { withCredentials: true }
         ).subscribe(() => this.getCartItems());
       }
-      return;
     } else {
       this._cart.update((items) => items.filter((item) => item.productId !== productId));
       this.saveToLocalStorage();
     }
+    return;
   }
 
   clearCart() {
@@ -118,6 +119,7 @@ export class CartService {
       this._cart.set([]);
       this.saveToLocalStorage();
     }
+    return;
   }
 
   private saveToLocalStorage() {
