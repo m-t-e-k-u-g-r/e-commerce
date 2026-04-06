@@ -5,6 +5,7 @@ import { CategoryService } from './services/category.service';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { CartService } from './services/cart.service';
 import { AuthService } from './services/auth.service';
+import { AddressService } from './services/address.service';
 
 @Component({
   selector: 'app-root',
@@ -22,10 +23,14 @@ export class App {
   categoryService = inject(CategoryService);
   cartService = inject(CartService);
   authService = inject(AuthService);
+  addressService = inject(AddressService);
 
   constructor() {
     effect(() => {
       this.authService.getUser().subscribe();
+      if (this.authService.isLoggedIn()) {
+        this.addressService.getAddresses();
+      }
       this.loadData();
     });
   }
