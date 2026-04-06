@@ -61,12 +61,12 @@ export class NavbarComponent {
   }
 
   menuItems: MenuItem[] = [
-    { label: 'Logout', action: () => {
-      this.authService.logout().subscribe();
-      this.menuOpen.set(false);
-    }},
     { label: 'My addresses', action: () => {
       this.router.navigate(['/address']);
+      this.menuOpen.set(false);
+    }},
+    { label: 'Logout', action: () => {
+      this.authService.logout().subscribe();
       this.menuOpen.set(false);
     }},
   ]
