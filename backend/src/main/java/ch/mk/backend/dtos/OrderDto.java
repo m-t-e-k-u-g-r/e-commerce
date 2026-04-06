@@ -1,0 +1,19 @@
+package ch.mk.backend.dtos;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.util.List;
+
+@AllArgsConstructor
+@Getter
+@Setter
+public class OrderDto {
+    private Integer id;
+    private Integer userId;
+    private String status;
+    private Double totalPrice;
+    private OrderAddressDto address;
+    private List<OrderItemDto> items;
+}
