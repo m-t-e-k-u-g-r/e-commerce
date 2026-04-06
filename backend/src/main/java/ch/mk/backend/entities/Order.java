@@ -7,6 +7,7 @@ import org.hibernate.annotations.ColumnDefault;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.List;
 
 @Getter
 @Setter
@@ -36,6 +37,12 @@ public class Order {
     @ColumnDefault("current_timestamp()")
     @Column(name = "updated_at")
     private Instant updatedAt;
+
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<OrderItem> items;
+
+    @OneToOne(mappedBy = "order", cascade = CascadeType.ALL)
+    private OrderAddress address;
 
     @PrePersist
     protected void onCreate() {
