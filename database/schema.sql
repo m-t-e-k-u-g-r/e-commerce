@@ -8,12 +8,15 @@ CREATE TABLE `products` (
     `description` TEXT,
     `price` DECIMAL(10,2) NOT NULL,
     `image_url` VARCHAR(255),
-    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
 CREATE TABLE `categories` (
     `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    `name` VARCHAR(255) UNIQUE
+    `name` VARCHAR(255) UNIQUE,
+    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
 CREATE TABLE `product_category` (
@@ -50,4 +53,21 @@ CREATE TABLE `cart_items` (
     FOREIGN KEY `cartItems_idfk` (`user_id`) REFERENCES users (`id`),
     FOREIGN KEY `cartItems_idfk2` (`product_id`) REFERENCES products (`id`),
     UNIQUE (`user_id`, `product_id`)
+);
+
+CREATE TABLE `addresses` (
+    `id` INT PRIMARY KEY AUTO_INCREMENT,
+    `user_id` INT NOT NULL,
+    `type` ENUM('BILLING', 'SHIPPING') NOT NULL,
+    `salutation` ENUM('MR', 'MS') NOT NULL,
+    `forename` VARCHAR(255) NOT NULL,
+    `surname` VARCHAR(255) NOT NULL,
+    `street` VARCHAR(255) NOT NULL,
+    `house_number` VARCHAR(20) NOT NULL,
+    `zip_code` VARCHAR(20) NOT NULL,
+    `city` VARCHAR(255) NOT NULL,
+    `country` ENUM('DE', 'AT', 'CH'),
+    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY `addresses_idfk` (`user_id`) REFERENCES users (`id`)
 );

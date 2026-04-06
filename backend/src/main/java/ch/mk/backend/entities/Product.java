@@ -3,6 +3,7 @@ package ch.mk.backend.entities;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.ColumnDefault;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -32,6 +33,7 @@ public class Product {
     @Column(name = "image_url")
     private String imageUrl;
 
+    @ColumnDefault("current_timestamp()")
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
 

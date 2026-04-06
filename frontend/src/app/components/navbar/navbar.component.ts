@@ -1,6 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { CartService } from '../../services/cart.service';
 import { AuthService } from '../../services/auth.service';
+import { Router } from '@angular/router';
 
 export type MenuItem = {
   label: string;
@@ -46,6 +47,7 @@ export type MenuItem = {
   styleUrl: './navbar.component.css',
 })
 export class NavbarComponent {
+  router = inject(Router);
   cartService = inject(CartService);
   authService = inject(AuthService);
   menuOpen = signal<Boolean>(false);
@@ -59,6 +61,10 @@ export class NavbarComponent {
   }
 
   menuItems: MenuItem[] = [
+    { label: 'My addresses', action: () => {
+      this.router.navigate(['/address']);
+      this.menuOpen.set(false);
+    }},
     { label: 'Logout', action: () => {
       this.authService.logout().subscribe();
       this.menuOpen.set(false);
