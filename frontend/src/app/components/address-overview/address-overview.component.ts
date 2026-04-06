@@ -11,6 +11,7 @@ import { Router } from '@angular/router';
         <th></th>
         <th>Name</th>
         <th>Address</th>
+        <th></th>
       </tr>
       @for (address of this.addressService.addresses(); track address.id) {
         <tr>
@@ -25,8 +26,20 @@ import { Router } from '@angular/router';
             {{ address.zipCode }} {{ address.city }}<br/>
             {{ address.country }}
           </td>
+          <td>
+            <button (click)="this.addressService.deleteAddress(address.id)">
+              <i class="fas fa-trash"></i>
+            </button>
+          </td>
         </tr>
       }
+      <tr>
+        <td colspan="4">
+          <button (click)="this.router.navigate(['/address/new'])">
+            <i class="fas fa-plus"></i> Add new address
+          </button>
+        </td>
+      </tr>
     </table>
   `,
   styleUrl: './address-overview.component.css',

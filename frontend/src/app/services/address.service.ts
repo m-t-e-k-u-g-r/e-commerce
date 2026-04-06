@@ -40,6 +40,11 @@ export class AddressService {
   }
 
   deleteAddress(addressId: number) {
+    const address = this.addresses().find((a: Address) => a.id === addressId);
+    if (address?.type === 'BILLING') {
+      console.error('Cannot delete billing address');
+      return;
+    }
     return this.http.delete<Address>(this.baseUrl + '/' + addressId,
       { withCredentials: true }
     ).subscribe(() => {

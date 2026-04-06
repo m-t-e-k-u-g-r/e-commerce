@@ -49,7 +49,7 @@ import { Address, AddressDto } from '../../models/address.type';
         <input type="text" formControlName="city" />
       </label>
       <label>Country
-        <select>
+        <select formControlName="country">
           <option value=""></option>
           <option value="DE">Germany</option>
           <option value="AT">Austria</option>
