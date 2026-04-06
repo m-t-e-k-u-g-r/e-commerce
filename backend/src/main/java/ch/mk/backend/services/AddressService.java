@@ -21,6 +21,10 @@ public class AddressService {
     private final AddressMapper addressMapper;
     private final UserRepository userRepository;
 
+    public Optional<Address> getAddressByIdAndUserId(Integer addressId, Integer userId) {
+        return addressRepository.findByUserIdAndId(userId, addressId);
+    }
+
     public List<AddressDto> getAddressDtosByUserId(Integer userId) {
         return addressRepository.findByUserId(userId)
                 .stream()

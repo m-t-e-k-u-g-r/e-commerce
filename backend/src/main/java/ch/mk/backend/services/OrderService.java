@@ -29,7 +29,7 @@ public class OrderService {
                 .toList();
     }
 
-    public OrderDto createOrder(Integer userId) {
+    public OrderDto createOrder(Integer userId, Integer addressId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -45,9 +45,9 @@ public class OrderService {
         Order order = createOrderEntity(user, totalPrice);
         createOrderItems(order, cartItems);
 
-        Address billingAddress = addressService.getBillingAddress(userId)
-                .orElseThrow(() -> new RuntimeException("Billing address not found"));
-        createOrderAddress(billingAddress, order);
+        Address shippingAddress = addressService.getAddressByIdAndUserId(addressId, userId)
+                .orElseThrow(() -> new RuntimeException("Shipping address not found"));
+        createOrderAddress(shippingAddress, order);
 
         cartItemRepository.deleteAll(cartItems);
 
