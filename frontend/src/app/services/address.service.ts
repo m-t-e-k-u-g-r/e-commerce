@@ -19,6 +19,7 @@ export class AddressService {
     return this.http.get<Address[]>(this.baseUrl,
       { withCredentials: true }
     ).subscribe(addresses => {
+      console.log('Fetched addresses:', addresses);
       this._addresses.set(addresses);
     });
   }
