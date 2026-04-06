@@ -11,6 +11,7 @@ public class AddressDto {
     private Integer id;
     private Integer userId;
     private String type;
+    private String salutation;
     private String forename;
     private String surname;
     private String street;
