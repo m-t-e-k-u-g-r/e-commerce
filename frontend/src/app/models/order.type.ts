@@ -1,7 +1,8 @@
 import { OrderAddressDto } from './address.type';
+import { Product } from './product.type';
 
 export interface OrderItem {
-  productId: number;
+  product: Product;
   quantity: number;
   price: number;
 }
@@ -13,4 +14,5 @@ export interface OrderDto {
   totalPrice: number;
   address: OrderAddressDto;
   items: OrderItem[];
+  createdDate: string;
 }
