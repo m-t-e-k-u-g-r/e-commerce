@@ -13,12 +13,12 @@ table {
 
 @media (min-width: 768px) {
   table {
-    width: 50%;
+    width: 60%;
   }
 }
 
 @media (min-width: 992px) {
   table {
-    width: 30%;
+    width: 40%;
   }
 }
