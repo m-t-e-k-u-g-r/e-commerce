@@ -9,15 +9,7 @@ import { MatButton } from '@angular/material/button';
 
 @Component({
   selector: 'app-address-form',
-  imports: [
-    ReactiveFormsModule,
-    MatFormField,
-    MatSelect,
-    MatOption,
-    MatLabel,
-    MatInput,
-    MatButton
-  ],
+  imports: [ReactiveFormsModule, MatFormField, MatSelect, MatOption, MatLabel, MatInput, MatButton],
   template: `
     <form [formGroup]="addressForm" (ngSubmit)="onSubmit()">
       <h2>
@@ -28,53 +20,63 @@ import { MatButton } from '@angular/material/button';
             Change shipping address
           }
         } @else {
-          Add new address
+          @if (this.addressService.billingAddress()) {
+            Add new shipping address
+          } @else {
+            Add billing address
+          }
         }
       </h2>
 
-      <h3>Personal Information</h3>
-      <mat-form-field>
-        <mat-label>Salutation</mat-label>
-        <mat-select formControlName="salutation">
-          <mat-option value="MR">Mr</mat-option>
-          <mat-option value="MS">Ms</mat-option>
-        </mat-select>
-      </mat-form-field>
+      <div class="input_wrapper">
+        <section class="form-section">
+          <h3>Personal Information</h3>
+          <mat-form-field>
+            <mat-label>Salutation</mat-label>
+            <mat-select formControlName="salutation">
+              <mat-option value="MR">Mr</mat-option>
+              <mat-option value="MS">Ms</mat-option>
+            </mat-select>
+          </mat-form-field>
 
-      <mat-form-field>
-        <mat-label>Forename</mat-label>
-        <input matInput type="text" formControlName="forename" />
-      </mat-form-field>
-      <mat-form-field>
-        <mat-label>Surname</mat-label>
-        <input matInput type="text" formControlName="surname" />
-      </mat-form-field>
+          <mat-form-field>
+            <mat-label>Forename</mat-label>
+            <input matInput type="text" formControlName="forename" />
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>Surname</mat-label>
+            <input matInput type="text" formControlName="surname" />
+          </mat-form-field>
+        </section>
 
-      <h3>Billing address</h3>
-      <mat-form-field>
-        <mat-label>Street</mat-label>
-        <input matInput type="text" formControlName="street" />
-      </mat-form-field>
-      <mat-form-field>
-        <mat-label>House number</mat-label>
-        <input matInput type="text" formControlName="houseNumber" />
-      </mat-form-field>
-      <mat-form-field>
-        <mat-label>Zip Code</mat-label>
-        <input matInput type="text" formControlName="zipCode" />
-      </mat-form-field>
-      <mat-form-field>
-        <mat-label>City</mat-label>
-        <input matInput type="text" formControlName="city" />
-      </mat-form-field>
-      <mat-form-field>
-        <mat-label>Country</mat-label>
-        <mat-select formControlName="country">
-          <mat-option value="DE">Germany</mat-option>
-          <mat-option value="AT">Austria</mat-option>
-          <mat-option value="CH">Switzerland</mat-option>
-        </mat-select>
-      </mat-form-field>
+        <section class="form-section">
+          <h3>Address</h3>
+          <mat-form-field>
+            <mat-label>Street</mat-label>
+            <input matInput type="text" formControlName="street" />
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>House number</mat-label>
+            <input matInput type="text" formControlName="houseNumber" />
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>Zip Code</mat-label>
+            <input matInput type="text" formControlName="zipCode" />
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>City</mat-label>
+            <input matInput type="text" formControlName="city" />
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>Country</mat-label>
+            <mat-select formControlName="country">
+              <mat-option value="DE">Germany</mat-option>
+              <mat-option value="AT">Austria</mat-option>
+              <mat-option value="CH">Switzerland</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </section>
+      </div>
 
       <button matButton="elevated" type="submit" [disabled]="addressForm.invalid">Save</button>
     </form>
@@ -82,7 +84,7 @@ import { MatButton } from '@angular/material/button';
   styleUrl: './address-form.component.css',
 })
 export class AddressFormComponent implements OnInit {
-  private addressService = inject(AddressService);
+  protected addressService = inject(AddressService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
 
