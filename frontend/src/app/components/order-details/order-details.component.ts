@@ -43,7 +43,7 @@ import { NgOptimizedImage } from '@angular/common';
               />
               <div>
                 <p class="bold">{{ item.product.name }}</p>
-                <p class="bold">{{ item.product.price * item.quantity }}</p>
+                <p class="bold">{{ (item.product.price * item.quantity).toFixed(2) }}</p>
                 <p>{{ item.product.description }}</p>
                 <p>Quantity: {{ item.quantity }}</p>
                 <p>Unit price: {{ item.product.price }}</p>
