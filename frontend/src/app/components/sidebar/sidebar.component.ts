@@ -1,36 +1,37 @@
 import { Component, inject } from '@angular/core';
 import { CategoryService } from '../../services/category.service';
-import { Router } from '@angular/router';
+import { MatButtonToggle, MatButtonToggleGroup } from '@angular/material/button-toggle';
 
 @Component({
   selector: 'app-sidebar',
-  imports: [],
+  imports: [MatButtonToggleGroup, MatButtonToggle],
   template: `
-    <div class="sidebar">
-      <button (click)="returnHome()">
+    <mat-button-toggle-group
+      [value]="this.categoryService.selectedId() || null"
+      (change)="onCategoryChange($event.value)"
+      class="sidebar"
+    >
+      <mat-button-toggle value="null">
         All Categories
-      </button>
+      </mat-button-toggle>
+
       @for (category of this.categoryService.categories(); track category.id) {
-        <button (click)="redirect(category.id, category.name)">
+        <mat-button-toggle [value]="category.id">
           {{ category.name }}
-        </button>
+        </mat-button-toggle>
       }
-    </div>
+    </mat-button-toggle-group>
   `,
   styleUrl: './sidebar.component.css',
 })
 export class SidebarComponent {
   categoryService = inject(CategoryService);
-  constructor(private router: Router) {}
 
-  returnHome() {
-    this.router.navigate(['']);
-  }
-
-  redirect(id: number, name: string) {
-    const slug = name.toLowerCase()
-      .replace(' ', '_')
-      .replace('-', '_') + '-' + String(id);
-    this.router.navigate(['/c', slug]);
+  onCategoryChange(categoryId: number | null) {
+    if (categoryId === null) {
+      this.categoryService.returnHome();
+    } else {
+      this.categoryService.redirect(categoryId);
+    }
   }
 }
