@@ -1,6 +1,7 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
 import { OrderDto } from '../../models/order.type';
 import { NgOptimizedImage } from '@angular/common';
+import { OrderService } from '../../services/order.service';
 
 @Component({
   selector: 'app-order',
@@ -38,6 +39,11 @@ import { NgOptimizedImage } from '@angular/common';
           </div>
         }
       </div>
+      @if (order.status === 'PENDING') {
+        <button (click)="this.orderService.cancelOrder(this.order.id)">
+          Cancel
+        </button>
+      }
     </div>
   `,
   styleUrl: './order.component.css',
@@ -45,6 +51,7 @@ import { NgOptimizedImage } from '@angular/common';
 export class OrderComponent {
   @Input() order!: OrderDto;
   @Output() action = new EventEmitter<OrderDto>();
+  orderService = inject(OrderService);
 
   notifyOrderOverview() {
     this.action.emit(this.order);

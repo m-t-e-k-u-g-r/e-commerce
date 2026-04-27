@@ -37,6 +37,15 @@ export class OrderService {
     });
   }
 
+  cancelOrder(orderId: number) {
+    return this.http.delete<OrderDto>(this.baseUrl + '/' + orderId,
+      { withCredentials: true }
+    ).subscribe(order => {
+      console.log('Order cancelled:', order);
+      this.getOrders();
+    });
+  }
+
   private formatDate(date: string): string {
     const [y, m, d] = date.split('-');
     return `${d}.${m}.${y}`;
