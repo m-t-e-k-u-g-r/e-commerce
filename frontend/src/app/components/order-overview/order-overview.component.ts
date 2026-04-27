@@ -8,18 +8,34 @@ import { OrderDto } from '../../models/order.type';
   selector: 'app-order-overview',
   imports: [OrderComponent, OrderDetailsComponent],
   template: `
-    <h1>Orders</h1>
-    <div class="main">
-      <div class="order_overview_container">
-        @for (order of this.orderService.orders(); track order.id) {
-          <app-order [order]="order" (action)="openDetails($event)" />
-        }
+    <div class="container">
+      <header>
+        <h1>My Orders</h1>
+      </header>
+
+      <div class="layout-wrapper">
+        <section class="orders-list">
+          <div class="grid-container">
+            @for (order of this.orderService.orders(); track order.id) {
+              <app-order
+                [order]="order"
+                (action)="openDetails($event)"
+                [class.active]="orderDetails?.id === order.id"
+              ></app-order>
+            }
+          </div>
+        </section>
+
+        <aside class="details-panel" [class.visible]="showDetails">
+          @if (showDetails) {
+            <app-order-details [order]="orderDetails" />
+          } @else {
+            <div class="no-selection">
+              <p>Select an order to view details.</p>
+            </div>
+          }
+        </aside>
       </div>
-      @if (showDetails) {
-        <app-order-details
-          [order]="orderDetails"
-        />
-      }
     </div>
   `,
   styleUrl: './order-overview.component.css',
