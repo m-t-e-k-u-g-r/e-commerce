@@ -86,11 +86,3 @@ tr.divided td {
   text-align: right;
   padding: 0 10px 0 0;
 }
-
-.checkout {
-  background-color: blue;
-  color: white;
-  padding: 0.75rem;
-  border-radius: 0.25rem;
-  border: none;
-}

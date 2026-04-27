@@ -3,10 +3,21 @@ import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { ActivatedRoute, Router } from '@angular/router';
 import { AddressService } from '../../services/address.service';
 import { Address, AddressDto } from '../../models/address.type';
+import { MatFormField, MatInput, MatLabel } from '@angular/material/input';
+import { MatOption, MatSelect } from '@angular/material/select';
+import { MatButton } from '@angular/material/button';
 
 @Component({
   selector: 'app-address-form',
-  imports: [ReactiveFormsModule],
+  imports: [
+    ReactiveFormsModule,
+    MatFormField,
+    MatSelect,
+    MatOption,
+    MatLabel,
+    MatInput,
+    MatButton
+  ],
   template: `
     <form [formGroup]="addressForm" (ngSubmit)="onSubmit()">
       <h2>
@@ -17,47 +28,55 @@ import { Address, AddressDto } from '../../models/address.type';
             Change shipping address
           }
         } @else {
-            Add new address
+          Add new address
         }
       </h2>
 
       <h3>Personal Information</h3>
-      <select formControlName="salutation">
-        <option value=""></option>
-        <option value="MR">Mr</option>
-        <option value="MS">Ms</option>
-      </select>
+      <mat-form-field>
+        <mat-label>Salutation</mat-label>
+        <mat-select formControlName="salutation">
+          <mat-option value="MR">Mr</mat-option>
+          <mat-option value="MS">Ms</mat-option>
+        </mat-select>
+      </mat-form-field>
 
-      <label>Forename
-        <input type="text" formControlName="forename" />
-      </label>
-      <label>Surname
-        <input type="text" formControlName="surname" />
-      </label>
+      <mat-form-field>
+        <mat-label>Forename</mat-label>
+        <input matInput type="text" formControlName="forename" />
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Surname</mat-label>
+        <input matInput type="text" formControlName="surname" />
+      </mat-form-field>
 
       <h3>Billing address</h3>
-      <label>Street
-        <input type="text" formControlName="street" />
-      </label>
-      <label>House number
-        <input type="text" formControlName="houseNumber" />
-      </label>
-      <label>Zip code
-        <input type="text" formControlName="zipCode" />
-      </label>
-      <label>City
-        <input type="text" formControlName="city" />
-      </label>
-      <label>Country
-        <select formControlName="country">
-          <option value=""></option>
-          <option value="DE">Germany</option>
-          <option value="AT">Austria</option>
-          <option value="CH">Switzerland</option>
-        </select>
-      </label>
+      <mat-form-field>
+        <mat-label>Street</mat-label>
+        <input matInput type="text" formControlName="street" />
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>House number</mat-label>
+        <input matInput type="text" formControlName="houseNumber" />
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Zip Code</mat-label>
+        <input matInput type="text" formControlName="zipCode" />
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>City</mat-label>
+        <input matInput type="text" formControlName="city" />
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Country</mat-label>
+        <mat-select formControlName="country">
+          <mat-option value="DE">Germany</mat-option>
+          <mat-option value="AT">Austria</mat-option>
+          <mat-option value="CH">Switzerland</mat-option>
+        </mat-select>
+      </mat-form-field>
 
-      <button type="submit" [disabled]="addressForm.invalid">Save</button>
+      <button matButton="elevated" type="submit" [disabled]="addressForm.invalid">Save</button>
     </form>
   `,
   styleUrl: './address-form.component.css',
@@ -126,12 +145,12 @@ export class AddressFormComponent implements OnInit {
     const formValue = this.addressForm.getRawValue();
     const addressData: AddressDto = {
       ...formValue,
-      type: type
-    }
+      type: type,
+    };
     if (this.addressId) {
       const updatedAddress = {
         ...addressData,
-        id: this.addressId
+        id: this.addressId,
       };
       this.addressService.changeAddress(updatedAddress);
     } else {

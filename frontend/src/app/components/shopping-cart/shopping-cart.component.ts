@@ -6,10 +6,11 @@ import { AddressService } from '../../services/address.service';
 import { OrderService } from '../../services/order.service';
 import { MatTableModule } from '@angular/material/table';
 import { computedCartItem } from '../../models/cartItem.type';
+import { MatButton } from '@angular/material/button';
 
 @Component({
   selector: 'app-shopping-cart',
-  imports: [NgOptimizedImage, MatTableModule],
+  imports: [NgOptimizedImage, MatTableModule, MatButton],
   template: `
     <h1>Shopping Cart</h1>
     <div class="shopping_cart">
@@ -70,16 +71,14 @@ import { computedCartItem } from '../../models/cartItem.type';
                 }}
                 in your shopping cart
               </span>
-              <button (click)="this.cartService.clearCart()" class="clear">
-                Clear Shopping Cart
-              </button>
+              <button (click)="this.cartService.clearCart()" matButton="elevated">Clear Shopping Cart</button>
             </div>
           </th>
         </ng-container>
 
         <ng-container matColumnDef="footer-row-checkout">
           <td mat-footer-cell *matFooterCellDef>
-            <button (click)="checkout()" class="checkout" style="width: 100%; margin-top: 10px;">
+            <button (click)="checkout()" matButton="filled">
               Check out
             </button>
           </td>
