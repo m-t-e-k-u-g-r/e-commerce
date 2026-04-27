@@ -3,6 +3,7 @@ import { environment } from '../../environments/environment.development';
 import { HttpClient } from '@angular/common/http';
 import { OrderDto } from '../models/order.type';
 import { map } from 'rxjs';
+import { CartService } from './cart.service';
 
 @Injectable({
   providedIn: 'root',
@@ -12,6 +13,7 @@ export class OrderService {
   http = inject(HttpClient);
   private _orders = signal<OrderDto[]>([]);
   readonly orders = this._orders.asReadonly();
+  cartService = inject(CartService);
 
   getOrders() {
     return this.http.get<OrderDto[]>(this.baseUrl,
@@ -24,7 +26,6 @@ export class OrderService {
         }))
       )
     ).subscribe(orders => {
-      console.log('Fetched orders:', orders);
       this._orders.set(orders);
     })
   }
@@ -33,6 +34,7 @@ export class OrderService {
     return this.http.post<OrderDto>(this.baseUrl, { addressId: addressId },
       { withCredentials: true }
     ).subscribe(order => {
+      this.cartService.getCartItems();
       this.getOrders();
     });
   }

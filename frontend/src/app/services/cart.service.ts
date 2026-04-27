@@ -33,7 +33,6 @@ export class CartService {
       return this.http.get<CartItem[]>(this.baseUrl + '/items',
         { withCredentials: true }
       ).subscribe((items: CartItem[]) => {
-        console.log('Fetched cart items:', items);
           this._cart.set(items);
         });
     } else {

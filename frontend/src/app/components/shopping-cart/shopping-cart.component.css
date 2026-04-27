@@ -45,9 +45,6 @@ tr.divided td {
 }
 
 .quantity_controls {
-  display: flex;
-  align-items: center;
-  justify-content: center;
   gap: 10px;
 }
 
@@ -88,7 +85,6 @@ tr.divided td {
   font-weight: bold;
   text-align: right;
   padding: 0 10px 0 0;
-  margin: 0 0;
 }
 
 .checkout {

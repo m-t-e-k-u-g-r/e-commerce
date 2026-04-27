@@ -1,78 +1,95 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, inject, Signal } from '@angular/core';
 import { ProductService } from '../../services/product.service';
 import { NgOptimizedImage } from '@angular/common';
 import { CartService } from '../../services/cart.service';
 import { AddressService } from '../../services/address.service';
 import { OrderService } from '../../services/order.service';
+import { MatTableModule } from '@angular/material/table';
+import { computedCartItem } from '../../models/cartItem.type';
 
 @Component({
   selector: 'app-shopping-cart',
-  imports: [NgOptimizedImage],
+  imports: [NgOptimizedImage, MatTableModule],
   template: `
     <h1>Shopping Cart</h1>
     <div class="shopping_cart">
-      <table>
-        <tr class="divided">
-          <td colspan="2">
-            You have {{ this.cartService.totalItems() }} item{{
-              this.cartService.totalItems() == 1 ? '' : 's'
-            }}
-            in your shopping cart
+      <table mat-table [dataSource]="computedCartItems()">
+
+        <ng-container matColumnDef="image">
+          <th mat-header-cell *matHeaderCellDef></th>
+          <td mat-cell *matCellDef="let item">
+            <div class="img_wrapper">
+              <img
+                [ngSrc]="item.productInfo.imageUrl"
+                priority
+                width="100"
+                height="100"
+                [alt]="item.productInfo.name"
+              />
+            </div>
           </td>
-          <td colspan="2" class="right">
-            <button (click)="this.cartService.clearCart()" class="clear">
-              Clear Shopping Cart
-            </button>
+          <td mat-footer-cell *matFooterCellDef></td>
+        </ng-container>
+
+        <ng-container matColumnDef="product">
+          <th mat-header-cell *matHeaderCellDef>Product</th>
+          <td mat-cell *matCellDef="let item">{{ item.productInfo.name }}</td>
+          <td mat-footer-cell *matFooterCellDef></td>
+        </ng-container>
+
+        <ng-container matColumnDef="quantity">
+          <th mat-header-cell *matHeaderCellDef style="text-align: center;">Quantity</th>
+          <td mat-cell *matCellDef="let item">
+            <div class="center quantity_controls">
+              <button (click)="this.cartService.reduceQuantity(item.productId)">-</button>
+              <span class="quantity_value">{{ item.quantity }} in cart</span>
+              <button (click)="this.cartService.addItem(item.productId)">+</button>
+            </div>
           </td>
-        </tr>
-        <tr>
-          <td colspan="4" class="buffer"></td>
-        </tr>
-        <tr class="head divided">
-          <td></td>
-          <td>Product</td>
-          <td class="center">Quantity</td>
-          <td class="right">Price</td>
-        </tr>
-        <tr>
-          <td colspan="4" class="buffer"></td>
-        </tr>
-        @for (cartItem of computedCartItems(); track cartItem.productId) {
-          @if (cartItem.product) {
-            <tr class="divided">
-              <td>
-                <div class="img_wrapper">
-                  <img
-                    [ngSrc]="cartItem.product.imageUrl"
-                    priority
-                    width="100"
-                    height="100"
-                    [alt]="cartItem.product.name"
-                  />
-                </div>
-              </td>
-              <td>{{ cartItem.product.name }}</td>
-              <td>
-                <div class="quantity_controls">
-                  <button (click)="this.cartService.reduceQuantity(cartItem.productId)">-</button>
-                  <span class="quantity_value">{{ cartItem.quantity }} in cart</span>
-                  <button (click)="this.cartService.addItem(cartItem.productId)">+</button>
-                </div>
-              </td>
-              <td class="right">$ {{ (cartItem.product.price * cartItem.quantity).toFixed(2) }}</td>
-            </tr>
-          }
-        }
-        <tr class="divided">
-          <td colspan="4">
+          <td mat-footer-cell *matFooterCellDef></td>
+        </ng-container>
+
+        <ng-container matColumnDef="price">
+          <th mat-header-cell *matHeaderCellDef>Price</th>
+          <td mat-cell *matCellDef="let item">
+            $ {{ (item.productInfo.price * item.quantity).toFixed(2) }}
+          </td>
+          <td mat-footer-cell *matFooterCellDef>
             <p class="total_amount">Total: $ {{ this.cartService.totalAmount() }}</p>
           </td>
-        </tr>
-        <tr>
-          <td colspan="4">
-            <button (click)="checkout()" class="checkout">Check out</button>
+        </ng-container>
+
+        <ng-container matColumnDef="header-row-info">
+          <th mat-header-cell *matHeaderCellDef colspan="4">
+            <div
+              style="display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 10px 0;"
+            >
+              <span>
+                You have {{ this.cartService.totalItems() }} item{{
+                  this.cartService.totalItems() == 1 ? '' : 's'
+                }}
+                in your shopping cart
+              </span>
+              <button (click)="this.cartService.clearCart()" class="clear">
+                Clear Shopping Cart
+              </button>
+            </div>
+          </th>
+        </ng-container>
+
+        <ng-container matColumnDef="footer-row-checkout">
+          <td mat-footer-cell *matFooterCellDef>
+            <button (click)="checkout()" class="checkout" style="width: 100%; margin-top: 10px;">
+              Check out
+            </button>
           </td>
-        </tr>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="['header-row-info']"></tr>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns" class="divided"></tr>
+        <tr mat-footer-row *matFooterRowDef="displayedColumns"></tr>
+        <tr mat-footer-row *matFooterRowDef="['footer-row-checkout']"></tr>
       </table>
     </div>
   `,
@@ -82,18 +99,19 @@ export class ShoppingCartComponent {
   cartService = inject(CartService);
   productService = inject(ProductService);
   addressService = inject(AddressService);
-  orderService = inject(OrderService)
+  orderService = inject(OrderService);
+  displayedColumns: string[] = ['image', 'product', 'quantity', 'price'];
 
-  computedCartItems = computed(() => {
+  computedCartItems: Signal<computedCartItem[]> = computed(() => {
     const products = this.productService.products();
     const cartItems = this.cartService.cart();
 
-    return cartItems.map((cartItem) => {
-      const product = products.find((p) => p.id === cartItem.productId);
-      return {
-        ...cartItem,
-        product: product,
-      };
+    const productMap = new Map(products.map((p) => [p.id, p]));
+
+    return cartItems.flatMap((cartItem) => {
+      const product = productMap.get(cartItem.productId);
+
+      return product ? [{ ...cartItem, productInfo: product }] : [];
     });
   });
 
