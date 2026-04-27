@@ -61,6 +61,10 @@ export class NavbarComponent {
   }
 
   menuItems: MenuItem[] = [
+    { label: 'My orders', action: () => {
+      this.router.navigate(['/orders']);
+      this.menuOpen.set(false);
+    }},
     { label: 'My addresses', action: () => {
       this.router.navigate(['/address']);
       this.menuOpen.set(false);

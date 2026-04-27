@@ -1,0 +1,10 @@
+.item {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+}
+
+.details {
+  display: flex;
+  flex-direction: column;
+}

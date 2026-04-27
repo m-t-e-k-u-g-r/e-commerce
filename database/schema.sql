@@ -71,3 +71,38 @@ CREATE TABLE `addresses` (
     `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY `addresses_idfk` (`user_id`) REFERENCES users (`id`)
 );
+
+CREATE TABLE `orders` (
+    `id` INT PRIMARY KEY AUTO_INCREMENT,
+    `user_id` INT NOT NULL,
+    `status` ENUM('PENDING','PAID','SHIPPED','DELIVERED','CANCELLED'),
+    `total_price` DECIMAL(10,2) NOT NULL,
+    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY `orders_idfk` (`user_id`) REFERENCES users (`id`)
+);
+
+CREATE TABLE `order_items` (
+    `id` INT PRIMARY KEY AUTO_INCREMENT,
+    `order_id` INT NOT NULL,
+    `product_id` INT NOT NULL,
+    `quantity` INT NOT NULL CHECK ( `quantity` > 0 ),
+    `price` DECIMAL(10,2) NOT NULL,
+    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY `orderItems_idfk` (`product_id`) REFERENCES products (`id`),
+    FOREIGN KEY `orderItems_idfk2` (`order_id`) REFERENCES orders (`id`),
+    UNIQUE (`order_id`, `product_id`)
+);
+
+CREATE TABLE `order_addresses` (
+    `id` INT PRIMARY KEY AUTO_INCREMENT,
+    `order_id` INT NOT NULL UNIQUE,
+    `street` VARCHAR(255) NOT NULL,
+    `house_number` VARCHAR(20) NOT NULL,
+    `zip_code` VARCHAR(20) NOT NULL,
+    `city` VARCHAR(255) NOT NULL,
+    `country` ENUM('DE', 'AT', 'CH'),
+    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    FOREIGN KEY `orderAddresses_idfk` (`order_id`) REFERENCES orders (`id`)
+);
