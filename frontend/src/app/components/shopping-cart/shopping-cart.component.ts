@@ -2,6 +2,8 @@ import { Component, computed, inject } from '@angular/core';
 import { ProductService } from '../../services/product.service';
 import { NgOptimizedImage } from '@angular/common';
 import { CartService } from '../../services/cart.service';
+import { AddressService } from '../../services/address.service';
+import { OrderService } from '../../services/order.service';
 
 @Component({
   selector: 'app-shopping-cart',
@@ -79,6 +81,8 @@ import { CartService } from '../../services/cart.service';
 export class ShoppingCartComponent {
   cartService = inject(CartService);
   productService = inject(ProductService);
+  addressService = inject(AddressService);
+  orderService = inject(OrderService)
 
   computedCartItems = computed(() => {
     const products = this.productService.products();
@@ -94,6 +98,10 @@ export class ShoppingCartComponent {
   });
 
   checkout() {
-    console.log('Checkout not yet implemented');
+    const billingAddress = this.addressService.billingAddress();
+    if (billingAddress) {
+      const id = billingAddress.id;
+      this.orderService.createOrder(id);
+    }
   }
 }

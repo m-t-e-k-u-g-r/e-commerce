@@ -29,6 +29,14 @@ export class OrderService {
     })
   }
 
+  createOrder(addressId: number) {
+    return this.http.post<OrderDto>(this.baseUrl, { addressId: addressId },
+      { withCredentials: true }
+    ).subscribe(order => {
+      this.getOrders();
+    });
+  }
+
   private formatDate(date: string): string {
     const [y, m, d] = date.split('-');
     return `${d}.${m}.${y}`;
