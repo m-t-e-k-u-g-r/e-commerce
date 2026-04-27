@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { OrderDto } from '../../models/order.type';
 import { NgOptimizedImage } from '@angular/common';
 
@@ -8,6 +8,7 @@ import { NgOptimizedImage } from '@angular/common';
   template: `
     <div class="order">
       <h2>Order {{ order.id }} from {{ order.createdDate }}</h2>
+      <a (click)="notifyOrderOverview()">Order details</a>
       <p>
         To:
         {{
@@ -43,4 +44,9 @@ import { NgOptimizedImage } from '@angular/common';
 })
 export class OrderComponent {
   @Input() order!: OrderDto;
+  @Output() action = new EventEmitter<OrderDto>();
+
+  notifyOrderOverview() {
+    this.action.emit(this.order);
+  }
 }
