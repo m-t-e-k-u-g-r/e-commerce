@@ -1,0 +1,23 @@
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  border: none;
+  background-color: var(--surface-color);
+  width: 100%;
+
+  mat-button-toggle {
+    width: 100%;
+    border: none;
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-color);
+
+    &:hover {
+      background-color: var(--border-color);
+    }
+  }
+
+  .mat-button-toggle-checked {
+    background-color: var(--primary-color) !important;
+    color: white !important;
+  }
+}

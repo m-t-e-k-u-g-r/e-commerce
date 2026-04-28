@@ -104,7 +104,7 @@ import { Router } from '@angular/router';
       </table>
     </div>
   `,
-  styleUrl: './shopping-cart.component.css',
+  styleUrl: './shopping-cart.component.scss',
 })
 export class ShoppingCartComponent {
   cartService = inject(CartService);

@@ -75,7 +75,7 @@ import { MatChipsModule } from '@angular/material/chips';
       </mat-card>
     }
   `,
-  styleUrl: './order-details.component.css',
+  styleUrl: './order-details.component.scss',
 })
 export class OrderDetailsComponent {
   @Input() order!: OrderDto | undefined;

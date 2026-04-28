@@ -42,7 +42,7 @@ import { CurrencyPipe } from '@angular/common';
       </mat-card-content>
     </mat-card>
   `,
-  styleUrl: './product.component.css',
+  styleUrl: './product.component.scss',
 })
 export class ProductComponent {
   @Input() product!: Product;

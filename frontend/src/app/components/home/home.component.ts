@@ -19,7 +19,7 @@ import { ActivatedRoute } from '@angular/router';
       </section>
     </div>
   `,
-  styleUrl: './home.component.css',
+  styleUrl: './home.component.scss',
 })
 export class HomeComponent implements OnInit {
   productService = inject(ProductService);

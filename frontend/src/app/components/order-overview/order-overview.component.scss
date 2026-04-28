@@ -62,10 +62,9 @@ app-order.active {
   .details-panel {
     width: 100%;
     position: static;
-    order: -1; /* Details oben anzeigen, wenn ausgewählt auf Tablet/Mobil? Oder drunter? */
+    order: -1;
   }
 
-  /* Auf kleineren Bildschirmen zeigen wir Details unter der Liste oder wir blenden die Liste aus */
   .details-panel.visible {
     margin-bottom: 2rem;
   }

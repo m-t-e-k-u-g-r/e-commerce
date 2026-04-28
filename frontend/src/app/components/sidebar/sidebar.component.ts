@@ -22,7 +22,7 @@ import { MatButtonToggle, MatButtonToggleGroup } from '@angular/material/button-
       }
     </mat-button-toggle-group>
   `,
-  styleUrl: './sidebar.component.css',
+  styleUrl: './sidebar.component.scss',
 })
 export class SidebarComponent {
   categoryService = inject(CategoryService);

@@ -47,7 +47,7 @@ export type MenuItem = {
       </div>
     </nav>
   `,
-  styleUrl: './navbar.component.css',
+  styleUrl: './navbar.component.scss',
 })
 export class NavbarComponent {
   router = inject(Router);

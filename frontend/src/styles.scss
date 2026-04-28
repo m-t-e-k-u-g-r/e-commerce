@@ -1,0 +1,62 @@
+@use 'variables';
+
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+main {
+  margin-left: clamp(1rem, 4vw, 2rem);
+  margin-right: clamp(1rem, 6vw, 5rem);
+  margin-bottom: clamp(2rem, 5vw, 5rem);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+button {
+  cursor: pointer;
+}
+
+// Angular Material Overrides for Dark Mode
+.mat-mdc-card {
+  background-color: var(--card-bg) !important;
+  color: var(--text-color) !important;
+}
+
+.mat-mdc-card-title, .mat-mdc-card-subtitle {
+  color: var(--text-color) !important;
+}
+
+.mat-mdc-table {
+  background-color: var(--surface-color) !important;
+}
+
+.mat-mdc-header-cell {
+  color: var(--text-color) !important;
+  background-color: var(--surface-color) !important;
+}
+
+.mat-mdc-cell {
+  color: var(--text-color) !important;
+}
+
+// Toastr Styles
+.ngx-toastr {
+  background-color: var(--surface-color) !important;
+  color: var(--text-color) !important;
+  border-left: 6px solid;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.3) !important;
+  opacity: 1 !important;
+}
+
+.toast-success { border-left-color: var(--toast-success) !important; }
+.toast-error { border-left-color: var(--toast-error) !important; }
+.toast-info { border-left-color: var(--toast-info) !important; }
+.toast-warning { border-left-color: var(--toast-warning) !important; }

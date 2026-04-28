@@ -38,7 +38,7 @@ import { OrderDto } from '../../models/order.type';
       </div>
     </div>
   `,
-  styleUrl: './order-overview.component.css',
+  styleUrl: './order-overview.component.scss',
 })
 export class OrderOverviewComponent {
   showDetails = false;

@@ -17,7 +17,7 @@ import { OrderService } from './services/order.service';
       <router-outlet/>
     </main>
   `,
-  styleUrl: './app.css',
+  styleUrl: './app.scss',
 })
 export class App {
   productService = inject(ProductService);

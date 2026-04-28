@@ -81,7 +81,7 @@ import { MatButton } from '@angular/material/button';
       <button matButton="elevated" type="submit" [disabled]="addressForm.invalid">Save</button>
     </form>
   `,
-  styleUrl: './address-form.component.css',
+  styleUrl: './address-form.component.scss',
 })
 export class AddressFormComponent implements OnInit {
   protected addressService = inject(AddressService);

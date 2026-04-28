@@ -87,7 +87,7 @@ import { MatIcon } from '@angular/material/icon';
       <tr mat-footer-row *matFooterRowDef="['footer-add-button']"></tr>
     </table>
   `,
-  styleUrl: './address-overview.component.css',
+  styleUrl: './address-overview.component.scss',
 })
 export class AddressOverviewComponent {
   addressService = inject(AddressService);
