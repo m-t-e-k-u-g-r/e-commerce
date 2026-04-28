@@ -1,21 +1,21 @@
 import { Component, computed, inject, Signal } from '@angular/core';
 import { ProductService } from '../../services/product.service';
-import { NgOptimizedImage } from '@angular/common';
+import { CurrencyPipe, NgOptimizedImage } from '@angular/common';
 import { CartService } from '../../services/cart.service';
 import { AddressService } from '../../services/address.service';
 import { OrderService } from '../../services/order.service';
 import { MatTableModule } from '@angular/material/table';
 import { computedCartItem } from '../../models/cartItem.type';
 import { MatButton } from '@angular/material/button';
+import { ConfirmService } from '../../services/confirm.service';
 
 @Component({
   selector: 'app-shopping-cart',
-  imports: [NgOptimizedImage, MatTableModule, MatButton],
+  imports: [NgOptimizedImage, MatTableModule, MatButton, CurrencyPipe],
   template: `
     <h1>Shopping Cart</h1>
     <div class="shopping_cart">
       <table mat-table [dataSource]="computedCartItems()">
-
         <ng-container matColumnDef="image">
           <th mat-header-cell *matHeaderCellDef></th>
           <td mat-cell *matCellDef="let item">
@@ -53,10 +53,12 @@ import { MatButton } from '@angular/material/button';
         <ng-container matColumnDef="price">
           <th mat-header-cell *matHeaderCellDef>Price</th>
           <td mat-cell *matCellDef="let item">
-            $ {{ (item.productInfo.price * item.quantity).toFixed(2) }}
+            {{ (item.productInfo.price * item.quantity).toFixed(2) | currency: 'USD' : 'symbol' }}
           </td>
           <td mat-footer-cell *matFooterCellDef>
-            <p class="total_amount">Total: $ {{ this.cartService.totalAmount() }}</p>
+            <p class="total_amount">
+              Total: {{ this.cartService.totalAmount() | currency: 'USD' : 'symbol' }}
+            </p>
           </td>
         </ng-container>
 
@@ -71,14 +73,24 @@ import { MatButton } from '@angular/material/button';
                 }}
                 in your shopping cart
               </span>
-              <button (click)="this.cartService.clearCart()" matButton="elevated">Clear Shopping Cart</button>
+              <button
+                (click)="this.cartService.clearCart()"
+                matButton="elevated"
+                [disabled]="computedCartItems().length == 0"
+              >
+                Clear Shopping Cart
+              </button>
             </div>
           </th>
         </ng-container>
 
         <ng-container matColumnDef="footer-row-checkout">
           <td mat-footer-cell *matFooterCellDef>
-            <button (click)="checkout()" matButton="filled">
+            <button
+              (click)="checkout()"
+              matButton="filled"
+              [disabled]="computedCartItems().length == 0"
+            >
               Check out
             </button>
           </td>
@@ -99,6 +111,7 @@ export class ShoppingCartComponent {
   productService = inject(ProductService);
   addressService = inject(AddressService);
   orderService = inject(OrderService);
+  confirmService = inject(ConfirmService);
   displayedColumns: string[] = ['image', 'product', 'quantity', 'price'];
 
   computedCartItems: Signal<computedCartItem[]> = computed(() => {
@@ -114,10 +127,27 @@ export class ShoppingCartComponent {
     });
   });
 
-  checkout() {
+  async checkout() {
     const billingAddress = this.addressService.billingAddress();
-    if (billingAddress) {
-      const id = billingAddress.id;
+    if (billingAddress == null) return;
+    const addresses = this.addressService.addresses();
+    const options = addresses.map(a => ({
+      label: `${a.street} ${a.houseNumber}`,
+      value: a.id
+    }));
+    const response = await this.confirmService.confirmOptions({
+      title: 'Place order',
+      message: `Are you sure you want to place an order for $ ${this.cartService.totalAmount()}?`,
+      fields: [{
+        name: 'address',
+        type: 'select',
+        defaultValue: billingAddress.id,
+        label: 'Shipping address',
+        options: options
+      }]
+    });
+    if (response.confirmed) {
+      const id: number = response.data.address;
       this.orderService.createOrder(id);
     }
   }
