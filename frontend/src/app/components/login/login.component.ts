@@ -2,9 +2,10 @@ import { Component, inject, signal } from '@angular/core';
 import {FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {AuthService} from '../../services/auth.service';
 import {Router} from '@angular/router';
-import { MatFormField, MatInput, MatLabel, MatSuffix } from '@angular/material/input';
+import { MatError, MatFormField, MatInput, MatLabel, MatSuffix } from '@angular/material/input';
 import { MatIcon } from '@angular/material/icon';
 import { MatButtonModule, MatButton, MatIconButton } from '@angular/material/button';
+import { MyErrorStateMatcher } from '../../guards/errorMatcher.guard';
 
 @Component({
   selector: 'app-login',
@@ -18,6 +19,7 @@ import { MatButtonModule, MatButton, MatIconButton } from '@angular/material/but
     MatIconButton,
     MatButton,
     MatSuffix,
+    MatError,
   ],
   template: `
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
@@ -28,16 +30,23 @@ import { MatButtonModule, MatButton, MatIconButton } from '@angular/material/but
           placeholder="john.doe@example.com"
           type="email"
           formControlName="email"
+          [errorStateMatcher]="matcher"
         />
+        @if (
+          this.loginForm.controls.email.hasError('email') &&
+          !this.loginForm.controls.email.hasError('required')
+        ) {
+          <mat-error>Please enter a valid email address</mat-error>
+        }
+        @if (this.loginForm.controls.email.hasError('required')) {
+          <mat-error>E-Mail is required</mat-error>
+        }
       </mat-form-field>
       <mat-form-field>
         <mat-label>Enter your password</mat-label>
-        <input
-          matInput
-          [type]="hide() ? 'password' : 'text'"
-          formControlName="password"
-        />
+        <input matInput [type]="hide() ? 'password' : 'text'" formControlName="password" />
         <button
+          type="button"
           mat-icon-button
           matSuffix
           (click)="toggleVisibility(false)"
@@ -46,6 +55,15 @@ import { MatButtonModule, MatButton, MatIconButton } from '@angular/material/but
         >
           <mat-icon>{{ hide() ? 'visibility_off' : 'visibility' }}</mat-icon>
         </button>
+        @if (this.loginForm.controls.password.hasError('required')) {
+          <mat-error>Password is required</mat-error>
+        }
+        @if (
+          this.loginForm.controls.password.hasError('minlength') ||
+          this.loginForm.controls.password.hasError('pattern')
+        ) {
+          <mat-error>Password is too weak</mat-error>
+        }
       </mat-form-field>
       @if (!isLogin) {
         <mat-form-field>
@@ -56,6 +74,7 @@ import { MatButtonModule, MatButton, MatIconButton } from '@angular/material/but
             formControlName="confirmPassword"
           />
           <button
+            type="button"
             mat-icon-button
             matSuffix
             (click)="toggleVisibility(true)"
@@ -64,9 +83,15 @@ import { MatButtonModule, MatButton, MatIconButton } from '@angular/material/but
           >
             <mat-icon>{{ hideConfirm() ? 'visibility_off' : 'visibility' }}</mat-icon>
           </button>
+          @if (this.loginForm.controls.confirmPassword.hasError('required')) {
+            <mat-error>Confirmation is required</mat-error>
+          }
+          @if (this.loginForm.controls.confirmPassword.hasError('pattern')) {
+            <mat-error>Confirmation password must match password</mat-error>
+          }
         </mat-form-field>
       }
-      <button type="submit" matButton="elevated">
+      <button type="submit" matButton="elevated" [disabled]="loginForm.invalid">
         {{ isLogin ? 'Login' : 'Signup' }}
       </button>
       @if (isLogin) {
@@ -86,6 +111,7 @@ import { MatButtonModule, MatButton, MatIconButton } from '@angular/material/but
   styleUrl: './login.component.css',
 })
 export class LoginComponent {
+  matcher = new MyErrorStateMatcher();
   private authService = inject(AuthService);
   router = inject(Router);
   isLogin = true;
@@ -94,8 +120,12 @@ export class LoginComponent {
     password: FormControl<string | null>;
     confirmPassword: FormControl<string | null>;
   }> = new FormGroup({
-    email: new FormControl('', [Validators.required, Validators.email, Validators.minLength(1)]),
-    password: new FormControl('', [Validators.required, Validators.minLength(6)]),
+    email: new FormControl('', [Validators.required, Validators.email]),
+    password: new FormControl('', [
+      Validators.required,
+      Validators.minLength(12),
+      Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$/),
+    ]),
     confirmPassword: new FormControl('', []),
   });
   hide = signal(true);
@@ -113,7 +143,11 @@ export class LoginComponent {
 
     const confirmControl = this.loginForm.controls.confirmPassword;
     if (!this.isLogin) {
-      confirmControl?.setValidators([Validators.required, Validators.minLength(6)]);
+      confirmControl?.setValidators([
+        Validators.required,
+        Validators.pattern(this.loginForm.controls.password.getRawValue() || ''),
+        Validators.minLength(6),
+      ]);
     } else {
       confirmControl?.clearValidators();
     }
