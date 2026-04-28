@@ -3,7 +3,7 @@ import { MAT_DIALOG_DATA, MatDialogActions, MatDialogContent, MatDialogRef, MatD
 import { MatButton } from '@angular/material/button';
 import { FormDialogInput } from '../../models/inputs.type';
 import { MatDivider } from '@angular/material/list';
-import { MatFormField, MatHint, MatInput, MatLabel } from '@angular/material/input';
+import { MatFormField, MatHint, MatInput, MatLabel, MatSuffix } from '@angular/material/input';
 import { MatOption, MatSelect } from '@angular/material/select';
 import { MatDatepicker, MatDatepickerInput, MatDatepickerToggle } from '@angular/material/datepicker';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
@@ -26,6 +26,7 @@ import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
     MatDatepickerToggle,
     MatDatepicker,
     ReactiveFormsModule,
+    MatSuffix,
   ],
   template: `
     <h2 mat-dialog-title>{{ data.title }}</h2>
@@ -35,7 +36,7 @@ import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
         <p class="dialog-message">
           {{ data.message }}
         </p>
-        <mat-divider/>
+        <mat-divider />
       }
       @for (field of fields; track field.name) {
         <mat-form-field>
@@ -85,14 +86,12 @@ import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
               }
             }
             @case ('date') {
-              <input
-                matInput
-                [matDatepicker]="picker"
-                [formControlName]="field.name"
-              />
-              <mat-hint>MM/DD/YYYY</mat-hint>
-              <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
-              <mat-datepicker #picker></mat-datepicker>
+              <div>
+                <input matInput [matDatepicker]="picker" [formControlName]="field.name" />
+                <mat-hint>MM/DD/YYYY</mat-hint>
+                <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                <mat-datepicker #picker></mat-datepicker>
+              </div>
             }
           }
         </mat-form-field>
@@ -124,7 +123,7 @@ export class OptionsDialogComponent implements OnInit {
   confirm() {
     this.optionDialogRef.close({
       confirmed: true,
-      data: this.form.value
+      data: this.form.value,
     });
   }
   cancel() {
