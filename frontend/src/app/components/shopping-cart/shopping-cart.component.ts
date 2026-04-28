@@ -8,6 +8,8 @@ import { MatTableModule } from '@angular/material/table';
 import { computedCartItem } from '../../models/cartItem.type';
 import { MatButton } from '@angular/material/button';
 import { ConfirmService } from '../../services/confirm.service';
+import { AuthService } from '../../services/auth.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-shopping-cart',
@@ -109,7 +111,9 @@ export class ShoppingCartComponent {
   productService = inject(ProductService);
   addressService = inject(AddressService);
   orderService = inject(OrderService);
+  authService = inject(AuthService);
   confirmService = inject(ConfirmService);
+  router = inject(Router);
   displayedColumns: string[] = ['image', 'product', 'quantity', 'price'];
 
   computedCartItems: Signal<computedCartItem[]> = computed(() => {
@@ -126,6 +130,9 @@ export class ShoppingCartComponent {
   });
 
   async checkout() {
+    if (!this.authService.isLoggedIn()) {
+      this.router.navigate(['/login']);
+    }
     const billingAddress = this.addressService.billingAddress();
     if (billingAddress == null) return;
     const addresses = this.addressService.addresses();
