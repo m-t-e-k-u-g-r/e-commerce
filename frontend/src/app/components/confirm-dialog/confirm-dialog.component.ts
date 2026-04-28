@@ -16,7 +16,11 @@ import { DialogInput } from '../../models/inputs.type';
 
     @if (data.message) {
       <mat-dialog-content>
-        {{ data.message }}
+        @if (data.messageType == 'html') {
+          <span [innerHTML]="data.message"></span>
+        } @else {
+          {{ data.message }}
+        }
       </mat-dialog-content>
     }
     <mat-dialog-actions>

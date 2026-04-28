@@ -158,7 +158,7 @@ export class AddressFormComponent implements OnInit {
     } else {
       this.addressService.addAddress(addressData);
     }
-    this.router.navigate(['/']);
+    this.router.navigate(['/address']);
   }
 
   ngOnInit() {

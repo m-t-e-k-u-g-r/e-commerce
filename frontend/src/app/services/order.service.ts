@@ -43,7 +43,6 @@ export class OrderService {
     return this.http.delete<OrderDto>(this.baseUrl + '/' + orderId,
       { withCredentials: true }
     ).subscribe(order => {
-      console.log('Order cancelled:', order);
       this.getOrders();
     });
   }
