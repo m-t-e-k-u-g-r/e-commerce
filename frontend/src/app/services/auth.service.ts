@@ -1,7 +1,7 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { environment } from '../../environments/environment.development';
 import { HttpClient } from '@angular/common/http';
-import { catchError, switchMap, tap, throwError } from 'rxjs';
+import { catchError, tap, throwError } from 'rxjs';
 import { User } from '../models/user.type';
 
 @Injectable({
@@ -73,7 +73,7 @@ export class AuthService {
     return this.http
       .post(this.baseUrl + '/refresh', {}, { withCredentials: true })
       .pipe(
-        tap((res) => {
+        tap(() => {
           this.isLoggedIn.set(true);
         }),
         catchError((err) => {

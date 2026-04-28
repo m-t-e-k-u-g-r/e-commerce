@@ -6,6 +6,10 @@ table {
   border-spacing: 0 15px;
 }
 
+.address_overview .mat-mdc-cell, .mat-mdc-footer-cell {
+  overflow: visible;
+}
+
 .address_info {
   display: flex;
   flex-direction: column;

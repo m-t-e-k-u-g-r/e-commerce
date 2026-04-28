@@ -4,12 +4,9 @@
   min-width: 200px;
 }
 
-button {
-  padding: 1rem;
+mat-button-toggle {
+  width: 100%;
   text-align: left;
-  :hover {
-    background-color: #f0f0f0;
-  }
 }
 
 @media (min-width: 768px) {

@@ -1,7 +1,9 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { CartService } from '../../services/cart.service';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
+import { MatIcon } from '@angular/material/icon';
+import { MatBadge } from '@angular/material/badge';
 
 export type MenuItem = {
   label: string;
@@ -10,18 +12,19 @@ export type MenuItem = {
 
 @Component({
   selector: 'app-navbar',
-  imports: [],
+  imports: [MatIcon, MatBadge],
   template: `
     <nav>
       <a href="/">
         <i class="fas fa-leaf"></i>
       </a>
-      <div class="cart_info">
-        <a href="/shopping-cart">
-          <i class="fa fa-shopping-cart"></i>
-        </a>
-        <p>{{ this.cartService.totalItems() }}</p>
-      </div>
+      <a
+        href="/shopping-cart"
+        matBadge="{{ badgeValue() }}"
+        matBadgePosition="below"
+      >
+        <mat-icon>shopping_cart</mat-icon>
+      </a>
       <div class="user_info">
         @if (!this.authService.isLoggedIn()) {
           <a href="/login">Log in</a>
@@ -51,27 +54,41 @@ export class NavbarComponent {
   cartService = inject(CartService);
   authService = inject(AuthService);
   menuOpen = signal<Boolean>(false);
+  badgeValue = computed(() => {
+    const number = this.cartService.totalItems();
+    if (number >= 100) return '99+';
+    return number.toString();
+  });
 
   onItemClick(item: MenuItem) {
     item.action();
   }
 
   toggle() {
-    this.menuOpen.update(value => !value);
+    this.menuOpen.update((value) => !value);
   }
 
   menuItems: MenuItem[] = [
-    { label: 'My orders', action: () => {
-      this.router.navigate(['/orders']);
-      this.menuOpen.set(false);
-    }},
-    { label: 'My addresses', action: () => {
-      this.router.navigate(['/address']);
-      this.menuOpen.set(false);
-    }},
-    { label: 'Logout', action: () => {
-      this.authService.logout().subscribe();
-      this.menuOpen.set(false);
-    }},
-  ]
+    {
+      label: 'My orders',
+      action: () => {
+        this.router.navigate(['/orders']);
+        this.menuOpen.set(false);
+      },
+    },
+    {
+      label: 'My addresses',
+      action: () => {
+        this.router.navigate(['/address']);
+        this.menuOpen.set(false);
+      },
+    },
+    {
+      label: 'Logout',
+      action: () => {
+        this.authService.logout().subscribe();
+        this.menuOpen.set(false);
+      },
+    },
+  ];
 }

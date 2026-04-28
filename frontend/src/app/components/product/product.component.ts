@@ -2,33 +2,45 @@ import { Component, computed, inject, Input } from '@angular/core';
 import { NgOptimizedImage } from '@angular/common';
 import { Product } from '../../models/product.type';
 import { CartService } from '../../services/cart.service';
+import { MatCard, MatCardContent, MatCardImage, MatCardSubtitle, MatCardTitle } from '@angular/material/card';
+import { CurrencyPipe } from '@angular/common';
 
 @Component({
   selector: 'app-product',
-  imports: [NgOptimizedImage],
+  imports: [
+    NgOptimizedImage,
+    MatCard,
+    MatCardImage,
+    MatCardContent,
+    MatCardTitle,
+    MatCardSubtitle,
+    CurrencyPipe,
+  ],
   template: `
-    <div class="product">
+    <mat-card>
       <img
+        mat-card-image
         ngSrc="{{ product.imageUrl }}"
-        priority
-        width="800"
-        height="450"
+        width="16"
+        height="9"
         alt="{{ product.name }}"
       />
-      <div class="product_detail">
-        <h1>{{ product.name }}</h1>
-        <p>$ {{ product.price }}</p>
-      </div>
-      <div class="button_container">
-        @if (itemInCart() !== undefined) {
-          <button (click)="decreaseQuantityByOne()"><h3>-</h3></button>
-          <p class="quantity">{{ itemInCart()?.quantity }} in cart</p>
-          <button (click)="addToCart()"><h3>+</h3></button>
-        } @else {
-          <button (click)="addToCart()" class="full_width"><h3>ADD TO CART</h3></button>
-        }
-      </div>
-    </div>
+      <mat-card-content>
+        <div class="product_detail">
+          <mat-card-title>{{ product.name }}</mat-card-title>
+          <mat-card-subtitle>{{ product.price | currency:'USD':'symbol' }}</mat-card-subtitle>
+        </div>
+        <div class="button_container">
+          @if (itemInCart() !== undefined) {
+            <button (click)="decreaseQuantityByOne()"><h3>-</h3></button>
+            <p class="quantity">{{ itemInCart()?.quantity }}</p>
+            <button (click)="addToCart()"><h3>+</h3></button>
+          } @else {
+            <button (click)="addToCart()" class="full_width"><h3>ADD TO CART</h3></button>
+          }
+        </div>
+      </mat-card-content>
+    </mat-card>
   `,
   styleUrl: './product.component.css',
 })

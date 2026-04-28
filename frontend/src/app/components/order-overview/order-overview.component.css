@@ -1,5 +1,82 @@
-.main {
+.container {
+  padding: 1.5rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+header {
+  margin-bottom: 2rem;
+}
+
+h1 {
+  font-weight: 300;
+  margin: 0;
+}
+
+.layout-wrapper {
   display: flex;
-  flex-direction: row;
-  justify-content: space-between;
+  gap: 2rem;
+  align-items: flex-start;
+}
+
+.orders-list {
+  flex: 1;
+}
+
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.details-panel {
+  width: 400px;
+  position: sticky;
+  top: 1.5rem;
+  display: none;
+}
+
+.details-panel.visible {
+  display: block;
+}
+
+.no-selection {
+  padding: 2rem;
+  text-align: center;
+  border: 2px dashed #ccc;
+  border-radius: 8px;
+  color: #666;
+}
+
+app-order.active {
+  outline: 2px solid #1976d2;
+  border-radius: 4px;
+}
+
+/* Responsiveness */
+@media (max-width: 1100px) {
+  .layout-wrapper {
+    flex-direction: column;
+  }
+
+  .details-panel {
+    width: 100%;
+    position: static;
+    order: -1; /* Details oben anzeigen, wenn ausgewählt auf Tablet/Mobil? Oder drunter? */
+  }
+
+  /* Auf kleineren Bildschirmen zeigen wir Details unter der Liste oder wir blenden die Liste aus */
+  .details-panel.visible {
+    margin-bottom: 2rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .container {
+    padding: 1rem;
+  }
+
+  .grid-container {
+    grid-template-columns: 1fr;
+  }
 }

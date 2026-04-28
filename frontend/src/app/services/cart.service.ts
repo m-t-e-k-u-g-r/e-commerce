@@ -19,13 +19,11 @@ export class CartService {
     this.cart().reduce((total, item) => total + item.quantity, 0),
   );
   readonly totalAmount = computed(() =>
-    Math.round(
-      this.cart().reduce((total, item) => {
-        const product = this.productService.products().find((p) => p.id === item.productId);
-        const price = product?.price ?? 0;
-        return total + item.quantity * price;
-      }, 0) * 100
-    ) / 100
+    this.cart().reduce((total, item) => {
+      const product = this.productService.products().find((p) => p.id === item.productId);
+      const price = product?.price ?? 0;
+      return total + item.quantity * price;
+    }, 0).toFixed(2)
   );
 
   getCartItems() {
@@ -33,7 +31,6 @@ export class CartService {
       return this.http.get<CartItem[]>(this.baseUrl + '/items',
         { withCredentials: true }
       ).subscribe((items: CartItem[]) => {
-        console.log('Fetched cart items:', items);
           this._cart.set(items);
         });
     } else {

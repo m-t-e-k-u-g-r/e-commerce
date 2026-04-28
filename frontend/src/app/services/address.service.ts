@@ -2,11 +2,13 @@ import { computed, inject, Injectable, signal } from '@angular/core';
 import { environment } from '../../environments/environment.development';
 import { HttpClient } from '@angular/common/http';
 import { Address, AddressDto, AddressForm } from '../models/address.type';
+import { ConfirmService } from './confirm.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AddressService {
+  confirmService = inject(ConfirmService);
   baseUrl = environment.apiUrl + 'users/addresses';
   http = inject(HttpClient);
   private _addresses = signal<Address[]>([]);
@@ -19,7 +21,6 @@ export class AddressService {
     return this.http.get<Address[]>(this.baseUrl,
       { withCredentials: true }
     ).subscribe(addresses => {
-      console.log('Fetched addresses:', addresses);
       this._addresses.set(addresses);
     });
   }
@@ -40,9 +41,14 @@ export class AddressService {
     });
   }
 
-  deleteAddress(addressId: number) {
+  async deleteAddress(addressId: number) {
     const address = this.addresses().find((a: Address) => a.id === addressId);
-    if (address?.type === 'BILLING') {
+    if (address == undefined) return;
+
+    const confirmed = await this.confirmService.confirm({ title: 'Delete address', message: 'Are you sure you want to delete this address?' })
+    if (!confirmed) return;
+
+    if (address.type === 'BILLING') {
       console.error('Cannot delete billing address');
       return;
     }
