@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { CartService } from '../../services/cart.service';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
@@ -20,7 +20,7 @@ export type MenuItem = {
       </a>
       <a
         href="/shopping-cart"
-        matBadge="{{ this.cartService.totalItems() }}"
+        matBadge="{{ badgeValue() }}"
         matBadgePosition="below"
       >
         <mat-icon>shopping_cart</mat-icon>
@@ -54,6 +54,11 @@ export class NavbarComponent {
   cartService = inject(CartService);
   authService = inject(AuthService);
   menuOpen = signal<Boolean>(false);
+  badgeValue = computed(() => {
+    const number = this.cartService.totalItems();
+    if (number >= 100) return '99+';
+    return number.toString();
+  });
 
   onItemClick(item: MenuItem) {
     item.action();

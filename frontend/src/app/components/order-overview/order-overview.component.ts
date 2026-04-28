@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, effect } from '@angular/core';
 import { OrderComponent } from '../order/order.component';
 import { OrderService } from '../../services/order.service';
 import { OrderDetailsComponent } from '../order-details/order-details.component';
@@ -41,9 +41,16 @@ import { OrderDto } from '../../models/order.type';
   styleUrl: './order-overview.component.css',
 })
 export class OrderOverviewComponent {
-  orderService = inject(OrderService);
   showDetails = false;
   orderDetails: OrderDto | undefined = undefined;
+  constructor(protected orderService: OrderService) {
+    effect(() => {
+      const details = this.orderService.details();
+      if (details) {
+        this.openDetails(details);
+      }
+    });
+  }
 
   openDetails(order: OrderDto) {
     this.showDetails = true;
