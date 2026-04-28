@@ -25,17 +25,12 @@ tr.divided td {
   padding: 10px;
 }
 
-.head {
-  font-weight: bolder;
-}
-
-.buffer {
-  height: 15px;
-}
-
-.right {
-  text-align: right;
-  padding: 0 10px 0 0;
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 10px 0;
 }
 
 .center {

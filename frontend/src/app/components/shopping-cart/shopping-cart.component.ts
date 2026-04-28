@@ -64,9 +64,7 @@ import { ConfirmService } from '../../services/confirm.service';
 
         <ng-container matColumnDef="header-row-info">
           <th mat-header-cell *matHeaderCellDef colspan="4">
-            <div
-              style="display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 10px 0;"
-            >
+            <div class="header">
               <span>
                 You have {{ this.cartService.totalItems() }} item{{
                   this.cartService.totalItems() == 1 ? '' : 's'
@@ -85,7 +83,7 @@ import { ConfirmService } from '../../services/confirm.service';
         </ng-container>
 
         <ng-container matColumnDef="footer-row-checkout">
-          <td mat-footer-cell *matFooterCellDef>
+          <td mat-footer-cell *matFooterCellDef colspan="4">
             <button
               (click)="checkout()"
               matButton="filled"
@@ -99,8 +97,8 @@ import { ConfirmService } from '../../services/confirm.service';
         <tr mat-header-row *matHeaderRowDef="['header-row-info']"></tr>
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
         <tr mat-row *matRowDef="let row; columns: displayedColumns" class="divided"></tr>
-        <tr mat-footer-row *matFooterRowDef="displayedColumns"></tr>
-        <tr mat-footer-row *matFooterRowDef="['footer-row-checkout']"></tr>
+        <tr mat-footer-row *matFooterRowDef="displayedColumns; sticky: true"></tr>
+        <tr mat-footer-row *matFooterRowDef="['footer-row-checkout']; sticky: true"></tr>
       </table>
     </div>
   `,

@@ -12,9 +12,7 @@ import { ActivatedRoute } from '@angular/router';
       <app-sidebar />
       <section class="product_list">
         @for (product of this.productService.products(); track product.id) {
-          @if (categoryId === undefined) {
-            <app-product [product]="product" />
-          } @else if (product.categoryIds.includes(categoryId)) {
+          @if (categoryId === undefined || product.categoryIds.includes(categoryId)) {
             <app-product [product]="product" />
           }
         }
