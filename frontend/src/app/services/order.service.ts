@@ -6,6 +6,7 @@ import { map } from 'rxjs';
 import { CartService } from './cart.service';
 import { ConfirmService } from './confirm.service';
 import { Router } from '@angular/router';
+import { NotificationService } from './notification.service';
 
 @Injectable({
   providedIn: 'root',
@@ -17,6 +18,7 @@ export class OrderService {
   readonly orders = this._orders.asReadonly();
   cartService = inject(CartService);
   confirmService = inject(ConfirmService);
+  notificationService = inject(NotificationService);
   router = inject(Router);
   details = signal<OrderDto | null>(null);
 
@@ -43,6 +45,7 @@ export class OrderService {
       this.getOrders();
       this.router.navigate(['/orders']);
       this.details.set(order);
+      this.notificationService.success(`Order #${order.id} placed successfully`);
     });
   }
 
@@ -53,6 +56,7 @@ export class OrderService {
       { withCredentials: true }
     ).subscribe(order => {
       this.getOrders();
+      this.notificationService.success(`Order #${order.id} cancelled`);
     });
   }
 

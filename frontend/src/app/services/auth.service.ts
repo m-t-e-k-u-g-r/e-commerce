@@ -1,8 +1,9 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { environment } from '../../environments/environment.development';
 import { HttpClient } from '@angular/common/http';
-import { catchError, tap, throwError } from 'rxjs';
+import { catchError, EMPTY, tap, throwError } from 'rxjs';
 import { User } from '../models/user.type';
+import { NotificationService } from './notification.service';
 
 @Injectable({
   providedIn: 'root',
@@ -10,6 +11,7 @@ import { User } from '../models/user.type';
 export class AuthService {
   baseUrl = environment.apiUrl + 'auth';
   http = inject(HttpClient);
+  notificationService = inject(NotificationService);
   isLoggedIn = signal<boolean>(false);
   userEmail = signal<string | null>(null);
 
@@ -25,7 +27,7 @@ export class AuthService {
         }),
         catchError((err) => {
           this.refresh().subscribe();
-          return throwError(() => err);
+          return EMPTY;
         }),
       );
   }
@@ -40,10 +42,11 @@ export class AuthService {
       .pipe(
         tap(() => {
           this.isLoggedIn.set(true);
+          this.notificationService.success('Registration successful');
         }),
         catchError((err) => {
-          console.error('Failed to signup user:', err);
-          return throwError(() => err);
+          this.notificationService.error('Registration failed. Please try again.');
+          return EMPTY;
         }),
       );
   }
@@ -61,10 +64,11 @@ export class AuthService {
       .pipe(
         tap(() => {
           this.isLoggedIn.set(true);
+          this.notificationService.success('Login successful');
         }),
         catchError((err) => {
-          console.error('Failed to log in user:', err);
-          return throwError(() => err);
+          this.notificationService.error('Login failed. Please try again.');
+          return EMPTY;
         }),
       );
   }
@@ -82,12 +86,12 @@ export class AuthService {
               console.error('Refresh called without a token (frontend bug)', err);
               break;
             case 403:
-              this.isLoggedIn.set(false);
               break;
             default:
-              console.error('Failed to refresh token:', err);
+              break;
           }
-          return throwError(() => err);
+          this.isLoggedIn.set(false);
+          return EMPTY;
         }),
       );
   }
@@ -101,10 +105,11 @@ export class AuthService {
         tap(() => {
           this.isLoggedIn.set(false);
           this.userEmail.set(null);
+          this.notificationService.success('Logout successful');
         }),
         catchError((err) => {
-          console.error('Failed to logout:', err);
-          return throwError(() => err);
+          this.notificationService.error('Logout failed. Please try again.');
+          return EMPTY;
         }),
       );
   }

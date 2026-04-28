@@ -8,6 +8,12 @@
   --info-menu-shadow: rgba(0, 0, 0, 0.15);
   --info-menu-hover: #f0f0f0;
   --profile-button-color: #000000;
+  --bg-color: #ffffff;
+  --text-color: #000000;
+  --toast-success: #28a745;
+  --toast-error: #dc3545;
+  --toast-info: #17a2b8;
+  --toast-warning: #ffc107;
 }
 
 main {
@@ -28,4 +34,40 @@ body {
 
 button {
   cursor: pointer;
+}
+
+.ngx-toastr {
+  background-color: var(--bg-color) !important;
+  color: var(--text-color) !important;
+  border-left: 6px solid;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1) !important;
+  opacity: 1 !important;
+}
+
+.toast-success {
+  border-left-color: var(--toast-success) !important;
+  .toast-progress {
+    background-color: var(--toast-success) !important;
+  }
+}
+
+.toast-error {
+  border-left-color: var(--toast-error) !important;
+  .toast-progress {
+    background-color: var(--toast-error) !important;
+  }
+}
+
+.toast-info {
+  border-left-color: var(--toast-info) !important;
+  .toast-progress {
+    background-color: var(--toast-info) !important;
+  }
+}
+
+.toast-warning {
+  border-left-color: var(--toast-warning) !important;
+  .toast-progress {
+    background-color: var(--toast-warning) !important;
+  }
 }

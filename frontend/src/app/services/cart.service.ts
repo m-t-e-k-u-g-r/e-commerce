@@ -4,6 +4,7 @@ import { environment } from '../../environments/environment.development';
 import { ProductService } from './product.service';
 import { AuthService } from './auth.service';
 import { HttpClient } from '@angular/common/http';
+import { NotificationService } from './notification.service';
 
 @Injectable({
   providedIn: 'root',
@@ -13,6 +14,7 @@ export class CartService {
   http = inject(HttpClient);
   productService = inject(ProductService);
   authService = inject(AuthService);
+  notificationService = inject(NotificationService);
   private _cart = signal<CartItem[]>([]);
   readonly cart = this._cart.asReadonly();
   readonly totalItems = computed(() =>
@@ -46,7 +48,9 @@ export class CartService {
     if (this.authService.isLoggedIn()) {
       return this.http.post(this.baseUrl + '/items/' + productId, {},
         { withCredentials: true }
-      ).subscribe(() => this.getCartItems());
+      ).subscribe(() => {
+        this.getCartItems();
+      });
     } else {
       this._cart.update((items) => {
         const index = items.findIndex((i) => i.productId === productId);
@@ -96,9 +100,11 @@ export class CartService {
     if (this.authService.isLoggedIn()) {
       const item = this.cart().find((i) => i.productId === productId);
       if (item) {
-        return this.http.delete(this.baseUrl + '/items/' + item.id,
-          { withCredentials: true }
-        ).subscribe(() => this.getCartItems());
+        return this.http
+          .delete(this.baseUrl + '/items/' + item.id, { withCredentials: true })
+          .subscribe(() => {
+            this.getCartItems();
+          });
       }
     } else {
       this._cart.update((items) => items.filter((item) => item.productId !== productId));
@@ -111,11 +117,14 @@ export class CartService {
     if (this.authService.isLoggedIn()) {
       this.http.delete(this.baseUrl,
         { withCredentials: true }
-      ).subscribe();
-      this.getCartItems();
+      ).subscribe(() => {
+        this.getCartItems();
+        this.notificationService.success('Cleared cart');
+      });
     } else {
       this._cart.set([]);
       this.saveToLocalStorage();
+      this.notificationService.success('Cleared cart');
     }
     return;
   }

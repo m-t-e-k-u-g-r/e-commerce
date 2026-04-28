@@ -159,22 +159,14 @@ export class LoginComponent {
     if (this.isLogin) {
       this.authService.login(data.email, data.password).subscribe({
         next: () => {
-          console.log('Login successful');
           this.router.navigate(['/']);
-        },
-        error: (err: Error) => {
-          console.error('Login failed', err);
         },
       });
     } else {
       if (data.password !== data.confirmPassword) return;
       this.authService.signup(data.email, data.password).subscribe({
         next: () => {
-          console.log('Signup successful');
           this.router.navigate(['/']);
-        },
-        error: (err: Error) => {
-          console.error('Signup failed', err);
         },
       });
     }
