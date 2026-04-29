@@ -22,4 +22,16 @@ export class NotificationService {
   warning(message: string, title: string = 'Warning') {
     this.toastr.warning(message, title);
   }
+
+  pending(message: string, title: string = 'Pending') {
+    const toast = this.toastr.info(message, title, {
+      toastClass: 'ngx-toastr toast-pending',
+      disableTimeOut: true,
+    });
+    return toast.toastId;
+  }
+
+  clear(toastId: number) {
+    this.toastr.remove(toastId);
+  }
 }
