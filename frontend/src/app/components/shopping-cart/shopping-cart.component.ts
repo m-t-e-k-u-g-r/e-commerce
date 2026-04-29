@@ -133,8 +133,7 @@ export class ShoppingCartComponent {
 
   async checkout() {
     if (!this.authService.isLoggedIn()) {
-      this.notificationService.info('Please log in to place an order');
-      this.router.navigate(['/login']);
+      this.handleGuestCheckout();
       return;
     }
     const billingAddress = this.addressService.billingAddress();
@@ -151,17 +150,46 @@ export class ShoppingCartComponent {
     const response = await this.confirmService.confirmOptions({
       title: 'Place order',
       message: `Are you sure you want to place an order for $ ${this.cartService.totalAmount()}?`,
-      fields: [{
-        name: 'address',
-        type: 'select',
-        defaultValue: billingAddress.id,
-        label: 'Shipping address',
-        options: options
-      }]
+      fields: [
+        {
+          name: 'address',
+          type: 'select',
+          defaultValue: billingAddress.id,
+          label: 'Shipping address',
+          options: options,
+        },
+      ],
     });
     if (response.confirmed) {
       const id: number = response.data.address;
       this.orderService.createOrder(id);
     }
+  }
+
+  async handleGuestCheckout() {
+    const address = this.addressService.guestAddress();
+    if (address == null) {
+      this.notificationService.warning('Please save an address first', 'No address found');
+      return this.router.navigate(['/address/new']);
+    }
+
+    const response = await this.confirmService.confirmOptions({
+      title: '',
+      message: 'Please enter your email to place an order',
+      fields: [
+        {
+          name: 'email',
+          type: 'email',
+          label: 'E-Mail',
+          required: true,
+          placeholder: 'example@email.com',
+        },
+      ],
+    });
+    if (!response.confirmed) return this.notificationService.info('Order placement canceled');
+
+    const email: string = response.data.email;
+    const cartItems = this.cartService.cart();
+    this.orderService.createGuestOrder(email, address, cartItems).subscribe();
   }
 }
