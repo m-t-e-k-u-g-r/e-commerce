@@ -25,23 +25,21 @@
 }
 
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg-color: #121212;
-    --surface-color: #1e1e1e;
-    --text-color: #ffffff;
-    --text-secondary: rgba(255, 255, 255, 0.7);
-    --border-color: rgba(255, 255, 255, 0.12);
-    --nav-bg: #1f1f1f;
-    --card-bg: #1e1e1e;
+:root[data-theme='dark'] {
+  --bg-color: #121212;
+  --surface-color: #1e1e1e;
+  --text-color: #ffffff;
+  --text-secondary: rgba(255, 255, 255, 0.7);
+  --border-color: rgba(255, 255, 255, 0.12);
+  --nav-bg: #1f1f1f;
+  --card-bg: #1e1e1e;
 
-    --form-bg: #2d2d2d;
-    --form-border: #444;
-    --input-bg: #333;
+  --form-bg: #2d2d2d;
+  --form-border: #444;
+  --input-bg: #333;
 
-    --toast-success: #34c759;
-    --toast-error: #ff453a;
-    --toast-info: #64d2ff;
-    --toast-warning: #ffd60a;
-  }
+  --toast-success: #34c759;
+  --toast-error: #ff453a;
+  --toast-info: #64d2ff;
+  --toast-warning: #ffd60a;
 }
