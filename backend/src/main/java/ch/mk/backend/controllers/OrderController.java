@@ -1,9 +1,6 @@
 package ch.mk.backend.controllers;
 
-import ch.mk.backend.dtos.CreateGuestOrderDto;
-import ch.mk.backend.dtos.GuestOrderDto;
-import ch.mk.backend.dtos.OrderDto;
-import ch.mk.backend.dtos.CreateOrderDto;
+import ch.mk.backend.dtos.*;
 import ch.mk.backend.services.JWTService;
 import ch.mk.backend.services.OrderService;
 import lombok.AllArgsConstructor;
@@ -48,10 +45,20 @@ public class OrderController {
             @RequestBody CreateGuestOrderDto dto
     ) {
         String token = UUID.randomUUID().toString();
-        GuestOrderDto orderDto = orderService.createGuestOrder(dto, token);
+        GuestOrderCreatedDto orderDto = orderService.createGuestOrder(dto, token);
         orderDto.setAccessToken(token);
 
         return new ResponseEntity<>(orderDto, HttpStatus.CREATED);
+    }
+
+    @GetMapping("/guest/{orderId}")
+    public ResponseEntity<GuestOrderDto> getGuestOrder(
+            @PathVariable Number orderId,
+            @RequestParam String token
+    ) {
+        GuestOrderDto order = this.orderService.getGuestOrderById(orderId.intValue(), token);
+
+        return new ResponseEntity<>(order, HttpStatus.OK);
     }
 
     @PutMapping("/{orderId}")
