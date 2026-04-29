@@ -1,6 +1,7 @@
 package ch.mk.backend.controllers;
 
 import ch.mk.backend.dtos.CreateGuestOrderDto;
+import ch.mk.backend.dtos.GuestOrderDto;
 import ch.mk.backend.dtos.OrderDto;
 import ch.mk.backend.dtos.CreateOrderDto;
 import ch.mk.backend.services.JWTService;
@@ -11,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/orders")
@@ -42,10 +44,12 @@ public class OrderController {
     }
 
     @PostMapping("/guest")
-    public ResponseEntity<OrderDto> createGuestOrder(
+    public ResponseEntity<GuestOrderDto> createGuestOrder(
             @RequestBody CreateGuestOrderDto dto
     ) {
-        OrderDto orderDto = orderService.createGuestOrder(dto);
+        String token = UUID.randomUUID().toString();
+        GuestOrderDto orderDto = orderService.createGuestOrder(dto, token);
+        orderDto.setAccessToken(token);
 
         return new ResponseEntity<>(orderDto, HttpStatus.CREATED);
     }

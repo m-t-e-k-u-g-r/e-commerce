@@ -2,6 +2,7 @@ package ch.mk.backend.services;
 
 import ch.mk.backend.dtos.CreateAddressDto;
 import ch.mk.backend.dtos.CreateGuestOrderDto;
+import ch.mk.backend.dtos.GuestOrderDto;
 import ch.mk.backend.dtos.OrderDto;
 import ch.mk.backend.entities.*;
 import ch.mk.backend.mappers.AddressMapper;
@@ -10,6 +11,7 @@ import ch.mk.backend.mappers.OrderMapper;
 import ch.mk.backend.repositories.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -31,6 +33,7 @@ public class OrderService {
     private final CartItemMapper cartItemMapper;
     private final AddressMapper addressMapper;
     private final GuestRepository guestRepository;
+    private final BCryptPasswordEncoder bcryptEncoder;
 
     public List<OrderDto> getOrdersByUserId(Integer userId) {
         return orderRepository.findByUserId(userId)
@@ -59,17 +62,28 @@ public class OrderService {
     }
 
     @Transactional
-    public OrderDto createGuestOrder(CreateGuestOrderDto dto) {
+    public GuestOrderDto createGuestOrder(CreateGuestOrderDto dto, String accessToken) {
         Guest guest = guestService.createGuest(dto.getEmail());
         List<CartItem> cartItems = dto.getItems().stream()
                 .map(cartItemMapper::toEntity)
                 .toList();
 
         guestRepository.save(guest);
-        return processOrder(cartItems, dto.getAddress(), order -> order.setGuest(guest));
+        String tokenHash = bcryptEncoder.encode(accessToken);
+        OrderDto orderDto = processOrder(cartItems, dto.getAddress(),
+                order -> {
+                    order.setGuest(guest);
+                    order.setAccessTokenHash(tokenHash);
+                }
+        );
+        return orderMapper.toGuestOrderDto(orderDto, guest.getId(), accessToken);
     }
 
-    private OrderDto processOrder(List<CartItem> cartItems, CreateAddressDto shippingAddress, Consumer<Order> customerSetter) {
+    private OrderDto processOrder(
+            List<CartItem> cartItems,
+            CreateAddressDto shippingAddress,
+            Consumer<Order> customerSetter
+    ) {
         BigDecimal totalPrice = calculateTotalPrice(cartItems);
         Order order = createOrderEntity(totalPrice);
 
