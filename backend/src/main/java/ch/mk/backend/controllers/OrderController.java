@@ -1,5 +1,6 @@
 package ch.mk.backend.controllers;
 
+import ch.mk.backend.dtos.CreateGuestOrderDto;
 import ch.mk.backend.dtos.OrderDto;
 import ch.mk.backend.dtos.CreateOrderDto;
 import ch.mk.backend.services.JWTService;
@@ -35,7 +36,16 @@ public class OrderController {
     ) {
         Integer userId = jwtService.getUserIdFromAccessToken(accessToken);
         Integer addressId = dto.getAddressId();
-        OrderDto orderDto = orderService.createOrder(userId, addressId);
+        OrderDto orderDto = orderService.createUserOrder(userId, addressId);
+
+        return new ResponseEntity<>(orderDto, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/guest")
+    public ResponseEntity<OrderDto> createGuestOrder(
+            @RequestBody CreateGuestOrderDto dto
+    ) {
+        OrderDto orderDto = orderService.createGuestOrder(dto);
 
         return new ResponseEntity<>(orderDto, HttpStatus.CREATED);
     }
