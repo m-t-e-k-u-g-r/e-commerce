@@ -1,4 +1,3 @@
-DROP DATABASE IF EXISTS `e_commerce`;
 CREATE DATABASE IF NOT EXISTS `e_commerce`;
 USE `e_commerce`;
 
