@@ -14,8 +14,6 @@ import java.util.List;
 @Setter
 public class GuestOrderDto {
     private Integer id;
-    private Integer guestId;
-    private String accessToken;
     private String status;
     private Double totalPrice;
     private OrderAddressDto address;

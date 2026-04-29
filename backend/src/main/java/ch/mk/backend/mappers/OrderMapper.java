@@ -1,5 +1,5 @@
 package ch.mk.backend.mappers;
-
+import ch.mk.backend.dtos.GuestOrderCreatedDto;
 import ch.mk.backend.dtos.GuestOrderDto;
 import ch.mk.backend.dtos.OrderDto;
 import ch.mk.backend.entities.Order;
@@ -22,7 +22,9 @@ public interface OrderMapper {
             @Mapping(target = "guestId", source = "guestId"),
             @Mapping(target = "accessToken", source = "accessToken"),
     })
-    GuestOrderDto toGuestOrderDto(OrderDto orderDto, Integer guestId, String accessToken);
+    GuestOrderCreatedDto toGuestOrderDto(OrderDto orderDto, Integer guestId, String accessToken);
+
+    GuestOrderDto getGuestOrderDto(Order order);
 
     default LocalDate map(Instant instant) {
         if (instant == null) {
