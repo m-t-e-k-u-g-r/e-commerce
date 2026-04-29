@@ -31,7 +31,6 @@ export class App {
     effect(() => {
       this.authService.getUser().subscribe();
       if (this.authService.isLoggedIn()) {
-        this.addressService.getAddresses();
         this.orderService.getOrders();
       }
       this.loadData();
@@ -42,5 +41,6 @@ export class App {
     this.productService.getProducts();
     this.categoryService.getCategories();
     this.cartService.getCartItems();
+    this.addressService.getAddresses();
   }
 }
