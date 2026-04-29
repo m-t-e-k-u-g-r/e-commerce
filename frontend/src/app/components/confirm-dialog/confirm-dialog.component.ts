@@ -12,21 +12,23 @@ import { DialogInput } from '../../models/inputs.type';
   selector: 'app-confirm-dialog',
   imports: [MatDialogTitle, MatDialogContent, MatDialogActions, MatButton, MatDialogClose],
   template: `
-    <h2 mat-dialog-title>{{ data.title }}</h2>
+    <div class="dialog-container">
+      <h2 mat-dialog-title>{{ data.title }}</h2>
 
-    @if (data.message) {
-      <mat-dialog-content>
-        @if (data.messageType == 'html') {
-          <span [innerHTML]="data.message"></span>
-        } @else {
-          {{ data.message }}
-        }
-      </mat-dialog-content>
-    }
-    <mat-dialog-actions>
-      <button mat-flat-button [mat-dialog-close]="true">Confirm</button>
-      <button mat-button [mat-dialog-close]="false">Cancel</button>
-    </mat-dialog-actions>
+      @if (data.message) {
+        <mat-dialog-content class="dialog-message">
+          @if (data.messageType == 'html') {
+            <span [innerHTML]="data.message"></span>
+          } @else {
+            <span>{{ data.message }}</span>
+          }
+        </mat-dialog-content>
+      }
+      <mat-dialog-actions>
+        <button mat-flat-button [mat-dialog-close]="true">Confirm</button>
+        <button mat-button [mat-dialog-close]="false">Cancel</button>
+      </mat-dialog-actions>
+    </div>
   `,
   styleUrl: './confirm-dialog.component.scss',
 })
