@@ -4,6 +4,8 @@ import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
 import { MatIcon } from '@angular/material/icon';
 import { MatBadge } from '@angular/material/badge';
+import { ThemeService } from '../../services/theme.service';
+import { MatIconButton } from '@angular/material/button';
 
 export type MenuItem = {
   label: string;
@@ -12,16 +14,17 @@ export type MenuItem = {
 
 @Component({
   selector: 'app-navbar',
-  imports: [MatIcon, MatBadge],
+  imports: [MatIcon, MatBadge, MatIconButton],
   template: `
     <nav>
-      <a href="/">
+      <a href="/" title="Home">
         <i class="fas fa-leaf"></i>
       </a>
       <a
         href="/shopping-cart"
         matBadge="{{ badgeValue() }}"
         matBadgePosition="below"
+        title="Shopping cart"
       >
         <mat-icon>shopping_cart</mat-icon>
       </a>
@@ -29,7 +32,7 @@ export type MenuItem = {
         @if (!this.authService.isLoggedIn()) {
           <a href="/login">Log in</a>
         } @else {
-          <div class="user_info">
+          <div class="user_info" title="Open menu">
             <button (click)="toggle()" class="profile_button">
               {{ this.authService.userEmail() }}
             </button>
@@ -45,6 +48,17 @@ export type MenuItem = {
           </div>
         }
       </div>
+      <button
+        matIconButton
+        (click)="this.themeService.toggleTheme()"
+        title="Toggle theme"
+      >
+        @if (this.themeService.theme() == 'light') {
+          <mat-icon>dark_mode</mat-icon>
+        } @else {
+          <mat-icon>light_mode</mat-icon>
+        }
+      </button>
     </nav>
   `,
   styleUrl: './navbar.component.scss',
@@ -53,6 +67,7 @@ export class NavbarComponent {
   router = inject(Router);
   cartService = inject(CartService);
   authService = inject(AuthService);
+  themeService = inject(ThemeService);
   menuOpen = signal<Boolean>(false);
   badgeValue = computed(() => {
     const number = this.cartService.totalItems();

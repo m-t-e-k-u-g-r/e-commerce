@@ -37,7 +37,7 @@ button {
 }
 
 // Angular Material Overrides for Dark Mode
-@media (prefers-color-scheme: dark) {
+:root[data-theme='dark'] {
   .mat-mdc-button-disabled {
     color: var(--text-secondary) !important;
     background-color: var(--input-bg) !important;
