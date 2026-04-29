@@ -1,12 +1,15 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { environment } from '../../environments/environment.development';
 import { HttpClient } from '@angular/common/http';
-import { OrderDto } from '../models/order.type';
-import { map } from 'rxjs';
+import { CreatedGuestOrderDto, OrderDto } from '../models/order.type';
+import { map, of } from 'rxjs';
 import { CartService } from './cart.service';
 import { ConfirmService } from './confirm.service';
 import { Router } from '@angular/router';
 import { NotificationService } from './notification.service';
+import { AddressDto } from '../models/address.type';
+import { CartItem } from '../models/cartItem.type';
+import { catchError, tap } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root',
@@ -47,6 +50,52 @@ export class OrderService {
       this.details.set(order);
       this.notificationService.success(`Order #${order.id} placed successfully`);
     });
+  }
+
+  createGuestOrder(
+    email: string,
+    address: AddressDto,
+    items: CartItem[]
+  ) {
+    return this.http
+      .post<CreatedGuestOrderDto>(this.baseUrl + '/guest', {
+        email: email,
+        address: address,
+        items: items,
+      })
+      .pipe(
+        tap((order) => {
+          this.notificationService.success(`Order # ${order.id} created`);
+
+          const orderId = order.id;
+          const accessToken = order.accessToken;
+
+          navigator.clipboard.writeText(accessToken);
+          this.notificationService.info('Access token has been copied to clipboard');
+
+          this.confirmService.confirm({
+            title: `Order #${orderId} has been placed`,
+            message: `
+              <p><strong>Order ID:</strong> ${orderId}</p>
+              <p><strong>Access Token:</strong></p>
+              <code id="access-token">
+                ${accessToken}
+              </code>
+              <p>
+                Please save this token as well as your order ID. You will need them to access your order later.
+              </p>
+              <p>
+                For security reasons, this will not be shown again.
+              </p>
+            `,
+            messageType: 'html',
+          });
+        }),
+        catchError(() => {
+          this.notificationService.error('Please try again.', 'Failed to place order');
+          return of(null);
+        }),
+      );
   }
 
   async cancelOrder(orderId: number) {

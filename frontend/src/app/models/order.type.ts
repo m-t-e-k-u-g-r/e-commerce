@@ -16,3 +16,10 @@ export interface OrderDto {
   items: OrderItem[];
   createdDate: string;
 }
+
+export interface GuestOrderDto extends Omit<OrderDto, 'userId'> {}
+
+export interface CreatedGuestOrderDto extends GuestOrderDto {
+  guestId: number;
+  accessToken: string;
+}
