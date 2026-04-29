@@ -1,4 +1,4 @@
-import { Component, inject, effect } from '@angular/core';
+import { Component, inject, effect, untracked, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { ProductService } from './services/product.service';
 import { CategoryService } from './services/category.service';
@@ -19,7 +19,7 @@ import { OrderService } from './services/order.service';
   `,
   styleUrl: './app.scss',
 })
-export class App {
+export class App implements OnInit {
   productService = inject(ProductService);
   categoryService = inject(CategoryService);
   cartService = inject(CartService);
@@ -29,18 +29,22 @@ export class App {
 
   constructor() {
     effect(() => {
-      this.authService.getUser().subscribe();
-      if (this.authService.isLoggedIn()) {
-        this.addressService.getAddresses();
-        this.orderService.getOrders();
-      }
-      this.loadData();
+      const loggedIn = this.authService.isLoggedIn();
+
+      untracked(() => {
+        if (loggedIn) {
+          this.addressService.getAddresses();
+          this.orderService.getOrders();
+        }
+        this.cartService.getCartItems();
+      });
     });
   }
 
-  private loadData() {
+  ngOnInit() {
+    this.authService.getUser().subscribe();
+
     this.productService.getProducts();
     this.categoryService.getCategories();
-    this.cartService.getCartItems();
   }
 }

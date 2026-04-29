@@ -1,15 +1,16 @@
 import { CanActivateFn, Router } from '@angular/router';
 import { inject } from '@angular/core';
 import { AuthService } from '../services/auth.service';
-import { map, of } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { map, take } from 'rxjs';
 
 export const authGuard: CanActivateFn = () => {
   const authService = inject(AuthService);
   const router = inject(Router);
   return authService.getUser().pipe(
-    map(() => true),
-    catchError(() => of(router.createUrlTree(['/login'])))
+    take(1),
+    map(user => {
+      return user ? true : router.createUrlTree(['/login']);
+    }),
   );
 };
 
@@ -17,7 +18,9 @@ export const redirectFromLogin: CanActivateFn = () => {
   const authService = inject(AuthService);
   const router = inject(Router);
   return authService.getUser().pipe(
-    map(() => router.createUrlTree(['/'])),
-    catchError(() => of(true))
+    take(1),
+    map(user => {
+      return user ? router.createUrlTree(['/']) : true;
+    }),
   );
 }
