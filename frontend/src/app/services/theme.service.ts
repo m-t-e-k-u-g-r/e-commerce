@@ -12,6 +12,7 @@ export class ThemeService {
     });
   }
   private setTheme(theme: Theme) {
+    localStorage.setItem('theme', theme);
     this.theme.set(theme);
   }
 
@@ -19,5 +20,12 @@ export class ThemeService {
     const current = document.documentElement.getAttribute('data-theme');
     const next = current === 'dark' ? 'light' : 'dark';
     this.setTheme(next);
+  }
+
+  loadTheme() {
+    const savedTheme = localStorage.getItem('theme') as Theme | null;
+    if (savedTheme) {
+      this.setTheme(savedTheme as Theme);
+    }
   }
 }

@@ -7,6 +7,7 @@ import { CartService } from './services/cart.service';
 import { AuthService } from './services/auth.service';
 import { AddressService } from './services/address.service';
 import { OrderService } from './services/order.service';
+import { ThemeService } from './services/theme.service';
 
 @Component({
   selector: 'app-root',
@@ -26,6 +27,7 @@ export class App {
   authService = inject(AuthService);
   addressService = inject(AddressService);
   orderService = inject(OrderService);
+  themeService = inject(ThemeService);
 
   constructor() {
     effect(() => {
@@ -42,5 +44,6 @@ export class App {
     this.productService.getProducts();
     this.categoryService.getCategories();
     this.cartService.getCartItems();
+    this.themeService.loadTheme();
   }
 }
