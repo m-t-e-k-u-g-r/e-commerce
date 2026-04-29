@@ -10,6 +10,7 @@ import { MatButton } from '@angular/material/button';
 import { ConfirmService } from '../../services/confirm.service';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
+import { NotificationService } from '../../services/notification.service';
 
 @Component({
   selector: 'app-shopping-cart',
@@ -113,6 +114,7 @@ export class ShoppingCartComponent {
   orderService = inject(OrderService);
   authService = inject(AuthService);
   confirmService = inject(ConfirmService);
+  notificationService = inject(NotificationService);
   router = inject(Router);
   displayedColumns: string[] = ['image', 'product', 'quantity', 'price'];
 
@@ -131,10 +133,16 @@ export class ShoppingCartComponent {
 
   async checkout() {
     if (!this.authService.isLoggedIn()) {
+      this.notificationService.info('Please log in to place an order');
       this.router.navigate(['/login']);
+      return;
     }
     const billingAddress = this.addressService.billingAddress();
-    if (billingAddress == null) return;
+    if (billingAddress == null) {
+      this.notificationService.info('Please create a billing address');
+      this.router.navigate(['/address/new']);
+      return;
+    }
     const addresses = this.addressService.addresses();
     const options = addresses.map(a => ({
       label: `${a.street} ${a.houseNumber}`,
