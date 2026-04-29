@@ -1,11 +1,18 @@
-import { Injectable } from '@angular/core';
+import { effect, Injectable, signal } from '@angular/core';
+import { Theme } from '../models/theme.type';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ThemeService {
-  private setTheme(theme: 'light' | 'dark') {
-    document.documentElement.setAttribute('data-theme', theme);
+  theme = signal<Theme>('light');
+  constructor() {
+    effect(() => {
+      document.documentElement.setAttribute('data-theme', this.theme());
+    });
+  }
+  private setTheme(theme: Theme) {
+    this.theme.set(theme);
   }
 
   toggleTheme() {
