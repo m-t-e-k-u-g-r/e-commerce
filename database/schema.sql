@@ -36,7 +36,8 @@ CREATE TABLE `users` (
 
 CREATE TABLE `guests` (
     `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    `email` VARCHAR(255) NOT NULL
+    `email` VARCHAR(255) NOT NULL,
+    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
 CREATE TABLE `refresh_tokens` (
