@@ -2,11 +2,12 @@ import { inject, Injectable, signal } from '@angular/core';
 import { environment } from '../../environments/environment.development';
 import { HttpClient } from '@angular/common/http';
 import { OrderDto } from '../models/order.type';
-import { map } from 'rxjs';
+import { finalize, map, of } from 'rxjs';
 import { CartService } from './cart.service';
 import { ConfirmService } from './confirm.service';
 import { Router } from '@angular/router';
 import { NotificationService } from './notification.service';
+import { catchError, tap } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root',
@@ -38,26 +39,50 @@ export class OrderService {
   }
 
   createOrder(addressId: number) {
+    const toastId = this.notificationService.pending('Placing order...');
     return this.http.post<OrderDto>(this.baseUrl, { addressId: addressId },
       { withCredentials: true }
-    ).subscribe(order => {
-      this.cartService.getCartItems();
-      this.getOrders();
-      this.router.navigate(['/orders']);
-      this.details.set(order);
-      this.notificationService.success(`Order #${order.id} placed successfully`);
-    });
+    ).pipe(
+      tap((order) => {
+        this.cartService.getCartItems();
+        this.getOrders();
+        this.router.navigate(['/orders']);
+        this.details.set(order);
+        this.notificationService.success(`Order #${order.id} placed successfully`);
+      }),
+      catchError(() => {
+        this.notificationService.error('Failed to place order');
+        return of(null);
+      }),
+      finalize(() => {
+        this.notificationService.clear(toastId);
+      })
+    )
   }
 
   async cancelOrder(orderId: number) {
-    const confirmed = await this.confirmService.confirm({ title: `Cancel order #${orderId}`, message: 'Are you sure you want to cancel this order?' });
+    const confirmed = await this.confirmService.confirm({
+      title: `Cancel order #${orderId}`,
+      message: 'Are you sure you want to cancel this order?',
+    });
     if (!confirmed) return;
+
+    const toastId = this.notificationService.pending('Placing order...');
     return this.http.delete<OrderDto>(this.baseUrl + '/' + orderId,
       { withCredentials: true }
-    ).subscribe(order => {
-      this.getOrders();
-      this.notificationService.success(`Order #${order.id} cancelled`);
-    });
+    ).pipe(
+      tap(order => {
+        this.getOrders();
+        this.notificationService.success(`Order #${order.id} cancelled`);
+      }),
+      catchError(() => {
+        this.notificationService.error(`Failed to cancel order #${orderId}`);
+        return of(null);
+      }),
+      finalize(() => {
+        this.notificationService.clear(toastId);
+      })
+    )
   }
 
   private formatDate(date: string): string {

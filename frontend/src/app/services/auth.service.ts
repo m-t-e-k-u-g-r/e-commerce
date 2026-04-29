@@ -1,7 +1,7 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { environment } from '../../environments/environment.development';
 import { HttpClient } from '@angular/common/http';
-import { catchError, of, tap } from 'rxjs';
+import { catchError, finalize, of, tap } from 'rxjs';
 import { User } from '../models/user.type';
 import { NotificationService } from './notification.service';
 import { Router } from '@angular/router';
@@ -16,6 +16,7 @@ export class AuthService {
   router = inject(Router);
   isLoggedIn = signal<boolean>(false);
   userEmail = signal<string | null>(null);
+  loading = signal(false);
 
   getUser() {
     return this.http.get<User>(this.baseUrl + '/me', { withCredentials: true }).pipe(
@@ -35,6 +36,8 @@ export class AuthService {
   }
 
   signup(email: string, password: string) {
+    this.loading.set(true);
+    const toastId = this.notificationService.pending('Signing up user...');
     return this.http
       .post(
         this.baseUrl + '/register',
@@ -45,15 +48,22 @@ export class AuthService {
         tap(() => {
           this.isLoggedIn.set(true);
           this.notificationService.success('Registration successful');
+          this.router.navigate(['/']);
         }),
         catchError(() => {
           this.notificationService.error('Registration failed. Please try again.');
           return of(null);
         }),
+        finalize(() => {
+          this.loading.set(false);
+          this.notificationService.clear(toastId);
+        })
       );
   }
 
   login(email: string, password: string) {
+    this.loading.set(true);
+    const toastId = this.notificationService.pending('Logging in user...');
     return this.http
       .post(
         this.baseUrl + '/login',
@@ -72,6 +82,10 @@ export class AuthService {
           this.notificationService.error('Login failed. Please try again.');
           return of(null);
         }),
+        finalize(() => {
+          this.loading.set(false);
+          this.notificationService.clear(toastId);
+        }),
       );
   }
 
@@ -88,6 +102,7 @@ export class AuthService {
   }
 
   logout() {
+    const toastId = this.notificationService.pending('Logging out user...')
     return this.http.delete(this.baseUrl + '/logout', { withCredentials: true }).pipe(
       tap(() => {
         this.isLoggedIn.set(false);
@@ -99,6 +114,9 @@ export class AuthService {
         this.notificationService.error('Logout failed. Please try again.');
         return of(null);
       }),
+      finalize(() => {
+        this.notificationService.clear(toastId)
+      })
     );
   }
 }

@@ -91,7 +91,7 @@ import { MyErrorStateMatcher } from '../../guards/errorMatcher.guard';
           }
         </mat-form-field>
       }
-      <button type="submit" matButton="elevated" [disabled]="loginForm.invalid">
+      <button type="submit" matButton="elevated" [disabled]="loginForm.invalid || this.authService.loading()">
         {{ isLogin ? 'Login' : 'Signup' }}
       </button>
       @if (isLogin) {
@@ -112,7 +112,7 @@ import { MyErrorStateMatcher } from '../../guards/errorMatcher.guard';
 })
 export class LoginComponent {
   matcher = new MyErrorStateMatcher();
-  private authService = inject(AuthService);
+  protected authService = inject(AuthService);
   router = inject(Router);
   isLogin = true;
   loginForm: FormGroup<{
@@ -157,11 +157,7 @@ export class LoginComponent {
     const data = this.loginForm.value;
     if (typeof data.email !== 'string' || typeof data.password !== 'string') return;
     if (this.isLogin) {
-      this.authService.login(data.email, data.password).subscribe({
-        next: () => {
-          this.router.navigate(['/']);
-        },
-      });
+      this.authService.login(data.email, data.password).subscribe();
     } else {
       if (data.password !== data.confirmPassword) return;
       this.authService.signup(data.email, data.password).subscribe({

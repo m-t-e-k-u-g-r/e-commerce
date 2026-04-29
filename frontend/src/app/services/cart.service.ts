@@ -6,6 +6,8 @@ import { AuthService } from './auth.service';
 import { HttpClient } from '@angular/common/http';
 import { NotificationService } from './notification.service';
 import { ConfirmService } from './confirm.service';
+import { catchError, tap } from 'rxjs/operators';
+import { finalize, of } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -123,12 +125,20 @@ export class CartService {
     });
     if (!confirmed) return;
     if (this.authService.isLoggedIn()) {
-      this.http.delete(this.baseUrl,
-        { withCredentials: true }
-      ).subscribe(() => {
-        this.getCartItems();
-        this.notificationService.success('Cleared cart');
-      });
+      const toastId = this.notificationService.pending('Clearing cart...');
+      this.http.delete(this.baseUrl, { withCredentials: true }).pipe(
+        tap(() => {
+          this.getCartItems();
+          this.notificationService.success('Cleared cart');
+        }),
+        catchError(() => {
+          this.notificationService.error('Failed to clear cart');
+          return of(null);
+        }),
+        finalize(() => {
+          this.notificationService.clear(toastId);
+        })
+      );
     } else {
       this._cart.set([]);
       this.saveToLocalStorage();
