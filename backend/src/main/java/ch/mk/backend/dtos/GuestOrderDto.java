@@ -12,9 +12,10 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Setter
-public class OrderDto {
+public class GuestOrderDto {
     private Integer id;
-    private Integer userId;
+    private Integer guestId;
+    private String accessToken;
     private String status;
     private Double totalPrice;
     private OrderAddressDto address;

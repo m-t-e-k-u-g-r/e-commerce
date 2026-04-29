@@ -82,6 +82,7 @@ CREATE TABLE `orders` (
     `id` INT PRIMARY KEY AUTO_INCREMENT,
     `user_id` INT NULL,
     `guest_id` INT NULL,
+    `access_token_hash` VARCHAR(255) NULL,
     `status` ENUM('PENDING','PAID','SHIPPED','DELIVERED','CANCELLED'),
     `total_price` DECIMAL(10,2) NOT NULL,
     `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
@@ -89,9 +90,9 @@ CREATE TABLE `orders` (
     FOREIGN KEY `orders_idfk` (`user_id`) REFERENCES users (`id`),
     FOREIGN KEY `orders_idfk_2` (`guest_id`) REFERENCES guests (`id`),
     CHECK (
-        (user_id IS NOT NULL AND guest_id IS NULL)
+        (user_id IS NOT NULL AND guest_id IS NULL AND access_token_hash IS NULL)
         OR
-        (user_id IS NULL AND guest_id IS NOT NULL)
+        (user_id IS NULL AND guest_id IS NOT NULL AND access_token_hash IS NOT NULL)
     )
 );
 
