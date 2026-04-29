@@ -1,9 +1,6 @@
 package ch.mk.backend.services;
 
-import ch.mk.backend.dtos.CreateAddressDto;
-import ch.mk.backend.dtos.CreateGuestOrderDto;
-import ch.mk.backend.dtos.GuestOrderDto;
-import ch.mk.backend.dtos.OrderDto;
+import ch.mk.backend.dtos.*;
 import ch.mk.backend.entities.*;
 import ch.mk.backend.mappers.AddressMapper;
 import ch.mk.backend.mappers.CartItemMapper;
@@ -42,6 +39,16 @@ public class OrderService {
                 .toList();
     }
 
+    public GuestOrderDto getGuestOrderById(Integer orderId, String accessToken) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+
+        boolean valid = bcryptEncoder.matches(accessToken, order.getAccessTokenHash());
+        if (!valid) throw new RuntimeException("Invalid access token");
+
+        return orderMapper.getGuestOrderDto(order);
+    }
+
     @Transactional
     public OrderDto createUserOrder(Integer userId, Integer addressId) {
         User user = userRepository.findById(userId)
@@ -62,7 +69,7 @@ public class OrderService {
     }
 
     @Transactional
-    public GuestOrderDto createGuestOrder(CreateGuestOrderDto dto, String accessToken) {
+    public GuestOrderCreatedDto createGuestOrder(CreateGuestOrderDto dto, String accessToken) {
         Guest guest = guestService.createGuest(dto.getEmail());
         List<CartItem> cartItems = dto.getItems().stream()
                 .map(cartItemMapper::toEntity)
