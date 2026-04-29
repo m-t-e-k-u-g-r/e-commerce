@@ -48,13 +48,13 @@ import { MatChipsModule } from '@angular/material/chips';
               <mat-list-item class="product-item">
                 <img matListItemIcon
                   [ngSrc]="item.product.imageUrl || ''"
-                  width="60"
-                  height="60"
+                  width="100"
+                  height="100"
                   alt="{{ item.product.name }}"
                   class="product-img"
                 />
                 <div matListItemTitle class="product-name">{{ item.product.name }}</div>
-                <div matListItemLine>
+                <div matListItemLine class="product-info">
                   {{ item.quantity }} x {{ item.product.price | currency:'USD':'symbol' }}
                 </div>
                 <div matListItemLine class="product-total">

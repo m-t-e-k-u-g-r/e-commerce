@@ -39,12 +39,17 @@ h3 {
 }
 
 .product-name {
+  color: var(--text-color);
   font-weight: 500;
+}
+
+.product-info {
+  color: var(--text-secondary);
 }
 
 .product-total {
   font-weight: 600;
-  color: #333;
+  color: var(--text-secondary);
 }
 
 .total-section {
