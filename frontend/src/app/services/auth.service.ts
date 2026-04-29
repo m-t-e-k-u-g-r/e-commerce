@@ -81,15 +81,6 @@ export class AuthService {
           this.isLoggedIn.set(true);
         }),
         catchError((err) => {
-          switch (err.status) {
-            case 401:
-              console.error('Refresh called without a token (frontend bug)', err);
-              break;
-            case 403:
-              break;
-            default:
-              break;
-          }
           this.isLoggedIn.set(false);
           return EMPTY;
         }),
