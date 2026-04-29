@@ -5,6 +5,7 @@ import { ProductService } from './product.service';
 import { AuthService } from './auth.service';
 import { HttpClient } from '@angular/common/http';
 import { NotificationService } from './notification.service';
+import { ConfirmService } from './confirm.service';
 
 @Injectable({
   providedIn: 'root',
@@ -15,6 +16,7 @@ export class CartService {
   productService = inject(ProductService);
   authService = inject(AuthService);
   notificationService = inject(NotificationService);
+  confirmService = inject(ConfirmService);
   private _cart = signal<CartItem[]>([]);
   readonly cart = this._cart.asReadonly();
   readonly totalItems = computed(() =>
@@ -113,7 +115,13 @@ export class CartService {
     return;
   }
 
-  clearCart() {
+  async clearCart() {
+    const confirmed = await this.confirmService.confirm({
+      title: 'Clear cart',
+      message: 'Are you sure you want to clear your cart?',
+      messageType: 'text'
+    });
+    if (!confirmed) return;
     if (this.authService.isLoggedIn()) {
       this.http.delete(this.baseUrl,
         { withCredentials: true }
