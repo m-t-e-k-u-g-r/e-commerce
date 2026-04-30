@@ -7,9 +7,12 @@ import { MatBadge } from '@angular/material/badge';
 import { ThemeService } from '../../services/theme.service';
 import { MatIconButton } from '@angular/material/button';
 
+type Visibility = 'user' | 'guest' | 'all'
 export type MenuItem = {
+  icon?: string;
   label: string;
   action: () => void;
+  visibleFor: Visibility;
 };
 
 @Component({
@@ -17,48 +20,51 @@ export type MenuItem = {
   imports: [MatIcon, MatBadge, MatIconButton],
   template: `
     <nav>
-      <a href="/" title="Home">
-        <i class="fas fa-leaf"></i>
-      </a>
-      <a
-        href="/shopping-cart"
-        matBadge="{{ badgeValue() }}"
-        matBadgePosition="below"
-        title="Shopping cart"
-      >
-        <mat-icon>shopping_cart</mat-icon>
-      </a>
-      <div class="user_info">
-        @if (!this.authService.isLoggedIn()) {
-          <a href="/login">Log in</a>
-        } @else {
-          <div class="user_info" title="Open menu">
-            <button (click)="toggle()" class="profile_button">
-              {{ this.authService.userEmail() }}
-            </button>
-            @if (this.menuOpen()) {
-              <ul class="info_menu">
-                @for (item of this.menuItems; track item.label) {
-                  <li (click)="onItemClick(item)">
-                    {{ item.label }}
-                  </li>
-                }
-              </ul>
-            }
-          </div>
-        }
+      <div class="nav-left">
+        <a href="/" title="Home">
+          <i class="fas fa-leaf"></i>
+        </a>
       </div>
-      <button
-        matIconButton
-        (click)="this.themeService.toggleTheme()"
-        title="Toggle theme"
-      >
-        @if (this.themeService.theme() == 'light') {
-          <mat-icon>dark_mode</mat-icon>
-        } @else {
-          <mat-icon>light_mode</mat-icon>
-        }
-      </button>
+      <div class="nav-right">
+        <a
+          href="/shopping-cart"
+          matBadge="{{ badgeValue() }}"
+          matBadgePosition="below"
+          title="Shopping cart"
+        >
+          <mat-icon>shopping_cart</mat-icon>
+        </a>
+        <div class="user_info">
+          <button matIconButton (click)="toggle()">
+            <mat-icon>
+              {{ this.authService.isLoggedIn() ? 'account_circle' : 'no_accounts' }}
+            </mat-icon>
+          </button>
+          @if (this.menuOpen()) {
+            <ul class="info_menu">
+              @for (item of this.getVisibleItems(); track item.label) {
+                <li (click)="onItemClick(item)">
+                  @if (item.icon) {
+                    <mat-icon>{{ item.icon }}</mat-icon>
+                  }
+                  {{ item.label }}
+                </li>
+              }
+            </ul>
+          }
+        </div>
+        <button
+          matIconButton
+          (click)="this.themeService.toggleTheme()"
+          title="Toggle theme"
+        >
+          @if (this.themeService.theme() == 'light') {
+            <mat-icon>dark_mode</mat-icon>
+          } @else {
+            <mat-icon>light_mode</mat-icon>
+          }
+        </button>
+      </div>
     </nav>
   `,
   styleUrl: './navbar.component.scss',
@@ -74,6 +80,16 @@ export class NavbarComponent {
     if (number >= 100) return '99+';
     return number.toString();
   });
+  getVisibleItems(): MenuItem[] {
+    const loggedIn = this.authService.isLoggedIn();
+
+    return this.menuItems.filter(
+      (item) =>
+        item.visibleFor === 'all' ||
+        (loggedIn && item.visibleFor === 'user') ||
+        (!loggedIn && item.visibleFor === 'guest'),
+    );
+  }
 
   onItemClick(item: MenuItem) {
     item.action();
@@ -86,24 +102,39 @@ export class NavbarComponent {
   menuItems: MenuItem[] = [
     {
       label: 'My orders',
+      icon: 'receipt_long',
       action: () => {
         this.router.navigate(['/orders']);
         this.menuOpen.set(false);
       },
+      visibleFor: 'user',
     },
     {
       label: 'My addresses',
+      icon: 'location_on',
       action: () => {
         this.router.navigate(['/address']);
         this.menuOpen.set(false);
       },
+      visibleFor: 'all',
+    },
+    {
+      label: 'Login',
+      icon: 'login',
+      action: () => {
+        this.router.navigate(['/login']);
+        this.menuOpen.set(false);
+      },
+      visibleFor: 'guest',
     },
     {
       label: 'Logout',
+      icon: 'logout',
       action: () => {
         this.authService.logout().subscribe();
         this.menuOpen.set(false);
       },
+      visibleFor: 'user',
     },
   ];
 }
