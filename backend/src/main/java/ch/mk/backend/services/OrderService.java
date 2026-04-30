@@ -8,8 +8,10 @@ import ch.mk.backend.mappers.OrderMapper;
 import ch.mk.backend.repositories.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -41,10 +43,10 @@ public class OrderService {
 
     public GuestOrderDto getGuestOrderById(Integer orderId, String accessToken) {
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new RuntimeException("Order not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "ORDER_NOT_FOUND"));
 
         boolean valid = bcryptEncoder.matches(accessToken, order.getAccessTokenHash());
-        if (!valid) throw new RuntimeException("Invalid access token");
+        if (!valid) throw new ResponseStatusException(HttpStatus.FORBIDDEN, "INVALID_ACCESS_TOKEN");
 
         return orderMapper.getGuestOrderDto(order);
     }
@@ -52,16 +54,16 @@ public class OrderService {
     @Transactional
     public OrderDto createUserOrder(Integer userId, Integer addressId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "USER_NOT_FOUND"));
 
         List<CartItem> cartItems = cartItemRepository.findByUserId(userId);
         if (cartItems.isEmpty()) {
-            throw new RuntimeException("Cart is empty");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "CART_EMPTY");
         }
 
         CreateAddressDto shippingAddress = addressMapper.toCreateDto(
                 addressService.getAddressByIdAndUserId(addressId, userId)
-                        .orElseThrow(() -> new RuntimeException("Shipping address not found"))
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "ADDRESS_NOT_FOUND"))
         );
 
         cartItemRepository.deleteAll(cartItems);
@@ -119,7 +121,7 @@ public class OrderService {
 
     public OrderDto updateOrderStatus(Integer orderId, Integer userId, String status) {
         Order order = orderRepository.findByIdAndUserId(orderId, userId)
-                .orElseThrow(() -> new RuntimeException("Order not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "ORDER_NOT_FOUND"));
         order.setStatus(status);
         orderRepository.save(order);
         return orderMapper.toDto(order);
@@ -127,7 +129,7 @@ public class OrderService {
 
     public void cancelOrder(Integer orderId, Integer userId) {
         Order order = orderRepository.findByIdAndUserId(orderId, userId)
-                .orElseThrow(() -> new RuntimeException("Order not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "ORDER_NOT_FOUND"));
         order.setStatus("CANCELLED");
         orderRepository.save(order);
     }

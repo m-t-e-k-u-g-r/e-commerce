@@ -4,6 +4,7 @@ import ch.mk.backend.dtos.LoginRequest;
 import ch.mk.backend.dtos.TokenDto;
 import ch.mk.backend.dtos.UserDto;
 import ch.mk.backend.entities.RefreshToken;
+import ch.mk.backend.entities.User;
 import ch.mk.backend.mappers.UserMapper;
 import ch.mk.backend.repositories.RefreshTokenRepository;
 import ch.mk.backend.repositories.UserRepository;
@@ -16,8 +17,10 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
 
@@ -47,12 +50,10 @@ public class AuthController {
 
     @GetMapping("/me")
     public ResponseEntity<UserDto> getUser(
-            @CookieValue("accessToken") String accessToken
+            @AuthenticationPrincipal User user
     ) {
         try {
-            var claims = jwtService.checkAccessToken(accessToken);
-            Integer userId = Integer.valueOf(claims.getPayload().getSubject());
-            return userRepository.findById(userId)
+            return userRepository.findById(user.getId())
                     .map(userMapper::toDto)
                     .map(ResponseEntity::ok)
                     .orElse(ResponseEntity.notFound().build());
@@ -121,10 +122,10 @@ public class AuthController {
 
     private String refreshAccessToken(String token) {
         RefreshToken storedToken = refreshTokenRepository.findByToken(token)
-                .orElseThrow(() -> new RuntimeException("Token not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "TOKEN_NOT_FOUND"));
 
         if (storedToken.getRevoked() || storedToken.getExpiresAt().isBefore(Instant.now())) {
-            throw new RuntimeException("Token is invalid or expired");
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "INVALID_TOKEN");
         }
         return jwtService.createAccessTokenFromRefreshToken(token);
     }

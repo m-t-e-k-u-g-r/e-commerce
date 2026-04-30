@@ -6,10 +6,12 @@ import ch.mk.backend.entities.User;
 import ch.mk.backend.repositories.RefreshTokenRepository;
 import ch.mk.backend.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -42,7 +44,7 @@ public class UserService {
 
         if (authentication.isAuthenticated()) {
             User user = userRepository.findByEmail(request.getEmail())
-                    .orElseThrow(() -> new RuntimeException("User not found"));
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "USER_NOT_FOUND"));
             String tokenString = jwtService.generateRefreshToken(user.getId().toString());
             saveRefreshToken(tokenString, user);
             return tokenString;

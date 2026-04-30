@@ -1,8 +1,8 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { environment } from '../../environments/environment.development';
-import { HttpClient } from '@angular/common/http';
-import { CreatedGuestOrderDto, OrderDto } from '../models/order.type';
-import { finalize, map, of } from 'rxjs';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { CreatedGuestOrderDto, GuestOrderDto, OrderDto } from '../models/order.type';
+import { finalize, map, of, throwError } from 'rxjs';
 import { CartService } from './cart.service';
 import { ConfirmService } from './confirm.service';
 import { Router } from '@angular/router';
@@ -11,6 +11,8 @@ import { AddressDto } from '../models/address.type';
 import { CartItem } from '../models/cartItem.type';
 import { catchError, tap } from 'rxjs/operators';
 import { jsonExport, mapToGuestOrderExport } from '../utils';
+import { MatDialog } from '@angular/material/dialog';
+import { OrderDetailsComponent } from '../components/order-details/order-details.component';
 
 @Injectable({
   providedIn: 'root',
@@ -24,7 +26,9 @@ export class OrderService {
   confirmService = inject(ConfirmService);
   notificationService = inject(NotificationService);
   router = inject(Router);
+  constructor(private dialog: MatDialog) {}
   details = signal<OrderDto | null>(null);
+  guestOrderDetails = signal<GuestOrderDto | null>(null);
   loading = signal(false);
 
   getOrders() {
@@ -39,7 +43,52 @@ export class OrderService {
       )
     ).subscribe(orders => {
       this._orders.set(orders);
+    });
+  }
+
+  async checkGuestOrder() {
+    const response = await this.confirmService.confirmOptions({
+      title: 'Retrieve order details',
+      message: 'Please enter your order ID and token to retrieve your order details.',
+      fields: [
+        { name: 'orderId', type: 'number', label: 'Order ID', required: true },
+        { name: 'token', type: 'text', label: 'Token', required: true }
+      ]
+    });
+    if (response.confirmed) {
+      const orderId: number = response.data.orderId;
+      const token: string = response.data.token;
+      this.getGuestOrder(orderId, token);
+    }
+  }
+
+  getGuestOrder(orderId: number, token: string) {
+    this.loading.set(true);
+    const toastId = this.notificationService.pending('Verifying order details...');
+    return this.http.get<GuestOrderDto>(this.baseUrl + '/guest/' + orderId, {
+      params: new HttpParams().set('token', token)
     })
+      .pipe(
+        tap((orderDto) => {
+          this.guestOrderDetails.set(orderDto);
+          this.notificationService.success('Order details verified successfully');
+          this.openGuestOrder(orderDto);
+        }),
+        catchError((err) => {
+          if (err.status === 404) {
+            this.notificationService.error(`Order #${orderId} not found`);
+          } else if (err.status === 403) {
+            this.notificationService.error('Invalid token for this order');
+          } else {
+            this.notificationService.error('Failed to verify order details');
+          }
+          return throwError(() => err);
+        }),
+        finalize(() => {
+          this.notificationService.clear(toastId);
+          this.loading.set(false);
+        }),
+      ).subscribe();
   }
 
   createOrder(addressId: number) {
@@ -154,5 +203,14 @@ export class OrderService {
   private formatDate(date: string): string {
     const [y, m, d] = date.split('-');
     return `${d}.${m}.${y}`;
+  }
+
+  openGuestOrder(order: GuestOrderDto) {
+    this.dialog.open(OrderDetailsComponent, {
+      data: order,
+      panelClass: 'order-dialog',
+      minWidth: '40vw',
+      maxHeight: '90vh'
+    });
   }
 }

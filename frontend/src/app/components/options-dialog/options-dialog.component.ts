@@ -39,72 +39,74 @@ import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
           </p>
           <mat-divider />
         }
-        @for (field of fields; track field.name) {
-          <mat-form-field>
-            <mat-label>{{ field.label }}</mat-label>
-            @switch (field.type) {
-              @case ('text') {
-                <input
-                  matInput
-                  placeholder="{{ field.placeholder || '' }}"
-                  [formControlName]="field.name"
-                />
-              }
-              @case ('email') {
-                <input
+        <div class="input_wrapper">
+          @for (field of fields; track field.name) {
+            <mat-form-field>
+              <mat-label>{{ field.label }}</mat-label>
+              @switch (field.type) {
+                @case ('text') {
+                  <input
+                    matInput
+                    placeholder="{{ field.placeholder || '' }}"
+                    [formControlName]="field.name"
+                  />
+                }
+                @case ('email') {
+                  <input
                     matInput
                     placeholder="{{ field.placeholder || '' }}"
                     [formControlName]="field.name"
                     type="email"
-                />
-              }
-              @case ('textarea') {
-                <textarea
-                  matInput
-                  placeholder="{{ field.placeholder || '' }}"
-                  value="{{ field.defaultValue || '' }}"
-                  formControlName="{{ field.name }}"
-                ></textarea>
-              }
-              @case ('number') {
-                <input
-                  matInput
-                  type="number"
-                  placeholder="{{ field.placeholder || '' }}"
-                  [formControlName]="field.name"
-                />
-              }
-              @case ('select') {
-                <mat-select [formControlName]="field.name">
-                  @for (option of field.options; track option) {
-                    <mat-option [value]="option.value">{{ option.label }}</mat-option>
-                  }
-                </mat-select>
-              }
-              @case ('radio') {
-                @for (option of field.options; track option.value) {
+                  />
+                }
+                @case ('textarea') {
+                  <textarea
+                    matInput
+                    placeholder="{{ field.placeholder || '' }}"
+                    value="{{ field.defaultValue || '' }}"
+                    formControlName="{{ field.name }}"
+                  ></textarea>
+                }
+                @case ('number') {
                   <input
                     matInput
-                    type="radio"
-                    id="{{ option.value }}"
+                    type="number"
+                    placeholder="{{ field.placeholder || '' }}"
                     [formControlName]="field.name"
                   />
-                  <label for="{{ option.value }}">
-                    {{ option.label }}
-                  </label>
+                }
+                @case ('select') {
+                  <mat-select [formControlName]="field.name">
+                    @for (option of field.options; track option) {
+                      <mat-option [value]="option.value">{{ option.label }}</mat-option>
+                    }
+                  </mat-select>
+                }
+                @case ('radio') {
+                  @for (option of field.options; track option.value) {
+                    <input
+                      matInput
+                      type="radio"
+                      id="{{ option.value }}"
+                      [formControlName]="field.name"
+                    />
+                    <label for="{{ option.value }}">
+                      {{ option.label }}
+                    </label>
+                  }
+                }
+                @case ('date') {
+                  <div>
+                    <input matInput [matDatepicker]="picker" [formControlName]="field.name" />
+                    <mat-hint>MM/DD/YYYY</mat-hint>
+                    <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                    <mat-datepicker #picker></mat-datepicker>
+                  </div>
                 }
               }
-              @case ('date') {
-                <div>
-                  <input matInput [matDatepicker]="picker" [formControlName]="field.name" />
-                  <mat-hint>MM/DD/YYYY</mat-hint>
-                  <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
-                  <mat-datepicker #picker></mat-datepicker>
-                </div>
-              }
-            }
-          </mat-form-field>
-        }
+            </mat-form-field>
+          }
+        </div>
       </mat-dialog-content>
 
       <mat-dialog-actions>
@@ -137,6 +139,9 @@ export class OptionsDialogComponent implements OnInit {
     });
   }
   cancel() {
-    this.optionDialogRef.close(false);
+    this.optionDialogRef.close({
+      confirmed: false,
+      data: this.form.value,
+    });
   }
 }
