@@ -1,10 +1,11 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { environment } from '../../environments/environment.development';
 import { HttpClient } from '@angular/common/http';
-import { catchError, finalize, tap, throwError } from 'rxjs';
+import { catchError, finalize, of, tap, throwError } from 'rxjs';
 import { NotificationService } from './notification.service';
 import { Router } from '@angular/router';
 import { User } from '../models/user.type';
+import { isAuthError } from '../guards/auth.guard';
 
 @Injectable({
   providedIn: 'root',
@@ -96,6 +97,23 @@ export class AuthService {
       finalize(() => {
         this.notificationService.clear(toastId)
       })
+    );
+  }
+
+  refresh() {
+    return this.http.post(this.baseUrl + '/refresh', {},
+      { withCredentials: true }
+    ).pipe(
+      tap(() => {
+        this.isLoggedIn.set(true);
+      }),
+      catchError((err) => {
+        this.isLoggedIn.set(false);
+        if (isAuthError(err)) {
+          return of(null);
+        }
+        return throwError(() => err);
+      }),
     );
   }
 }

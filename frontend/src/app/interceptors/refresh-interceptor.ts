@@ -1,28 +1,8 @@
-import { HttpClient, HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
+import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
 import { catchError, filter, switchMap } from 'rxjs/operators';
 import { inject } from '@angular/core';
 import { AuthService } from '../services/auth.service';
-import { BehaviorSubject, finalize, of, take, tap, throwError } from 'rxjs';
-import { isAuthError } from '../guards/auth.guard';
-import { environment } from '../../environments/environment.development';
-
-const baseUrl = environment.apiUrl;
-function refresh() {
-  const http = inject(HttpClient);
-  const authService = inject(AuthService);
-  return http.post(baseUrl + '/refresh', {}, { withCredentials: true }).pipe(
-    tap(() => {
-      authService.isLoggedIn.set(true);
-    }),
-    catchError((err) => {
-      authService.isLoggedIn.set(false);
-      if (isAuthError(err)) {
-        return of(null);
-      }
-      return throwError(() => err);
-    }),
-  );
-}
+import { BehaviorSubject, finalize, take, throwError } from 'rxjs';
 
 let isRefreshing = false;
 const refreshTokenSubject = new BehaviorSubject<boolean>(false);
@@ -31,7 +11,7 @@ export const refreshInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
   return next(req).pipe(
     catchError((err: HttpErrorResponse) => {
-      if (err.status === 401) {
+      if (err.status === 401 || err.status === 403) {
         if (req.url.includes('/auth/refresh')) {
           authService.forceLogout();
           return throwError(() => err);
@@ -41,7 +21,7 @@ export const refreshInterceptor: HttpInterceptorFn = (req, next) => {
           isRefreshing = true
           refreshTokenSubject.next(false);
 
-          return refresh().pipe(
+          return authService.refresh().pipe(
             switchMap(() => {
               refreshTokenSubject.next(true);
               return next(req);
