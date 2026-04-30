@@ -27,7 +27,7 @@ export class UserService {
         this.authService.isLoggedIn.set(true);
       }),
       finalize(() => {
-        this.authService.isInitialized.set(true);
+        this.authService.setInitialized(true);
       })
     );
   }

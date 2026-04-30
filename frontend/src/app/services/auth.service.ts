@@ -6,6 +6,7 @@ import { NotificationService } from './notification.service';
 import { Router } from '@angular/router';
 import { User } from '../models/user.type';
 import { isAuthError } from '../guards/auth.guard';
+import { toObservable } from '@angular/core/rxjs-interop';
 
 @Injectable({
   providedIn: 'root',
@@ -16,7 +17,8 @@ export class AuthService {
   notificationService = inject(NotificationService);
   router = inject(Router);
   isLoggedIn = signal<boolean>(false);
-  isInitialized = signal<boolean>(false);
+  private _isInitialized = signal<boolean>(false);
+  readonly isInitialized$ = toObservable(this._isInitialized);
   loading = signal(false);
   user = signal<User | null>(null);
 
@@ -115,5 +117,9 @@ export class AuthService {
         return throwError(() => err);
       }),
     );
+  }
+
+  setInitialized(value: boolean) {
+    this._isInitialized.set(value);
   }
 }
