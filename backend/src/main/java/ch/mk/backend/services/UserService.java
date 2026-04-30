@@ -47,6 +47,8 @@ public class UserService {
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "USER_NOT_FOUND"));
             String tokenString = jwtService.generateRefreshToken(user.getId().toString());
             saveRefreshToken(tokenString, user);
+            user.setLastLogin(Instant.now());
+            userRepository.save(user);
             return tokenString;
         }
         return null;

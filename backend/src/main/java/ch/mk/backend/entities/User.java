@@ -47,6 +47,9 @@ public class User {
     @PrePersist
     protected void onCreate() {
         this.createdAt = Instant.now();
+        this.updatedAt = Instant.now();
+        this.lastLogin = Instant.now();
+        this.deactivated = false;
     }
 
     @PreUpdate
