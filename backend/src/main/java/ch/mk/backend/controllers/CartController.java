@@ -2,12 +2,13 @@ package ch.mk.backend.controllers;
 
 import ch.mk.backend.dtos.CartItemDto;
 import ch.mk.backend.entities.CartItem;
+import ch.mk.backend.entities.User;
 import ch.mk.backend.mappers.CartItemMapper;
 import ch.mk.backend.repositories.CartItemRepository;
 import ch.mk.backend.services.CartItemService;
-import ch.mk.backend.services.JWTService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,17 +21,14 @@ public class CartController {
     CartItemService cartItemService;
     private final CartItemMapper cartItemMapper;
     private final CartItemRepository cartItemRepository;
-    private final JWTService jwtService;
 
     public record UpdateQuantityRequest(int quantity) {}
 
     @GetMapping("/items")
     public List<CartItemDto> getCart(
-            @CookieValue("accessToken") String accessToken
+            @AuthenticationPrincipal User user
     ) {
-        Integer userId = jwtService.getUserIdFromAccessToken(accessToken);
-
-        return cartItemRepository.findByUserId(userId)
+        return cartItemRepository.findByUserId(user.getId())
                 .stream()
                 .map(cartItemMapper::toDto)
                 .toList();
@@ -39,33 +37,29 @@ public class CartController {
     @PostMapping("/items/{productId}")
     public ResponseEntity<Void> addToCart(
             @PathVariable int productId,
-            @CookieValue("accessToken") String accessToken
+            @AuthenticationPrincipal User user
     ) {
-        var claims = jwtService.checkAccessToken(accessToken);
-        Integer userId = Integer.valueOf(claims.getPayload().getSubject());
-
-        Optional<CartItem> existingItem = cartItemService.findCartItemByProductId(productId, userId);
+        Optional<CartItem> existingItem = cartItemService.findCartItemByProductId(productId, user.getId());
 
         if (existingItem.isPresent()) {
             existingItem.get().setQuantity(existingItem.get().getQuantity() + 1);
             cartItemRepository.save(existingItem.get());
         } else {
-            cartItemService.createCartItem(userId, productId);
+            cartItemService.createCartItem(user.getId(), productId);
         }
         return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/items/{id}")
     public ResponseEntity<Void> updateCartItemQuantity(
-            @CookieValue("accessToken") String accessToken,
+            @AuthenticationPrincipal User user,
             @PathVariable int id,
             @RequestBody UpdateQuantityRequest request
     ) {
-        var userId = Integer.valueOf(jwtService.checkAccessToken(accessToken).getPayload().getSubject());
         var cartItem = cartItemRepository.findById(id);
         int quantity = request.quantity();
 
-        if (cartItem.isPresent() && cartItemService.cartItemBelongsToUser(cartItem.get(), userId)) {
+        if (cartItem.isPresent() && cartItemService.cartItemBelongsToUser(cartItem.get(), user.getId())) {
             if (quantity <= 0) {
                 cartItemRepository.deleteById(id);
             } else {
@@ -79,12 +73,11 @@ public class CartController {
 
     @DeleteMapping("/items/{id}")
     public ResponseEntity<Void> removeFromCart(
-            @CookieValue("accessToken") String accessToken,
+            @AuthenticationPrincipal User user,
             @PathVariable int id
     ) {
-        var userId = Integer.valueOf(jwtService.checkAccessToken(accessToken).getPayload().getSubject());
         var cartItem = cartItemRepository.findById(id);
-        if (cartItem.isPresent() && cartItemService.cartItemBelongsToUser(cartItem.get(), userId)) {
+        if (cartItem.isPresent() && cartItemService.cartItemBelongsToUser(cartItem.get(), user.getId())) {
             cartItemRepository.deleteById(id);
         } else {
             return ResponseEntity.notFound().build();
@@ -95,12 +88,9 @@ public class CartController {
 
     @DeleteMapping
     public ResponseEntity<Void> clearCart(
-            @CookieValue("accessToken") String accessToken
+            @AuthenticationPrincipal User user
     ) {
-        var claims = jwtService.checkAccessToken(accessToken);
-        Integer userId = Integer.valueOf(claims.getPayload().getSubject());
-
-        var cartItems = cartItemRepository.findByUserId(userId);
+        var cartItems = cartItemRepository.findByUserId(user.getId());
         cartItemRepository.deleteAllById(cartItems.stream().map(CartItem::getId).toList());
 
         return ResponseEntity.noContent().build();

@@ -1,11 +1,12 @@
 package ch.mk.backend.controllers;
 
 import ch.mk.backend.dtos.*;
-import ch.mk.backend.services.JWTService;
+import ch.mk.backend.entities.User;
 import ch.mk.backend.services.OrderService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,26 +17,22 @@ import java.util.UUID;
 @AllArgsConstructor
 public class OrderController {
 
-    private final JWTService jwtService;
     private final OrderService orderService;
 
     @GetMapping
     public List<OrderDto> getOrders(
-            @CookieValue("accessToken") String accessToken
+            @AuthenticationPrincipal User user
     ) {
-        Integer userId = jwtService.getUserIdFromAccessToken(accessToken);
-
-        return orderService.getOrdersByUserId(userId);
+        return orderService.getOrdersByUserId(user.getId());
     }
 
     @PostMapping
     public ResponseEntity<OrderDto> createOrder(
-            @CookieValue("accessToken") String accessToken,
+            @AuthenticationPrincipal User user,
             @RequestBody CreateOrderDto dto
     ) {
-        Integer userId = jwtService.getUserIdFromAccessToken(accessToken);
         Integer addressId = dto.getAddressId();
-        OrderDto orderDto = orderService.createUserOrder(userId, addressId);
+        OrderDto orderDto = orderService.createUserOrder(user.getId(), addressId);
 
         return new ResponseEntity<>(orderDto, HttpStatus.CREATED);
     }
@@ -63,22 +60,20 @@ public class OrderController {
 
     @PutMapping("/{orderId}")
     public ResponseEntity<OrderDto> updateOrderStatus(
-            @CookieValue("accessToken") String accessToken,
+            @AuthenticationPrincipal User user,
             @PathVariable Number orderId,
             @RequestParam String status
     ) {
-        Integer userId = jwtService.getUserIdFromAccessToken(accessToken);
-        OrderDto orderDto = orderService.updateOrderStatus(orderId.intValue(), userId, status);
+        OrderDto orderDto = orderService.updateOrderStatus(orderId.intValue(), user.getId(), status);
         return new ResponseEntity<>(orderDto, HttpStatus.OK);
     }
 
     @DeleteMapping("/{orderId}")
     public ResponseEntity<Void> cancelOrder(
-            @CookieValue("accessToken") String accessToken,
+            @AuthenticationPrincipal User user,
             @PathVariable Number orderId
     ) {
-        Integer userId = jwtService.getUserIdFromAccessToken(accessToken);
-        orderService.cancelOrder(orderId.intValue(), userId);
+        orderService.cancelOrder(orderId.intValue(), user.getId());
         return ResponseEntity.noContent().build();
     }
 }
