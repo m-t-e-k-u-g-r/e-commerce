@@ -10,6 +10,7 @@ import { NotificationService } from './notification.service';
 import { AddressDto } from '../models/address.type';
 import { CartItem } from '../models/cartItem.type';
 import { catchError, tap } from 'rxjs/operators';
+import { jsonExport, mapToGuestOrderExport } from '../utils';
 
 @Injectable({
   providedIn: 'root',
@@ -43,13 +44,19 @@ export class OrderService {
   createOrder(addressId: number) {
     return this.http.post<OrderDto>(this.baseUrl, { addressId: addressId },
       { withCredentials: true }
-    ).subscribe(order => {
-      this.cartService.getCartItems();
-      this.getOrders();
-      this.router.navigate(['/orders']);
-      this.details.set(order);
-      this.notificationService.success(`Order #${order.id} placed successfully`);
-    });
+    ).pipe(
+      tap((order) => {
+        this.cartService.getCartItems();
+        this.getOrders();
+        this.router.navigate(['/orders']);
+        this.details.set(order);
+        this.notificationService.success(`Order #${order.id} placed successfully`);
+      }),
+      catchError(() => {
+        this.notificationService.error('Please try again', 'Failed to place order');
+        return of(null);
+      })
+    );
   }
 
   createGuestOrder(
@@ -64,7 +71,7 @@ export class OrderService {
         items: items,
       })
       .pipe(
-        tap((order) => {
+        tap(async (order) => {
           this.notificationService.success(`Order # ${order.id} created`);
 
           const orderId = order.id;
@@ -73,7 +80,7 @@ export class OrderService {
           navigator.clipboard.writeText(accessToken);
           this.notificationService.info('Access token has been copied to clipboard');
 
-          this.confirmService.confirm({
+          const confirmed = await this.confirmService.confirm({
             title: `Order #${orderId} has been placed`,
             message: `
               <p><strong>Order ID:</strong> ${orderId}</p>
@@ -87,9 +94,16 @@ export class OrderService {
               <p>
                 For security reasons, this will not be shown again.
               </p>
+              <p>
+                Click <i>Confirm</i> to download the details of your order.
+              </p>
             `,
             messageType: 'html',
           });
+          if (confirmed) {
+            const exportData = mapToGuestOrderExport(order);
+            jsonExport(exportData, `order_${orderId}`);
+          }
         }),
         catchError(() => {
           this.notificationService.error('Please try again.', 'Failed to place order');
@@ -103,10 +117,16 @@ export class OrderService {
     if (!confirmed) return;
     return this.http.delete<OrderDto>(this.baseUrl + '/' + orderId,
       { withCredentials: true }
-    ).subscribe(order => {
-      this.getOrders();
-      this.notificationService.success(`Order #${order.id} cancelled`);
-    });
+    ).pipe(
+      tap((order) => {
+        this.getOrders();
+        this.notificationService.success(`Order #${order.id} cancelled`);
+      }),
+      catchError(() => {
+        this.notificationService.error('Please try again.', `Failed to cancel order #${orderId}`);
+        return of(null);
+      })
+    );
   }
 
   private formatDate(date: string): string {

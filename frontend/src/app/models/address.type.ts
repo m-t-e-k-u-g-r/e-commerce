@@ -19,6 +19,8 @@ export interface OrderAddressDto {
   country: string;
 }
 
+export interface GuestOrderAddressDto extends Omit<OrderAddressDto, 'id'> {}
+
 export interface AddressForm extends AddressDto {
   id: number;
 }

@@ -1,4 +1,4 @@
-import { OrderAddressDto } from './address.type';
+import { GuestOrderAddressDto, OrderAddressDto } from './address.type';
 import { Product } from './product.type';
 
 export interface OrderItem {
@@ -22,4 +22,24 @@ export interface GuestOrderDto extends Omit<OrderDto, 'userId'> {}
 export interface CreatedGuestOrderDto extends GuestOrderDto {
   guestId: number;
   accessToken: string;
+}
+
+export interface GuestOrderExportDto {
+  orderId: number;
+  accessToken: string;
+  createdAt: string;
+  status: string;
+  totalPrice: number;
+
+  shippingAddress: Omit<GuestOrderAddressDto, 'type'>;
+
+  items: GuestOrderExportItemDto[];
+}
+
+export interface GuestOrderExportItemDto {
+  productId: number;
+  name: string;
+  quantity: number;
+  unitPrice: number;
+  lineTotal: number;
 }
