@@ -41,7 +41,7 @@ public class OrderController {
     }
 
     @PostMapping("/guest")
-    public ResponseEntity<GuestOrderDto> createGuestOrder(
+    public ResponseEntity<GuestOrderCreatedDto> createGuestOrder(
             @RequestBody CreateGuestOrderDto dto
     ) {
         String token = UUID.randomUUID().toString();
