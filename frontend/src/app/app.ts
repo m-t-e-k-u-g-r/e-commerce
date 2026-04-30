@@ -8,6 +8,7 @@ import { AuthService } from './services/auth.service';
 import { AddressService } from './services/address.service';
 import { OrderService } from './services/order.service';
 import { ThemeService } from './services/theme.service';
+import { UserService } from './services/user.service';
 
 @Component({
   selector: 'app-root',
@@ -25,6 +26,7 @@ export class App implements OnInit {
   categoryService = inject(CategoryService);
   cartService = inject(CartService);
   authService = inject(AuthService);
+  userService = inject(UserService);
   addressService = inject(AddressService);
   orderService = inject(OrderService);
   themeService = inject(ThemeService);
@@ -43,7 +45,7 @@ export class App implements OnInit {
   }
 
   ngOnInit() {
-    this.authService.getUser().subscribe();
+    this.userService.getUser().subscribe();
 
     this.productService.getProducts();
     this.categoryService.getCategories();

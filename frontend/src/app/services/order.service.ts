@@ -13,6 +13,7 @@ import { catchError, tap } from 'rxjs/operators';
 import { jsonExport, mapToGuestOrderExport } from '../utils';
 import { MatDialog } from '@angular/material/dialog';
 import { OrderDetailsComponent } from '../components/order-details/order-details.component';
+import { formatDate } from '../utils';
 
 @Injectable({
   providedIn: 'root',
@@ -38,7 +39,7 @@ export class OrderService {
       map(orders =>
         orders.map(o => ({
           ...o,
-          createdDate: this.formatDate(o.createdDate),
+          createdDate: formatDate(o.createdDate),
         }))
       )
     ).subscribe(orders => {
@@ -198,11 +199,6 @@ export class OrderService {
         this.notificationService.clear(toastId);
       })
     );
-  }
-
-  private formatDate(date: string): string {
-    const [y, m, d] = date.split('-');
-    return `${d}.${m}.${y}`;
   }
 
   openGuestOrder(order: GuestOrderDto) {

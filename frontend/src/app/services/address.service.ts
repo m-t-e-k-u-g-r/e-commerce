@@ -6,6 +6,7 @@ import { ConfirmService } from './confirm.service';
 import { NotificationService } from './notification.service';
 import { AuthService } from './auth.service';
 import { isAddressDto } from '../guards/addressType.guard';
+import { UserService } from './user.service';
 
 @Injectable({
   providedIn: 'root',
@@ -14,7 +15,8 @@ export class AddressService {
   confirmService = inject(ConfirmService);
   notificationService = inject(NotificationService);
   authService = inject(AuthService);
-  baseUrl = environment.apiUrl + 'users/addresses';
+  userService = inject(UserService);
+  baseUrl = environment.apiUrl + 'addresses';
   http = inject(HttpClient);
   guestAddress = signal<Address | null>(null);
   private _addresses = signal<Address[]>([]);
@@ -24,7 +26,7 @@ export class AddressService {
   );
 
   getAddresses() {
-    this.authService.getUser().subscribe({
+    this.userService.getUser().subscribe({
       next: (user) => {
         if (!user) {
           this.guestAddress.set(this.getGuestAddress());

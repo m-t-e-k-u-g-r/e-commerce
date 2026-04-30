@@ -42,3 +42,8 @@ export function mapToGuestOrderExport(dto: CreatedGuestOrderDto): GuestOrderExpo
     })),
   };
 }
+
+export function formatDate(date: string): string {
+  const [y, m, d] = date.split('-');
+  return `${d}.${m}.${y}`;
+}
