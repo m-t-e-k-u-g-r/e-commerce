@@ -1,10 +1,11 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { environment } from '../../environments/environment.development';
 import { HttpClient } from '@angular/common/http';
-import { catchError, finalize, of, tap } from 'rxjs';
+import { catchError, finalize, of, tap, throwError } from 'rxjs';
 import { User } from '../models/user.type';
 import { NotificationService } from './notification.service';
 import { Router } from '@angular/router';
+import { isAuthError } from '../guards/auth.guard';
 
 @Injectable({
   providedIn: 'root',
@@ -26,9 +27,12 @@ export class AuthService {
       }),
       catchError(() => {
         return this.refresh().pipe(
-          catchError(() => {
+          catchError(err => {
             this.isLoggedIn.set(false);
-            return of(null);
+            if (isAuthError(err)) {
+              return of(null);
+            }
+            return throwError(() => err);
           }),
         );
       }),
@@ -50,9 +54,9 @@ export class AuthService {
           this.notificationService.success('Registration successful');
           this.router.navigate(['/']);
         }),
-        catchError(() => {
+        catchError((err) => {
           this.notificationService.error('Registration failed. Please try again.');
-          return of(null);
+          return throwError(() => err);
         }),
         finalize(() => {
           this.loading.set(false);
@@ -77,10 +81,11 @@ export class AuthService {
         tap(() => {
           this.isLoggedIn.set(true);
           this.notificationService.success('Login successful');
+          this.router.navigate(['/']);
         }),
-        catchError(() => {
+        catchError(err => {
           this.notificationService.error('Login failed. Please try again.');
-          return of(null);
+          return throwError(() => err);
         }),
         finalize(() => {
           this.loading.set(false);
@@ -94,9 +99,12 @@ export class AuthService {
       tap(() => {
         this.isLoggedIn.set(true);
       }),
-      catchError(() => {
+      catchError(err => {
         this.isLoggedIn.set(false);
-        return of(null);
+        if (isAuthError(err)) {
+          return of(null);
+        }
+        return throwError(() => err);
       }),
     );
   }
@@ -110,9 +118,9 @@ export class AuthService {
         this.router.navigate(['/'])
         this.notificationService.success('Logout successful');
       }),
-      catchError(() => {
+      catchError(err => {
         this.notificationService.error('Logout failed. Please try again.');
-        return of(null);
+        return throwError(() => err);
       }),
       finalize(() => {
         this.notificationService.clear(toastId)

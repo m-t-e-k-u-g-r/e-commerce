@@ -19,19 +19,24 @@ export class AddressService {
   guestAddress = signal<Address | null>(null);
   private _addresses = signal<Address[]>([]);
   readonly addresses = this._addresses.asReadonly();
-  readonly billingAddress = computed(() =>
-    this.addresses().find((a: Address) => a.type === 'BILLING') ?? null
+  readonly billingAddress = computed(
+    () => this.addresses().find((a: Address) => a.type === 'BILLING') ?? null,
   );
 
   getAddresses() {
-    if (!this.authService.isLoggedIn()) {
-      this.guestAddress.set(this.getGuestAddress());
-      return;
-    }
-    return this.http.get<Address[]>(this.baseUrl,
-      { withCredentials: true }
-    ).subscribe(addresses => {
-      this._addresses.set(addresses);
+    this.authService.getUser().subscribe({
+      next: (user) => {
+        if (!user) {
+          this.guestAddress.set(this.getGuestAddress());
+          return;
+        }
+        this.http
+          .get<Address[]>(this.baseUrl, { withCredentials: true })
+          .subscribe((addresses) => this._addresses.set(addresses));
+      },
+      error: (err) => {
+        console.error('Error fetching addresses:', err);
+      }
     });
   }
 
@@ -40,17 +45,17 @@ export class AddressService {
       const id = Math.round(Math.random() * 100);
       const saveAddress = {
         id: id,
-        ...address
-      }
+        ...address,
+      };
       this.saveGuestAddress(saveAddress);
       return this.getGuestAddress();
     }
-    return this.http.post<Address>(this.baseUrl, address,
-      { withCredentials: true }
-    ).subscribe(() => {
-      this.getAddresses();
-      this.notificationService.success('Address added');
-    });
+    return this.http
+      .post<Address>(this.baseUrl, address, { withCredentials: true })
+      .subscribe(() => {
+        this.getAddresses();
+        this.notificationService.success('Address added');
+      });
   }
 
   getGuestAddress(): Address | null {
@@ -79,12 +84,12 @@ export class AddressService {
     if (!this.authService.isLoggedIn()) {
       return this.saveGuestAddress(address);
     }
-    return this.http.put<Address>(this.baseUrl + '/' + address.id,
-      address, { withCredentials: true }
-    ).subscribe(() => {
-      this.getAddresses();
-      this.notificationService.success('Address updated');
-    });
+    return this.http
+      .put<Address>(this.baseUrl + '/' + address.id, address, { withCredentials: true })
+      .subscribe(() => {
+        this.getAddresses();
+        this.notificationService.success('Address updated');
+      });
   }
 
   async deleteAddress(addressId: number) {
@@ -94,17 +99,20 @@ export class AddressService {
     const address = this.addresses().find((a: Address) => a.id === addressId);
     if (address == undefined) return this.notificationService.warning('Address not found');
 
-    const confirmed = await this.confirmService.confirm({ title: 'Delete address', message: 'Are you sure you want to delete this address?' })
+    const confirmed = await this.confirmService.confirm({
+      title: 'Delete address',
+      message: 'Are you sure you want to delete this address?',
+    });
     if (!confirmed) return;
 
     if (address.type === 'BILLING') {
       return this.notificationService.warning('Cannot delete billing address');
     }
-    return this.http.delete<Address>(this.baseUrl + '/' + addressId,
-      { withCredentials: true }
-    ).subscribe(() => {
-      this.getAddresses();
-      this.notificationService.success('Address deleted');
-    });
+    return this.http
+      .delete<Address>(this.baseUrl + '/' + addressId, { withCredentials: true })
+      .subscribe(() => {
+        this.getAddresses();
+        this.notificationService.success('Address deleted');
+      });
   }
 }

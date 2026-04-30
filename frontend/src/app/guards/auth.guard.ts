@@ -14,6 +14,10 @@ export const authGuard: CanActivateFn = () => {
   );
 };
 
+export function isAuthError(err: any): boolean {
+  return err.status === 401 || err.status === 403;
+}
+
 export const redirectFromLogin: CanActivateFn = () => {
   const authService = inject(AuthService);
   const router = inject(Router);
