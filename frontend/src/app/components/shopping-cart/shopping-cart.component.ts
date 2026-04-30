@@ -77,7 +77,7 @@ import { NotificationService } from '../../services/notification.service';
               <button
                 (click)="this.cartService.clearCart()"
                 matButton="elevated"
-                [disabled]="computedCartItems().length == 0"
+                [disabled]="this.disabled()"
               >
                 Clear Shopping Cart
               </button>
@@ -90,7 +90,7 @@ import { NotificationService } from '../../services/notification.service';
             <button
               (click)="checkout()"
               matButton="filled"
-              [disabled]="computedCartItems().length == 0"
+              [disabled]="this.disabled()"
             >
               Check out
             </button>
@@ -117,6 +117,9 @@ export class ShoppingCartComponent {
   notificationService = inject(NotificationService);
   router = inject(Router);
   displayedColumns: string[] = ['image', 'product', 'quantity', 'price'];
+  disabled = computed(() => {
+    return this.computedCartItems().length == 0 || this.orderService.loading()
+  });
 
   computedCartItems: Signal<computedCartItem[]> = computed(() => {
     const products = this.productService.products();

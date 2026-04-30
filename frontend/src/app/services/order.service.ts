@@ -25,6 +25,7 @@ export class OrderService {
   notificationService = inject(NotificationService);
   router = inject(Router);
   details = signal<OrderDto | null>(null);
+  loading = signal(false);
 
   getOrders() {
     return this.http.get<OrderDto[]>(this.baseUrl,
@@ -43,6 +44,7 @@ export class OrderService {
 
   createOrder(addressId: number) {
     const toastId = this.notificationService.pending('Placing order...');
+    this.loading.set(true);
     return this.http.post<OrderDto>(this.baseUrl, { addressId: addressId },
       { withCredentials: true }
     ).pipe(
@@ -59,8 +61,9 @@ export class OrderService {
       }),
       finalize(() => {
         this.notificationService.clear(toastId);
+        this.loading.set(false);
       })
-    );
+    ).subscribe();
   }
 
   createGuestOrder(
@@ -68,6 +71,8 @@ export class OrderService {
     address: AddressDto,
     items: CartItem[]
   ) {
+    const toastId = this.notificationService.pending('Placing order...');
+    this.loading.set(true);
     return this.http
       .post<CreatedGuestOrderDto>(this.baseUrl + '/guest', {
         email: email,
@@ -114,6 +119,10 @@ export class OrderService {
           this.notificationService.error('Please try again.', 'Failed to place order');
           return of(null);
         }),
+        finalize(() => {
+          this.notificationService.clear(toastId);
+          this.loading.set(false);
+        })
       );
   }
 
