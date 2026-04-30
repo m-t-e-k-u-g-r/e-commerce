@@ -43,6 +43,22 @@ export class OrderService {
     });
   }
 
+  async checkGuestOrder() {
+    const response = await this.confirmService.confirmOptions({
+      title: 'Retrieve order details',
+      message: 'Please enter your order ID and token to retrieve your order details.',
+      fields: [
+        { name: 'orderId', type: 'number', label: 'Order ID', required: true },
+        { name: 'token', type: 'text', label: 'Token', required: true }
+      ]
+    });
+    if (response.confirmed) {
+      const orderId: number = response.data.orderId;
+      const token: string = response.data.token;
+      this.getGuestOrder(orderId, token);
+    }
+  }
+
   getGuestOrder(orderId: number, token: string) {
     this.loading.set(true);
     const toastId = this.notificationService.pending('Verifying order details...');
