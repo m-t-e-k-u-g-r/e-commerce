@@ -18,6 +18,7 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
 
@@ -121,10 +122,10 @@ public class AuthController {
 
     private String refreshAccessToken(String token) {
         RefreshToken storedToken = refreshTokenRepository.findByToken(token)
-                .orElseThrow(() -> new RuntimeException("Token not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "TOKEN_NOT_FOUND"));
 
         if (storedToken.getRevoked() || storedToken.getExpiresAt().isBefore(Instant.now())) {
-            throw new RuntimeException("Token is invalid or expired");
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "INVALID_TOKEN");
         }
         return jwtService.createAccessTokenFromRefreshToken(token);
     }
