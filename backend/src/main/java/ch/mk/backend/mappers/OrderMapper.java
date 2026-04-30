@@ -24,6 +24,7 @@ public interface OrderMapper {
     })
     GuestOrderCreatedDto toGuestOrderDto(OrderDto orderDto, Integer guestId, String accessToken);
 
+    @Mapping(source = "createdAt", target = "createdDate")
     GuestOrderDto getGuestOrderDto(Order order);
 
     default LocalDate map(Instant instant) {
