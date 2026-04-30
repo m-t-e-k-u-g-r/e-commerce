@@ -36,6 +36,10 @@ button {
   }
 }
 
+.order-dialog .mat-mdc-dialog-surface::-webkit-scrollbar {
+  display: none;
+}
+
 .input_wrapper {
   display: grid;
   grid-template-columns: 1fr 1fr;

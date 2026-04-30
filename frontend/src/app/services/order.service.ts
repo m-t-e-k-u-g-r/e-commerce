@@ -11,6 +11,8 @@ import { AddressDto } from '../models/address.type';
 import { CartItem } from '../models/cartItem.type';
 import { catchError, tap } from 'rxjs/operators';
 import { jsonExport, mapToGuestOrderExport } from '../utils';
+import { MatDialog } from '@angular/material/dialog';
+import { OrderDetailsComponent } from '../components/order-details/order-details.component';
 
 @Injectable({
   providedIn: 'root',
@@ -24,6 +26,7 @@ export class OrderService {
   confirmService = inject(ConfirmService);
   notificationService = inject(NotificationService);
   router = inject(Router);
+  constructor(private dialog: MatDialog) {}
   details = signal<OrderDto | null>(null);
   guestOrderDetails = signal<GuestOrderDto | null>(null);
   loading = signal(false);
@@ -69,6 +72,7 @@ export class OrderService {
         tap((orderDto) => {
           this.guestOrderDetails.set(orderDto);
           this.notificationService.success('Order details verified successfully');
+          this.openGuestOrder(orderDto);
         }),
         catchError((err) => {
           if (err.status === 404) {
@@ -199,5 +203,14 @@ export class OrderService {
   private formatDate(date: string): string {
     const [y, m, d] = date.split('-');
     return `${d}.${m}.${y}`;
+  }
+
+  openGuestOrder(order: GuestOrderDto) {
+    this.dialog.open(OrderDetailsComponent, {
+      data: order,
+      panelClass: 'order-dialog',
+      minWidth: '40vw',
+      maxHeight: '90vh'
+    });
   }
 }
