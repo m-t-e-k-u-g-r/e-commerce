@@ -72,6 +72,7 @@ export class OrderService {
       })
       .pipe(
         tap(async (order) => {
+          this.cartService.clearCart(true);
           this.notificationService.success(`Order # ${order.id} created`);
 
           const orderId = order.id;

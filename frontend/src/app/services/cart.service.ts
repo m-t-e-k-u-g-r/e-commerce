@@ -115,13 +115,15 @@ export class CartService {
     return;
   }
 
-  async clearCart() {
-    const confirmed = await this.confirmService.confirm({
-      title: 'Clear cart',
-      message: 'Are you sure you want to clear your cart?',
-      messageType: 'text'
-    });
-    if (!confirmed) return;
+  async clearCart(skipConfirmation: boolean = false) {
+    if (!skipConfirmation) {
+      const confirmed = await this.confirmService.confirm({
+        title: 'Clear cart',
+        message: 'Are you sure you want to clear your cart?',
+        messageType: 'text'
+      });
+      if (!confirmed) return;
+    }
     if (this.authService.isLoggedIn()) {
       this.http.delete(this.baseUrl,
         { withCredentials: true }
