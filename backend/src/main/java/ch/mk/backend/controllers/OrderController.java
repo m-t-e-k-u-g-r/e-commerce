@@ -1,7 +1,6 @@
 package ch.mk.backend.controllers;
 
-import ch.mk.backend.dtos.OrderDto;
-import ch.mk.backend.dtos.CreateOrderDto;
+import ch.mk.backend.dtos.*;
 import ch.mk.backend.services.JWTService;
 import ch.mk.backend.services.OrderService;
 import lombok.AllArgsConstructor;
@@ -10,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/orders")
@@ -35,9 +35,30 @@ public class OrderController {
     ) {
         Integer userId = jwtService.getUserIdFromAccessToken(accessToken);
         Integer addressId = dto.getAddressId();
-        OrderDto orderDto = orderService.createOrder(userId, addressId);
+        OrderDto orderDto = orderService.createUserOrder(userId, addressId);
 
         return new ResponseEntity<>(orderDto, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/guest")
+    public ResponseEntity<GuestOrderCreatedDto> createGuestOrder(
+            @RequestBody CreateGuestOrderDto dto
+    ) {
+        String token = UUID.randomUUID().toString();
+        GuestOrderCreatedDto orderDto = orderService.createGuestOrder(dto, token);
+        orderDto.setAccessToken(token);
+
+        return new ResponseEntity<>(orderDto, HttpStatus.CREATED);
+    }
+
+    @GetMapping("/guest/{orderId}")
+    public ResponseEntity<GuestOrderDto> getGuestOrder(
+            @PathVariable Number orderId,
+            @RequestParam String token
+    ) {
+        GuestOrderDto order = this.orderService.getGuestOrderById(orderId.intValue(), token);
+
+        return new ResponseEntity<>(order, HttpStatus.OK);
     }
 
     @PutMapping("/{orderId}")

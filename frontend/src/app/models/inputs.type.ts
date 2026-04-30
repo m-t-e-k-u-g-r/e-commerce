@@ -6,6 +6,7 @@ export interface DialogInput {
 
 type FieldType =
   | 'text'
+  | 'email'
   | 'textarea'
   | 'number'
   | 'select'

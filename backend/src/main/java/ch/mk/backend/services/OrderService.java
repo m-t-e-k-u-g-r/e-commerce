@@ -1,15 +1,19 @@
 package ch.mk.backend.services;
 
-import ch.mk.backend.dtos.OrderDto;
+import ch.mk.backend.dtos.*;
 import ch.mk.backend.entities.*;
+import ch.mk.backend.mappers.AddressMapper;
+import ch.mk.backend.mappers.CartItemMapper;
 import ch.mk.backend.mappers.OrderMapper;
 import ch.mk.backend.repositories.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.function.Consumer;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +26,11 @@ public class OrderService {
     private final OrderItemRepository orderItemRepository;
     private final OrderAddressRepository orderAddressRepository;
     private final AddressService addressService;
+    private final GuestService guestService;
+    private final CartItemMapper cartItemMapper;
+    private final AddressMapper addressMapper;
+    private final GuestRepository guestRepository;
+    private final BCryptPasswordEncoder bcryptEncoder;
 
     public List<OrderDto> getOrdersByUserId(Integer userId) {
         return orderRepository.findByUserId(userId)
@@ -30,8 +39,18 @@ public class OrderService {
                 .toList();
     }
 
+    public GuestOrderDto getGuestOrderById(Integer orderId, String accessToken) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+
+        boolean valid = bcryptEncoder.matches(accessToken, order.getAccessTokenHash());
+        if (!valid) throw new RuntimeException("Invalid access token");
+
+        return orderMapper.getGuestOrderDto(order);
+    }
+
     @Transactional
-    public OrderDto createOrder(Integer userId, Integer addressId) {
+    public OrderDto createUserOrder(Integer userId, Integer addressId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -40,24 +59,62 @@ public class OrderService {
             throw new RuntimeException("Cart is empty");
         }
 
-        BigDecimal totalPrice = cartItems.stream()
-                .map(cartItem -> cartItem.getProduct().getPrice().multiply(BigDecimal.valueOf(cartItem.getQuantity())))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        CreateAddressDto shippingAddress = addressMapper.toCreateDto(
+                addressService.getAddressByIdAndUserId(addressId, userId)
+                        .orElseThrow(() -> new RuntimeException("Shipping address not found"))
+        );
 
-        Order order = createOrderEntity(user, totalPrice);
+        cartItemRepository.deleteAll(cartItems);
+        return processOrder(cartItems, shippingAddress, order -> order.setUser(user));
+    }
+
+    @Transactional
+    public GuestOrderCreatedDto createGuestOrder(CreateGuestOrderDto dto, String accessToken) {
+        Guest guest = guestService.createGuest(dto.getEmail());
+        List<CartItem> cartItems = dto.getItems().stream()
+                .map(cartItemMapper::toEntity)
+                .toList();
+
+        guestRepository.save(guest);
+        String tokenHash = bcryptEncoder.encode(accessToken);
+        OrderDto orderDto = processOrder(cartItems, dto.getAddress(),
+                order -> {
+                    order.setGuest(guest);
+                    order.setAccessTokenHash(tokenHash);
+                }
+        );
+        return orderMapper.toGuestOrderDto(orderDto, guest.getId(), accessToken);
+    }
+
+    private OrderDto processOrder(
+            List<CartItem> cartItems,
+            CreateAddressDto shippingAddress,
+            Consumer<Order> customerSetter
+    ) {
+        BigDecimal totalPrice = calculateTotalPrice(cartItems);
+        Order order = createOrderEntity(totalPrice);
+
         List<OrderItem> orderItems = createOrderItems(order, cartItems);
         order.setItems(orderItems);
-
-        Address shippingAddress = addressService.getAddressByIdAndUserId(addressId, userId)
-                .orElseThrow(() -> new RuntimeException("Shipping address not found"));
         OrderAddress orderAddress = createOrderAddress(shippingAddress, order);
         order.setAddress(orderAddress);
         orderAddress.setOrder(order);
 
-        cartItemRepository.deleteAll(cartItems);
+        customerSetter.accept(order);
 
         orderRepository.save(order);
+        orderAddressRepository.save(orderAddress);
+        orderItemRepository.saveAll(orderItems);
         return orderMapper.toDto(order);
+    }
+
+    private BigDecimal calculateTotalPrice(List<CartItem> cartItems) {
+        return cartItems.stream()
+                .filter(item -> item.getProduct() != null)
+                .map(item -> item.getProduct()
+                        .getPrice()
+                        .multiply(BigDecimal.valueOf(item.getQuantity())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     public OrderDto updateOrderStatus(Integer orderId, Integer userId, String status) {
@@ -75,16 +132,14 @@ public class OrderService {
         orderRepository.save(order);
     }
 
-    private Order createOrderEntity(User user, BigDecimal totalPrice) {
+    private Order createOrderEntity(BigDecimal totalPrice) {
         Order order = new Order();
-        order.setUser(user);
         order.setStatus("PENDING");
         order.setTotalPrice(totalPrice);
-        orderRepository.save(order);
         return order;
     }
 
-    private OrderAddress createOrderAddress(Address billingAddress, Order order) {
+    private OrderAddress createOrderAddress(CreateAddressDto billingAddress, Order order) {
         OrderAddress orderAddress = new OrderAddress();
         orderAddress.setOrder(order);
         orderAddress.setStreet(billingAddress.getStreet());
@@ -92,7 +147,6 @@ public class OrderService {
         orderAddress.setZipCode(billingAddress.getZipCode());
         orderAddress.setCity(billingAddress.getCity());
         orderAddress.setCountry(billingAddress.getCountry());
-        orderAddressRepository.save(orderAddress);
         return orderAddress;
     }
 
@@ -105,7 +159,6 @@ public class OrderService {
             orderItem.setQuantity(cartItem.getQuantity());
             orderItem.setPrice(cartItem.getProduct().getPrice());
             orderItems.add(orderItem);
-            orderItemRepository.save(orderItem);
         }
         return orderItems;
     }

@@ -5,8 +5,11 @@ import ch.mk.backend.entities.CartItem;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {ProductResolver.class})
 public interface CartItemMapper {
     @Mapping(source = "product.id", target = "productId")
     CartItemDto toDto(CartItem cartItem);
+
+    @Mapping(target = "product", source = "productId", qualifiedByName = "mapProduct")
+    CartItem toEntity(CartItemDto dto);
 }

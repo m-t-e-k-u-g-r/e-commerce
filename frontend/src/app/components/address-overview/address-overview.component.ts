@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { AddressService } from '../../services/address.service';
 import { Router } from '@angular/router';
 import { MatCell, MatCellDef, MatColumnDef, MatFooterCell, MatFooterCellDef,
@@ -6,6 +6,8 @@ import { MatCell, MatCellDef, MatColumnDef, MatFooterCell, MatFooterCellDef,
   MatHeaderRow, MatHeaderRowDef, MatRow, MatRowDef, MatTable } from '@angular/material/table';
 import { MatFabButton, MatMiniFabButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
+import { AuthService } from '../../services/auth.service';
+import { Address } from '../../models/address.type';
 
 @Component({
   selector: 'app-address-overview',
@@ -29,11 +31,7 @@ import { MatIcon } from '@angular/material/icon';
     MatFooterRowDef,
   ],
   template: `
-    <table
-      mat-table
-      [dataSource]="this.addressService.addresses()"
-      class="address_overview"
-    >
+    <table mat-table [dataSource]="this.data()" class="address_overview">
       <ng-container matColumnDef="edit">
         <th mat-header-cell *matHeaderCellDef></th>
         <td mat-cell *matCellDef="let address">
@@ -66,7 +64,7 @@ import { MatIcon } from '@angular/material/icon';
           <button
             mat-mini-fab
             (click)="this.addressService.deleteAddress(address.id)"
-            [disabled]="this.addressService.billingAddress()?.id == address.id"
+            [disabled]="disableDelete(address.id)"
           >
             <mat-icon>delete</mat-icon>
           </button>
@@ -75,7 +73,11 @@ import { MatIcon } from '@angular/material/icon';
 
       <ng-container matColumnDef="footer-add-button">
         <td mat-footer-cell *matFooterCellDef>
-          <button mat-fab extended (click)="this.router.navigate(['/address/new'])">
+          <button
+            mat-fab extended
+            (click)="this.router.navigate(['/address/new'])"
+            [disabled]="!authService.isLoggedIn() && this.addressService.guestAddress() !== null"
+          >
             <mat-icon>add</mat-icon>
             Add new address
           </button>
@@ -91,6 +93,25 @@ import { MatIcon } from '@angular/material/icon';
 })
 export class AddressOverviewComponent {
   addressService = inject(AddressService);
+  authService = inject(AuthService);
   router = inject(Router);
   displayedColumns: string[] = ['edit', 'name', 'address', 'delete'];
+  data = computed(() => {
+    if (this.authService.isLoggedIn()) {
+      return this.addressService.addresses();
+    }
+
+    const guestAddress = this.addressService.guestAddress();
+    if (guestAddress !== null) {
+      return [guestAddress];
+    }
+    console.log('no address')
+    return [] as Address[];
+  });
+  disableDelete(addressId: number) {
+    if (this.authService.isLoggedIn()) {
+      return this.addressService.billingAddress()?.id == addressId;
+    }
+    return true;
+  }
 }

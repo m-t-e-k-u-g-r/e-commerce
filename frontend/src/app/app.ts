@@ -35,7 +35,6 @@ export class App implements OnInit {
 
       untracked(() => {
         if (loggedIn) {
-          this.addressService.getAddresses();
           this.orderService.getOrders();
         }
         this.cartService.getCartItems();
@@ -50,5 +49,6 @@ export class App implements OnInit {
     this.categoryService.getCategories();
     this.cartService.getCartItems();
     this.themeService.loadTheme();
+    this.addressService.getAddresses();
   }
 }

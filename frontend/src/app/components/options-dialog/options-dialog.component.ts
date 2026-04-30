@@ -50,6 +50,14 @@ import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
                   [formControlName]="field.name"
                 />
               }
+              @case ('email') {
+                <input
+                    matInput
+                    placeholder="{{ field.placeholder || '' }}"
+                    [formControlName]="field.name"
+                    type="email"
+                />
+              }
               @case ('textarea') {
                 <textarea
                   matInput

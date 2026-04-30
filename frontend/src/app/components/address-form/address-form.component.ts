@@ -6,6 +6,7 @@ import { Address, AddressDto } from '../../models/address.type';
 import { MatFormField, MatInput, MatLabel } from '@angular/material/input';
 import { MatOption, MatSelect } from '@angular/material/select';
 import { MatButton } from '@angular/material/button';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-address-form',
@@ -85,6 +86,7 @@ import { MatButton } from '@angular/material/button';
 })
 export class AddressFormComponent implements OnInit {
   protected addressService = inject(AddressService);
+  private authService = inject(AuthService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
 
@@ -166,7 +168,12 @@ export class AddressFormComponent implements OnInit {
       const idParam = params.get('id');
       if (idParam) {
         this.addressId = Number(idParam);
-        const address = this.addressService.addresses().find((a) => a.id === this.addressId);
+        let address: Address | undefined;
+        if (this.authService.isLoggedIn()) {
+          address = this.addressService.addresses().find((a) => a.id === this.addressId);
+        } else {
+          address = this.addressService.guestAddress() ?? undefined;
+        }
         this.selectedAddress = address;
         if (address) {
           this.addressForm.patchValue({
