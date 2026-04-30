@@ -36,6 +36,19 @@ button {
   }
 }
 
+.input_wrapper {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+@media (max-width: 600px) {
+  .input_wrapper {
+    grid-template-columns: 1fr;
+  }
+}
+
 // Angular Material Overrides for Dark Mode
 :root[data-theme='dark'] {
   .mat-mdc-button-disabled {

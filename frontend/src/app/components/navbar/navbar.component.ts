@@ -6,6 +6,7 @@ import { MatIcon } from '@angular/material/icon';
 import { MatBadge } from '@angular/material/badge';
 import { ThemeService } from '../../services/theme.service';
 import { MatIconButton } from '@angular/material/button';
+import { OrderService } from '../../services/order.service';
 
 type Visibility = 'user' | 'guest' | 'all'
 export type MenuItem = {
@@ -73,6 +74,7 @@ export class NavbarComponent {
   router = inject(Router);
   cartService = inject(CartService);
   authService = inject(AuthService);
+  orderService = inject(OrderService);
   themeService = inject(ThemeService);
   menuOpen = signal<Boolean>(false);
   badgeValue = computed(() => {
@@ -93,6 +95,7 @@ export class NavbarComponent {
 
   onItemClick(item: MenuItem) {
     item.action();
+    this.menuOpen.set(false);
   }
 
   toggle() {
@@ -103,37 +106,31 @@ export class NavbarComponent {
     {
       label: 'My orders',
       icon: 'receipt_long',
-      action: () => {
-        this.router.navigate(['/orders']);
-        this.menuOpen.set(false);
-      },
+      action: () => this.router.navigate(['/orders']),
       visibleFor: 'user',
+    },
+    {
+      label: 'Check order',
+      icon: 'receipt',
+      action: () => this.orderService.checkGuestOrder(),
+      visibleFor: 'guest',
     },
     {
       label: 'My addresses',
       icon: 'location_on',
-      action: () => {
-        this.router.navigate(['/address']);
-        this.menuOpen.set(false);
-      },
+      action: () => this.router.navigate(['/address']),
       visibleFor: 'all',
     },
     {
       label: 'Login',
       icon: 'login',
-      action: () => {
-        this.router.navigate(['/login']);
-        this.menuOpen.set(false);
-      },
+      action: () => this.router.navigate(['/login']),
       visibleFor: 'guest',
     },
     {
       label: 'Logout',
       icon: 'logout',
-      action: () => {
-        this.authService.logout().subscribe();
-        this.menuOpen.set(false);
-      },
+      action: () => this.authService.logout().subscribe(),
       visibleFor: 'user',
     },
   ];
