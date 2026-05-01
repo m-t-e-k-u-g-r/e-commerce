@@ -23,6 +23,13 @@ export class NotificationService {
     this.toastr.warning(message, title);
   }
 
+  toBeImplemented(
+    message: string = 'This feature has not yet been implemented',
+    title: string = 'To be implemented',
+  ) {
+    this.toastr.warning(message, title, {});
+  }
+
   pending(message: string, title: string = 'Pending') {
     const toast = this.toastr.info(message, title, {
       toastClass: 'ngx-toastr toast-pending',
