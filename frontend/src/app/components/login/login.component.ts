@@ -6,6 +6,7 @@ import { MatError, MatFormField, MatInput, MatLabel, MatSuffix } from '@angular/
 import { MatIcon } from '@angular/material/icon';
 import { MatButtonModule, MatButton, MatIconButton } from '@angular/material/button';
 import { MyErrorStateMatcher } from '../../guards/errorMatcher.guard';
+import { passwordValidators } from '../../utils';
 
 @Component({
   selector: 'app-login',
@@ -143,11 +144,7 @@ export class LoginComponent {
 
     const confirmControl = this.loginForm.controls.confirmPassword;
     if (!this.isLogin) {
-      confirmControl?.setValidators([
-        Validators.required,
-        Validators.pattern(this.loginForm.controls.password.getRawValue() || ''),
-        Validators.minLength(6),
-      ]);
+      confirmControl?.setValidators(passwordValidators);
     } else {
       confirmControl?.clearValidators();
     }

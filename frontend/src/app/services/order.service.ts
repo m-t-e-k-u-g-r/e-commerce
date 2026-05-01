@@ -2,7 +2,7 @@ import { inject, Injectable, signal } from '@angular/core';
 import { environment } from '../../environments/environment.development';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { CreatedGuestOrderDto, GuestOrderDto, OrderDto } from '../models/order.type';
-import { finalize, map, of, throwError } from 'rxjs';
+import { finalize, of, throwError } from 'rxjs';
 import { CartService } from './cart.service';
 import { ConfirmService } from './confirm.service';
 import { Router } from '@angular/router';
@@ -13,6 +13,8 @@ import { catchError, tap } from 'rxjs/operators';
 import { jsonExport, mapToGuestOrderExport } from '../utils';
 import { MatDialog } from '@angular/material/dialog';
 import { OrderDetailsComponent } from '../components/order-details/order-details.component';
+import { AuthService } from './auth.service';
+import { Validators } from '@angular/forms';
 
 @Injectable({
   providedIn: 'root',
@@ -22,6 +24,7 @@ export class OrderService {
   http = inject(HttpClient);
   private _orders = signal<OrderDto[]>([]);
   readonly orders = this._orders.asReadonly();
+  authService = inject(AuthService);
   cartService = inject(CartService);
   confirmService = inject(ConfirmService);
   notificationService = inject(NotificationService);
@@ -31,19 +34,21 @@ export class OrderService {
   guestOrderDetails = signal<GuestOrderDto | null>(null);
   loading = signal(false);
 
-  getOrders() {
-    return this.http.get<OrderDto[]>(this.baseUrl,
+  loadOrders() {
+    if (!this.authService.isLoggedIn()) {
+      return;
+    }
+    this.http.get<OrderDto[]>(this.baseUrl,
       { withCredentials: true }
     ).pipe(
-      map(orders =>
-        orders.map(o => ({
-          ...o,
-          createdDate: this.formatDate(o.createdDate),
-        }))
-      )
-    ).subscribe(orders => {
-      this._orders.set(orders);
-    });
+      tap(orders => {
+        this._orders.set(orders);
+      }),
+      catchError((err) => {
+        this.notificationService.error('Failed to load orders');
+        return throwError(() => err);
+      })
+    ).subscribe();
   }
 
   async checkGuestOrder() {
@@ -51,8 +56,8 @@ export class OrderService {
       title: 'Retrieve order details',
       message: 'Please enter your order ID and token to retrieve your order details.',
       fields: [
-        { name: 'orderId', type: 'number', label: 'Order ID', required: true },
-        { name: 'token', type: 'text', label: 'Token', required: true }
+        { name: 'orderId', type: 'number', label: 'Order ID', validators: [Validators.required] },
+        { name: 'token', type: 'text', label: 'Token', validators: [Validators.required] }
       ]
     });
     if (response.confirmed) {
@@ -98,8 +103,8 @@ export class OrderService {
       { withCredentials: true }
     ).pipe(
       tap((order) => {
-        this.cartService.getCartItems();
-        this.getOrders();
+        this.cartService.loadCartItems();
+        this.loadOrders();
         this.router.navigate(['/orders']);
         this.details.set(order);
         this.notificationService.success(`Order #${order.id} placed successfully`);
@@ -187,7 +192,7 @@ export class OrderService {
       { withCredentials: true }
     ).pipe(
       tap(order => {
-        this.getOrders();
+        this.loadOrders();
         this.notificationService.success(`Order #${order.id} cancelled`);
       }),
       catchError(() => {
@@ -198,11 +203,6 @@ export class OrderService {
         this.notificationService.clear(toastId);
       })
     );
-  }
-
-  private formatDate(date: string): string {
-    const [y, m, d] = date.split('-');
-    return `${d}.${m}.${y}`;
   }
 
   openGuestOrder(order: GuestOrderDto) {

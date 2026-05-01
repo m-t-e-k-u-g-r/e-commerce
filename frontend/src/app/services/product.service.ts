@@ -13,7 +13,7 @@ export class ProductService {
   http = inject(HttpClient);
   products = signal<Product[]>([]);
 
-  getProducts() {
+  loadProducts() {
     return this.http.get<Product[]>(this.baseUrl).pipe(
       tap(products => this.products.set(products)),
         catchError(err => {

@@ -6,6 +6,8 @@ import { ConfirmService } from './confirm.service';
 import { NotificationService } from './notification.service';
 import { AuthService } from './auth.service';
 import { isAddressDto } from '../guards/addressType.guard';
+import { throwError } from 'rxjs';
+import { catchError, tap } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root',
@@ -14,7 +16,7 @@ export class AddressService {
   confirmService = inject(ConfirmService);
   notificationService = inject(NotificationService);
   authService = inject(AuthService);
-  baseUrl = environment.apiUrl + 'users/addresses';
+  baseUrl = environment.apiUrl + 'addresses';
   http = inject(HttpClient);
   guestAddress = signal<Address | null>(null);
   private _addresses = signal<Address[]>([]);
@@ -23,21 +25,20 @@ export class AddressService {
     () => this.addresses().find((a: Address) => a.type === 'BILLING') ?? null,
   );
 
-  getAddresses() {
-    this.authService.getUser().subscribe({
-      next: (user) => {
-        if (!user) {
-          this.guestAddress.set(this.getGuestAddress());
-          return;
-        }
-        this.http
-          .get<Address[]>(this.baseUrl, { withCredentials: true })
-          .subscribe((addresses) => this._addresses.set(addresses));
-      },
-      error: (err) => {
-        console.error('Error fetching addresses:', err);
-      }
-    });
+  loadAddresses() {
+    if (this.authService.isLoggedIn()) {
+      this.http.get<Address[]>(this.baseUrl, { withCredentials: true }).pipe(
+        tap((addresses: Address[]) => {
+          this._addresses.set(addresses);
+        }),
+        catchError((err) => {
+          this.notificationService.error('Could not load addresses');
+          return throwError(() => err);
+        }),
+      ).subscribe();
+    } else {
+      this.guestAddress.set(this.getGuestAddress());
+    }
   }
 
   addAddress(address: AddressDto) {
@@ -53,7 +54,7 @@ export class AddressService {
     return this.http
       .post<Address>(this.baseUrl, address, { withCredentials: true })
       .subscribe(() => {
-        this.getAddresses();
+        this.loadAddresses();
         this.notificationService.success('Address added');
       });
   }
@@ -87,7 +88,7 @@ export class AddressService {
     return this.http
       .put<Address>(this.baseUrl + '/' + address.id, address, { withCredentials: true })
       .subscribe(() => {
-        this.getAddresses();
+        this.loadAddresses();
         this.notificationService.success('Address updated');
       });
   }
@@ -111,7 +112,7 @@ export class AddressService {
     return this.http
       .delete<Address>(this.baseUrl + '/' + addressId, { withCredentials: true })
       .subscribe(() => {
-        this.getAddresses();
+        this.loadAddresses();
         this.notificationService.success('Address deleted');
       });
   }

@@ -34,8 +34,8 @@ export class CategoryService {
     }
   }
 
-  getCategories() {
-    return this.http
+  loadCategories() {
+    this.http
       .get<Category[]>(this.baseUrl)
       .pipe(
         tap((categories) => this.categories.set(categories)),

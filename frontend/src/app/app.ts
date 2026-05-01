@@ -1,4 +1,4 @@
-import { Component, inject, effect, untracked, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { ProductService } from './services/product.service';
 import { CategoryService } from './services/category.service';
@@ -8,6 +8,8 @@ import { AuthService } from './services/auth.service';
 import { AddressService } from './services/address.service';
 import { OrderService } from './services/order.service';
 import { ThemeService } from './services/theme.service';
+import { UserService } from './services/user.service';
+import { take } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -25,30 +27,27 @@ export class App implements OnInit {
   categoryService = inject(CategoryService);
   cartService = inject(CartService);
   authService = inject(AuthService);
+  userService = inject(UserService);
   addressService = inject(AddressService);
   orderService = inject(OrderService);
   themeService = inject(ThemeService);
 
   constructor() {
-    effect(() => {
-      const loggedIn = this.authService.isLoggedIn();
-
-      untracked(() => {
-        if (loggedIn) {
-          this.orderService.getOrders();
-        }
-        this.cartService.getCartItems();
+    this.authService.ready$
+      .pipe(
+        take(1)
+      ).subscribe(() => {
+        this.orderService.loadOrders();
+        this.cartService.loadCartItems();
+        this.addressService.loadAddresses();
       });
-    });
   }
 
   ngOnInit() {
-    this.authService.getUser().subscribe();
+    this.userService.getUser().subscribe();
 
-    this.productService.getProducts();
-    this.categoryService.getCategories();
-    this.cartService.getCartItems();
+    this.productService.loadProducts();
+    this.categoryService.loadCategories();
     this.themeService.loadTheme();
-    this.addressService.getAddresses();
   }
 }

@@ -20,6 +20,12 @@ public class User {
     @Column(name = "email")
     private String email;
 
+    @Column(name = "forename")
+    private String forename;
+
+    @Column(name = "surname")
+    private String surname;
+
     @Column(name = "password_hash", nullable = false)
     private String passwordHash;
 
@@ -27,8 +33,27 @@ public class User {
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
 
+    @ColumnDefault("current_timestamp()")
+    @Column(name = "updated_at")
+    private Instant updatedAt;
+
+    @Column(name = "last_login", nullable = false)
+    private Instant lastLogin;
+
+    @ColumnDefault("0")
+    @Column(name = "deactivated", nullable = false)
+    private Boolean deactivated;
+
     @PrePersist
     protected void onCreate() {
         this.createdAt = Instant.now();
+        this.updatedAt = Instant.now();
+        this.lastLogin = Instant.now();
+        this.deactivated = false;
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = Instant.now();
     }
 }

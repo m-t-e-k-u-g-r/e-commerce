@@ -2,12 +2,8 @@ package ch.mk.backend.controllers;
 
 import ch.mk.backend.dtos.LoginRequest;
 import ch.mk.backend.dtos.TokenDto;
-import ch.mk.backend.dtos.UserDto;
 import ch.mk.backend.entities.RefreshToken;
-import ch.mk.backend.entities.User;
-import ch.mk.backend.mappers.UserMapper;
 import ch.mk.backend.repositories.RefreshTokenRepository;
-import ch.mk.backend.repositories.UserRepository;
 import ch.mk.backend.services.CookieService;
 import ch.mk.backend.services.JWTService;
 import ch.mk.backend.services.UserService;
@@ -17,7 +13,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -41,26 +36,6 @@ public class AuthController {
     private CookieService cookieService;
     @Autowired
     private RefreshTokenRepository refreshTokenRepository;
-
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private UserMapper userMapper;
-
-    @GetMapping("/me")
-    public ResponseEntity<UserDto> getUser(
-            @AuthenticationPrincipal User user
-    ) {
-        try {
-            return userRepository.findById(user.getId())
-                    .map(userMapper::toDto)
-                    .map(ResponseEntity::ok)
-                    .orElse(ResponseEntity.notFound().build());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-    }
 
     @PostMapping("/register")
     public ResponseEntity<TokenDto> registerUser(@RequestBody LoginRequest request) {

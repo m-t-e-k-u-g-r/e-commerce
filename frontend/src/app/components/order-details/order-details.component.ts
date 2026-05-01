@@ -1,6 +1,6 @@
 import { Component, inject, Inject, Input, Optional } from '@angular/core';
 import { GuestOrderDto, OrderDto } from '../../models/order.type';
-import { NgOptimizedImage, CurrencyPipe } from '@angular/common';
+import { NgOptimizedImage, CurrencyPipe, DatePipe } from '@angular/common';
 import { MatCard, MatCardContent, MatCardSubtitle, MatCardTitle, MatCardHeader, MatCardActions } from '@angular/material/card';
 import { MatListModule } from '@angular/material/list';
 import { MatDividerModule } from '@angular/material/divider';
@@ -25,6 +25,7 @@ import { OrderService } from '../../services/order.service';
     CurrencyPipe,
     MatButton,
     MatCardActions,
+    DatePipe,
   ],
   template: `
     @if (order) {
@@ -49,7 +50,7 @@ import { OrderService } from '../../services/order.service';
             </div>
             <div class="info-item">
               <span class="label">Order date</span>
-              <span>{{ order.createdDate }}</span>
+              <span>{{ order.createdAt | date: 'medium' }}</span>
             </div>
             <div class="info-item">
               <span class="label">Shipping address</span>

@@ -1,11 +1,13 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { environment } from '../../environments/environment.development';
 import { HttpClient } from '@angular/common/http';
-import { catchError, finalize, of, tap, throwError } from 'rxjs';
-import { User } from '../models/user.type';
+import { catchError, finalize, of, shareReplay, take, tap, throwError } from 'rxjs';
 import { NotificationService } from './notification.service';
 import { Router } from '@angular/router';
+import { User } from '../models/user.type';
 import { isAuthError } from '../guards/auth.guard';
+import { toObservable } from '@angular/core/rxjs-interop';
+import { filter } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root',
@@ -16,28 +18,15 @@ export class AuthService {
   notificationService = inject(NotificationService);
   router = inject(Router);
   isLoggedIn = signal<boolean>(false);
-  userEmail = signal<string | null>(null);
+  private _isInitialized = signal<boolean>(false);
+  readonly isInitialized$ = toObservable(this._isInitialized);
+  readonly ready$ = this.isInitialized$.pipe(
+    filter(Boolean),
+    take(1),
+    shareReplay(1)
+  );
   loading = signal(false);
-
-  getUser() {
-    return this.http.get<User>(this.baseUrl + '/me', { withCredentials: true }).pipe(
-      tap((user: User) => {
-        this.userEmail.set(user.email);
-        this.isLoggedIn.set(true);
-      }),
-      catchError(() => {
-        return this.refresh().pipe(
-          catchError(err => {
-            this.isLoggedIn.set(false);
-            if (isAuthError(err)) {
-              return of(null);
-            }
-            return throwError(() => err);
-          }),
-        );
-      }),
-    );
-  }
+  user = signal<User | null>(null);
 
   signup(email: string, password: string) {
     this.loading.set(true);
@@ -94,19 +83,10 @@ export class AuthService {
       );
   }
 
-  refresh() {
-    return this.http.post(this.baseUrl + '/refresh', {}, { withCredentials: true }).pipe(
-      tap(() => {
-        this.isLoggedIn.set(true);
-      }),
-      catchError(err => {
-        this.isLoggedIn.set(false);
-        if (isAuthError(err)) {
-          return of(null);
-        }
-        return throwError(() => err);
-      }),
-    );
+  forceLogout() {
+    this.isLoggedIn.set(false);
+    this.user.set(null);
+    this.notificationService.warning('Refresh token has expired. Please log in again.', 'Session expired')
   }
 
   logout() {
@@ -114,7 +94,7 @@ export class AuthService {
     return this.http.delete(this.baseUrl + '/logout', { withCredentials: true }).pipe(
       tap(() => {
         this.isLoggedIn.set(false);
-        this.userEmail.set(null);
+        this.user.set(null);
         this.router.navigate(['/'])
         this.notificationService.success('Logout successful');
       }),
@@ -126,5 +106,26 @@ export class AuthService {
         this.notificationService.clear(toastId)
       })
     );
+  }
+
+  refresh() {
+    return this.http.post(this.baseUrl + '/refresh', {},
+      { withCredentials: true }
+    ).pipe(
+      tap(() => {
+        this.isLoggedIn.set(true);
+      }),
+      catchError((err) => {
+        this.isLoggedIn.set(false);
+        if (isAuthError(err)) {
+          return of(null);
+        }
+        return throwError(() => err);
+      }),
+    );
+  }
+
+  setInitialized(value: boolean) {
+    this._isInitialized.set(value);
   }
 }
