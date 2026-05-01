@@ -1,8 +1,11 @@
 package ch.mk.backend.services;
 
+import ch.mk.backend.dtos.EditUserDto;
 import ch.mk.backend.dtos.LoginRequest;
+import ch.mk.backend.dtos.UserDto;
 import ch.mk.backend.entities.RefreshToken;
 import ch.mk.backend.entities.User;
+import ch.mk.backend.mappers.UserMapper;
 import ch.mk.backend.repositories.RefreshTokenRepository;
 import ch.mk.backend.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +32,8 @@ public class UserService {
 
     @Autowired
     private AuthenticationManager authenticationManager;
+    @Autowired
+    private UserMapper userMapper;
 
     public void createUser(String email, String password_hash) {
         User user = new User();
@@ -36,6 +41,18 @@ public class UserService {
         user.setPasswordHash(password_hash);
 
         userRepository.save(user);
+    }
+
+    public UserDto editUser(User user, EditUserDto dto) {
+        user.setEmail(dto.getEmail());
+        if (dto.getForename() != null) {
+            user.setForename(dto.getForename());
+        }
+        if (dto.getSurname() != null) {
+            user.setSurname(dto.getSurname());
+        }
+        userRepository.save(user);
+        return userMapper.toDto(user);
     }
 
     public String verifyUser(LoginRequest request) {
