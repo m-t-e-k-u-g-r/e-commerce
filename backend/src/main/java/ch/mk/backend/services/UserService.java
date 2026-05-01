@@ -50,6 +50,9 @@ public class UserService {
     }
 
     public UserDto editUser(User user, EditUserDto dto) {
+        if (dto.getEmail() == null || dto.getEmail().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "EMAIL_EMPTY");
+        }
         user.setEmail(dto.getEmail());
         if (dto.getForename() != null) {
             user.setForename(dto.getForename());

@@ -62,22 +62,17 @@ export class UserService {
     });
     if (!response.confirmed) return;
 
-    const updatedUser: EditUser = {
-      email: response.data.email,
-      forename: response.data.forename,
-      surname: response.data.surname,
-    }
-    this.editProfile(updatedUser).subscribe();
+    this.editProfile(response.data).subscribe();
   }
 
   editProfile(updatedUser: EditUser) {
     const toastId = this.notificationService.pending('Updating profile...');
-    return this.http.put<User>(this.baseUrl + '/profile',
-      { updatedUser },
+    return this.http.put<User>(this.baseUrl + '/profile', updatedUser,
       { withCredentials: true }
     ).pipe(
       tap((user: User) => {
         this.authService.user.set(user);
+        this.notificationService.success('Profile updated successfully');
       }),
       catchError((err) => {
         this.notificationService.error('Failed to update profile');
