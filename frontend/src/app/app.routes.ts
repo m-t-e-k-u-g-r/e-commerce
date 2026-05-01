@@ -6,6 +6,7 @@ import { AddressOverviewComponent } from './components/address-overview/address-
 import { AddressFormComponent } from './components/address-form/address-form.component';
 import { OrderOverviewComponent } from './components/order-overview/order-overview.component';
 import { authGuard, redirectFromLogin } from './guards/auth.guard';
+import { ProfileComponent } from './components/profile/profile.component';
 
 export const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -15,6 +16,7 @@ export const routes: Routes = [
   { path: 'address/new', component: AddressFormComponent },
   { path: 'address/e/:id', component: AddressFormComponent },
   { path: 'orders', component: OrderOverviewComponent, canActivate: [authGuard] },
+  { path: 'profile', component: ProfileComponent, canActivate: [authGuard] },
   { path: 'login', component: LoginComponent, canActivate: [redirectFromLogin] },
   { path: '**', redirectTo: ''},
 ];
