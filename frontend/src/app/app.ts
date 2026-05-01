@@ -1,4 +1,4 @@
-import { Component, inject, effect, untracked, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { ProductService } from './services/product.service';
 import { CategoryService } from './services/category.service';
@@ -9,6 +9,8 @@ import { AddressService } from './services/address.service';
 import { OrderService } from './services/order.service';
 import { ThemeService } from './services/theme.service';
 import { UserService } from './services/user.service';
+import { take } from 'rxjs';
+import { filter, switchMap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -32,16 +34,14 @@ export class App implements OnInit {
   themeService = inject(ThemeService);
 
   constructor() {
-    effect(() => {
-      const loggedIn = this.authService.isLoggedIn();
-
-      untracked(() => {
-        if (loggedIn) {
-          this.orderService.getOrders();
-        }
-        this.cartService.getCartItems();
-      });
-    });
+    this.authService.isInitialized$
+      .pipe(
+        filter(Boolean),
+        take(1),
+        filter(() => this.authService.isLoggedIn()),
+        switchMap(() => this.orderService.getOrders())
+      )
+      .subscribe();
   }
 
   ngOnInit() {

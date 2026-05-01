@@ -6,7 +6,6 @@ import { ConfirmService } from './confirm.service';
 import { NotificationService } from './notification.service';
 import { AuthService } from './auth.service';
 import { isAddressDto } from '../guards/addressType.guard';
-import { UserService } from './user.service';
 
 @Injectable({
   providedIn: 'root',
@@ -15,7 +14,6 @@ export class AddressService {
   confirmService = inject(ConfirmService);
   notificationService = inject(NotificationService);
   authService = inject(AuthService);
-  userService = inject(UserService);
   baseUrl = environment.apiUrl + 'addresses';
   http = inject(HttpClient);
   guestAddress = signal<Address | null>(null);
@@ -26,20 +24,17 @@ export class AddressService {
   );
 
   getAddresses() {
-    this.userService.getUser().subscribe({
-      next: (user) => {
-        if (!user) {
-          this.guestAddress.set(this.getGuestAddress());
-          return;
-        }
-        this.http
-          .get<Address[]>(this.baseUrl, { withCredentials: true })
-          .subscribe((addresses) => this._addresses.set(addresses));
-      },
-      error: (err) => {
-        console.error('Error fetching addresses:', err);
-      }
-    });
+    if (this.authService.isLoggedIn()) {
+      this.http
+        .get<Address[]>(this.baseUrl, { withCredentials: true })
+        .subscribe({
+          next: (addresses) => this._addresses.set(addresses),
+          error: () => this.notificationService.error('Could not load addresses'),
+        });
+      return;
+    }
+    this.guestAddress.set(this.getGuestAddress());
+    return;
   }
 
   addAddress(address: AddressDto) {
