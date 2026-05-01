@@ -24,6 +24,19 @@ button {
   cursor: pointer;
 }
 
+.cdk-overlay-pane.mat-mdc-dialog-panel {
+  min-width: 360px;
+  width: 90% !important;
+
+  @media (min-width: 800px) {
+    width: 70% !important;
+  }
+}
+
+.mat-mdc-dialog-container {
+  width: 100%;
+}
+
 .dialog-container {
   container: dialog / inline-size;
   color: var(--text-color);
