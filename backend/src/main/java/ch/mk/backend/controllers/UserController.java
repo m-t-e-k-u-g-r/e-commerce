@@ -1,5 +1,6 @@
 package ch.mk.backend.controllers;
 
+import ch.mk.backend.dtos.ChangePasswordDto;
 import ch.mk.backend.dtos.EditUserDto;
 import ch.mk.backend.dtos.UserDto;
 import ch.mk.backend.entities.User;
@@ -46,5 +47,14 @@ public class UserController {
     ) {
         UserDto updatedUser = userService.editUser(user, userDto);
         return new ResponseEntity<>(updatedUser, HttpStatus.OK);
+    }
+
+    @PutMapping("/change-password")
+    public ResponseEntity<Void> changePassword(
+            @AuthenticationPrincipal User user,
+            @RequestBody ChangePasswordDto dto
+    ) {
+        userService.changePassword(user, dto);
+        return ResponseEntity.noContent().build();
     }
 }

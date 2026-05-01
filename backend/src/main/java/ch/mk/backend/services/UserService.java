@@ -1,5 +1,6 @@
 package ch.mk.backend.services;
 
+import ch.mk.backend.dtos.ChangePasswordDto;
 import ch.mk.backend.dtos.EditUserDto;
 import ch.mk.backend.dtos.LoginRequest;
 import ch.mk.backend.dtos.UserDto;
@@ -13,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -32,8 +34,12 @@ public class UserService {
 
     @Autowired
     private AuthenticationManager authenticationManager;
+
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private BCryptPasswordEncoder bcryptEncoder;
 
     public void createUser(String email, String password_hash) {
         User user = new User();
@@ -53,6 +59,17 @@ public class UserService {
         }
         userRepository.save(user);
         return userMapper.toDto(user);
+    }
+
+    public void changePassword(User user, ChangePasswordDto dto) {
+        boolean oldPasswordCorrect = bcryptEncoder.matches(dto.getOldPassword(), user.getPasswordHash());
+        if (!oldPasswordCorrect) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "INVALID_PASSWORD");
+
+        boolean samePassword = bcryptEncoder.matches(dto.getNewPassword(), user.getPasswordHash());
+        if (samePassword) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "SAME_PASSWORD");
+
+        user.setPasswordHash(bcryptEncoder.encode(dto.getNewPassword()));
+        userRepository.save(user);
     }
 
     public String verifyUser(LoginRequest request) {
