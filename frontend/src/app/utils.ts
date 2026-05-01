@@ -1,4 +1,11 @@
 import { CreatedGuestOrderDto, GuestOrderExportDto, OrderItem } from './models/order.type';
+import { Validators } from '@angular/forms';
+
+export const passwordValidators = [
+  Validators.required,
+  Validators.minLength(12),
+  Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$/),
+]
 
 export function jsonExport(data: any, name: string | null = null) {
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });

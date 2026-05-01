@@ -63,28 +63,31 @@ import { MatIcon } from '@angular/material/icon';
                   />
                 }
                 @case ('password') {
-                  <input
-                    matInput
-                    [type]="isHidden(field.name) ? 'password' : 'text'"
-                    formControlName="field.name"
-                  />
-                  <button
-                    type="button"
-                    mat-icon-button
-                    matSuffix
-                    (click)="toggleVisibility(field.name)"
-                    [attr.aria-label]="'Hide password'"
-                    [attr.aria-pressed]="isHidden(field.name)"
-                  >
-                    <mat-icon>{{ isHidden(field.name) ? 'visibility_off' : 'visibility' }}</mat-icon>
-                  </button>
+                  <div>
+                    <input
+                      matInput
+                      [type]="!isHidden(field.name) ? 'password' : 'text'"
+                      [formControlName]="field.name"
+                    />
+                    <button
+                      type="button"
+                      mat-icon-button
+                      matSuffix
+                      (click)="toggleVisibility(field.name)"
+                      [attr.aria-label]="'Hide password'"
+                    >
+                      <mat-icon>
+                        {{ !isHidden(field.name) ? 'visibility_off' : 'visibility' }}
+                      </mat-icon>
+                    </button>
+                  </div>
                 }
                 @case ('textarea') {
                   <textarea
                     matInput
                     placeholder="{{ field.placeholder || '' }}"
                     value="{{ field.defaultValue || '' }}"
-                    formControlName="{{ field.name }}"
+                    [formControlName]="field.name"
                   ></textarea>
                 }
                 @case ('number') {
@@ -149,9 +152,7 @@ export class OptionsDialogComponent implements OnInit {
   ngOnInit() {
     const group: any = {};
     this.fields.forEach((field) => {
-      group[field.name] = new FormControl(field.defaultValue || '',
-        field.validators ?? []
-      );
+      group[field.name] = new FormControl(field.defaultValue || '', field.validators ?? []);
       if (field.toggleable) {
         this.hiddenState[field.name] = true;
       }
