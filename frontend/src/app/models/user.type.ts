@@ -1,9 +1,12 @@
-export interface User {
+export interface User extends EditUser {
   id: number;
+  lastLogin: Date;
+}
+
+export interface EditUser {
   email: string;
   forename?: string;
   surname?: string;
-  lastLogin: Date;
 }
 
 export interface UserListItem {
