@@ -2,7 +2,7 @@ import { Component, inject, OnInit } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AddressService } from '../../services/address.service';
-import { Address, AddressDto } from '../../models/address.type';
+import { AddressDto, AddressForm } from '../../models/address.type';
 import { MatFormField, MatInput, MatLabel } from '@angular/material/input';
 import { MatOption, MatSelect } from '@angular/material/select';
 import { MatButton } from '@angular/material/button';
@@ -79,7 +79,17 @@ import { AuthService } from '../../services/auth.service';
         </section>
       </div>
 
-      <button matButton="elevated" type="submit" [disabled]="addressForm.invalid">Save</button>
+      <button
+        matButton="elevated"
+        type="submit"
+        [disabled]="addressForm.invalid"
+      >
+        @if (this.addressService.loading()) {
+
+        } @else {
+          Save
+        }
+      </button>
     </form>
   `,
   styleUrl: './address-form.component.scss',
@@ -91,7 +101,7 @@ export class AddressFormComponent implements OnInit {
   private router = inject(Router);
 
   addressId?: number;
-  selectedAddress?: Address;
+  selectedAddress?: AddressForm;
 
   addressForm: FormGroup<{
     salutation: FormControl<string>;
@@ -168,7 +178,7 @@ export class AddressFormComponent implements OnInit {
       const idParam = params.get('id');
       if (idParam) {
         this.addressId = Number(idParam);
-        let address: Address | undefined;
+        let address: AddressForm | undefined;
         if (this.authService.isLoggedIn()) {
           address = this.addressService.addresses().find((a) => a.id === this.addressId);
         } else {

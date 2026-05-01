@@ -5,6 +5,14 @@
   align-items: start;
 }
 
+.mat-spinner-global {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
+}
+
 .product_list {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));

@@ -21,6 +21,6 @@ export class ProductService {
           this.products.set([]);
           return of([]);
         })
-      ).subscribe();
+      );
   }
 }

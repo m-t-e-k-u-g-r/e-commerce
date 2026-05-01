@@ -9,7 +9,9 @@ import { AddressService } from './services/address.service';
 import { OrderService } from './services/order.service';
 import { ThemeService } from './services/theme.service';
 import { UserService } from './services/user.service';
-import { take } from 'rxjs';
+import { finalize, forkJoin, of, take } from 'rxjs';
+import { catchError } from 'rxjs/operators';
+import { LoadingService } from './services/loading.service';
 
 @Component({
   selector: 'app-root',
@@ -31,6 +33,7 @@ export class App implements OnInit {
   addressService = inject(AddressService);
   orderService = inject(OrderService);
   themeService = inject(ThemeService);
+  loadingService = inject(LoadingService)
 
   constructor() {
     this.authService.ready$
@@ -44,10 +47,15 @@ export class App implements OnInit {
   }
 
   ngOnInit() {
-    this.userService.getUser().subscribe();
-
-    this.productService.loadProducts();
-    this.categoryService.loadCategories();
+    this.loadingService.startLoading();
     this.themeService.loadTheme();
+
+    forkJoin([
+      this.userService.getUser().pipe(catchError(() => of(null))),
+      this.productService.loadProducts(),
+      this.categoryService.loadCategories()
+    ]).pipe(
+      finalize(() => this.loadingService.stopLoading())
+    ).subscribe();
   }
 }

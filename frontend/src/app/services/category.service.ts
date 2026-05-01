@@ -2,7 +2,7 @@ import { Injectable, inject, signal, computed } from '@angular/core';
 import { environment } from '../../environments/environment.development';
 import { HttpClient } from '@angular/common/http';
 import { Category } from '../models/category.type';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import { Router } from '@angular/router';
 
@@ -35,16 +35,16 @@ export class CategoryService {
   }
 
   loadCategories() {
-    this.http
+    return this.http
       .get<Category[]>(this.baseUrl)
       .pipe(
-        tap((categories) => this.categories.set(categories)),
-        catchError((err) => {
-          console.error('Failed to load categories', err);
-          this.categories.set([]);
-          return of([]);
+        tap((categories) => {
+          this.categories.set(categories)
         }),
-      )
-      .subscribe();
+        catchError((err) => {
+          this.categories.set([]);
+          return throwError(() => err);
+        }),
+      );
   }
 }

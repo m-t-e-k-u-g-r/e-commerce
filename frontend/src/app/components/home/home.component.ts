@@ -3,12 +3,17 @@ import { ProductService } from '../../services/product.service';
 import { ProductComponent } from '../product/product.component';
 import { SidebarComponent } from '../sidebar/sidebar.component';
 import { ActivatedRoute } from '@angular/router';
+import { MatProgressSpinner } from '@angular/material/progress-spinner';
+import { LoadingService } from '../../services/loading.service';
 
 @Component({
   selector: 'app-home',
-  imports: [ProductComponent, SidebarComponent],
+  imports: [ProductComponent, SidebarComponent, MatProgressSpinner],
   template: `
     <div class="home">
+      @if (this.loadingService.isLoading()) {
+        <mat-spinner class="mat-spinner-global" mode="indeterminate" />
+      }
       <app-sidebar />
       <section class="product_list">
         @for (product of this.productService.products(); track product.id) {
@@ -25,6 +30,7 @@ export class HomeComponent implements OnInit {
   productService = inject(ProductService);
   categoryId?: number;
   constructor(private route: ActivatedRoute) {}
+  loadingService = inject(LoadingService);
 
   ngOnInit() {
     this.route.paramMap.subscribe((params) => {

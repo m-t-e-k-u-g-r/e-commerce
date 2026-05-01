@@ -18,12 +18,13 @@ export class AddressService {
   authService = inject(AuthService);
   baseUrl = environment.apiUrl + 'addresses';
   http = inject(HttpClient);
-  guestAddress = signal<Address | null>(null);
+  guestAddress = signal<AddressForm | null>(null);
   private _addresses = signal<Address[]>([]);
   readonly addresses = this._addresses.asReadonly();
   readonly billingAddress = computed(
     () => this.addresses().find((a: Address) => a.type === 'BILLING') ?? null,
   );
+  loading = signal(false);
 
   loadAddresses() {
     if (this.authService.isLoggedIn()) {
@@ -49,14 +50,20 @@ export class AddressService {
         ...address,
       };
       this.saveGuestAddress(saveAddress);
-      return this.getGuestAddress();
+      this.guestAddress.set(saveAddress);
     }
-    return this.http
+    this.http
       .post<Address>(this.baseUrl, address, { withCredentials: true })
-      .subscribe(() => {
-        this.loadAddresses();
-        this.notificationService.success('Address added');
-      });
+      .pipe(
+        tap(() => {
+          this.loadAddresses();
+          this.notificationService.success('Address added');
+        }),
+        catchError((err) => {
+          this.notificationService.error('Could not add address');
+          return throwError(() => err);
+        })
+      ).subscribe();
   }
 
   getGuestAddress(): Address | null {
@@ -85,12 +92,18 @@ export class AddressService {
     if (!this.authService.isLoggedIn()) {
       return this.saveGuestAddress(address);
     }
-    return this.http
+    this.http
       .put<Address>(this.baseUrl + '/' + address.id, address, { withCredentials: true })
-      .subscribe(() => {
-        this.loadAddresses();
-        this.notificationService.success('Address updated');
-      });
+      .pipe(
+        tap(() => {
+          this.loadAddresses();
+          this.notificationService.success('Address updated');
+        }),
+        catchError((err) => {
+          this.notificationService.error('Could not update address');
+          return throwError(() => err);
+        })
+      );
   }
 
   async deleteAddress(addressId: number) {
