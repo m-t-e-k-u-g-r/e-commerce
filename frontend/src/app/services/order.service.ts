@@ -48,7 +48,7 @@ export class OrderService {
         this.notificationService.error('Failed to load orders');
         return throwError(() => err);
       })
-    );
+    ).subscribe();
   }
 
   async checkGuestOrder() {

@@ -35,7 +35,7 @@ export class AddressService {
           this.notificationService.error('Could not load addresses');
           return throwError(() => err);
         }),
-      );
+      ).subscribe();
     } else {
       this.guestAddress.set(this.getGuestAddress());
     }

@@ -44,7 +44,7 @@ export class CartService {
           this.notificationService.error('Could not load cart items');
           return throwError(() => err);
         })
-      );
+      ).subscribe();
     } else {
       const cart = localStorage.getItem('cart');
       if (cart) {
