@@ -4,7 +4,6 @@ import { User } from '../models/user.type';
 import { finalize, map, tap } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { AuthService } from './auth.service';
-import { formatDate } from '../utils';
 
 @Injectable({
   providedIn: 'root',
@@ -18,10 +17,6 @@ export class UserService {
     return this.http.get<User>(this.baseUrl + '/me',
       { withCredentials: true }
     ).pipe(
-      map((user: User) => ({
-        ...user,
-          lastLogin: formatDate(user.lastLogin),
-      })),
       tap((user: User) => {
         this.authService.user.set(user);
         this.authService.isLoggedIn.set(true);

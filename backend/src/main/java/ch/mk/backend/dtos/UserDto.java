@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.Instant;
+
 @AllArgsConstructor
 @Getter
 @Setter
@@ -15,5 +17,5 @@ public class UserDto {
     private String forename;
     @Nullable
     private String surname;
-    private String lastLogin;
+    private Instant lastLogin;
 }

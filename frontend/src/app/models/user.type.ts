@@ -3,5 +3,5 @@ export interface User {
   email: string;
   forename?: string;
   surname?: string;
-  lastLogin: string;
+  lastLogin: Date;
 }

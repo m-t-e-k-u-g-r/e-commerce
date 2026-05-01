@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDate;
+import java.time.Instant;
 import java.util.List;
 
 @AllArgsConstructor
@@ -18,5 +18,5 @@ public class GuestOrderDto {
     private Double totalPrice;
     private OrderAddressDto address;
     private List<OrderItemDto> items;
-    private LocalDate createdDate;
+    private Instant createdAt;
 }

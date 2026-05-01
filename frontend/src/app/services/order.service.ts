@@ -13,7 +13,6 @@ import { catchError, tap } from 'rxjs/operators';
 import { jsonExport, mapToGuestOrderExport } from '../utils';
 import { MatDialog } from '@angular/material/dialog';
 import { OrderDetailsComponent } from '../components/order-details/order-details.component';
-import { formatDate } from '../utils';
 
 @Injectable({
   providedIn: 'root',
@@ -36,15 +35,14 @@ export class OrderService {
     return this.http.get<OrderDto[]>(this.baseUrl,
       { withCredentials: true }
     ).pipe(
-      map(orders =>
-        orders.map(o => ({
-          ...o,
-          createdDate: formatDate(o.createdDate),
-        }))
-      )
-    ).subscribe(orders => {
-      this._orders.set(orders);
-    });
+      tap(orders => {
+        this._orders.set(orders);
+      }),
+      catchError((err) => {
+        this.notificationService.error('Failed to load orders');
+        return throwError(() => err);
+      })
+    );
   }
 
   async checkGuestOrder() {

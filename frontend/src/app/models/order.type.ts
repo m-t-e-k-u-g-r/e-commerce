@@ -14,7 +14,7 @@ export interface OrderDto {
   totalPrice: number;
   address: OrderAddressDto;
   items: OrderItem[];
-  createdDate: string;
+  createdAt: Date;
 }
 
 export interface GuestOrderDto extends Omit<OrderDto, 'userId'> {}
@@ -27,7 +27,7 @@ export interface CreatedGuestOrderDto extends GuestOrderDto {
 export interface GuestOrderExportDto {
   orderId: number;
   accessToken: string;
-  createdAt: string;
+  createdAt: Date;
   status: string;
   totalPrice: number;
 

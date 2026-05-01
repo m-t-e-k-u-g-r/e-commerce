@@ -21,7 +21,7 @@ export function mapToGuestOrderExport(dto: CreatedGuestOrderDto): GuestOrderExpo
   return {
     orderId: dto.id,
     accessToken: dto.accessToken,
-    createdAt: dto.createdDate,
+    createdAt: dto.createdAt,
     status: dto.status,
     totalPrice: dto.totalPrice,
 
@@ -41,9 +41,4 @@ export function mapToGuestOrderExport(dto: CreatedGuestOrderDto): GuestOrderExpo
       lineTotal: item.price * item.quantity,
     })),
   };
-}
-
-export function formatDate(date: string): string {
-  const [y, m, d] = date.split('-');
-  return `${d}.${m}.${y}`;
 }
