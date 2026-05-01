@@ -34,3 +34,12 @@ export interface Field {
 export interface FormDialogInput extends Omit<DialogInput, 'messageType'> {
   fields: Field[];
 }
+
+export interface DialogOptions {
+  width?: string;
+  height?: string;
+  minWidth?: string;
+  minHeight?: string;
+  maxWidth?: string;
+  maxHeight?: string;
+}

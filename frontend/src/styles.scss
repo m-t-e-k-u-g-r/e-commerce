@@ -25,6 +25,7 @@ button {
 }
 
 .dialog-container {
+  container: dialog / inline-size;
   color: var(--text-color);
   background-color: var(--surface-color);
 
@@ -34,23 +35,21 @@ button {
   .dialog-message {
     color: var(--text-secondary);
   }
+
+  .input_wrapper {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    margin-bottom: 2rem;
+
+    @container dialog (min-width: 800px) {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
 }
 
 .order-dialog .mat-mdc-dialog-surface::-webkit-scrollbar {
   display: none;
-}
-
-.input_wrapper {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2rem;
-  margin-bottom: 2rem;
-}
-
-@media (max-width: 600px) {
-  .input_wrapper {
-    grid-template-columns: 1fr;
-  }
 }
 
 // Angular Material Overrides for Dark Mode
