@@ -5,3 +5,9 @@ export interface User {
   surname?: string;
   lastLogin: Date;
 }
+
+export interface UserListItem {
+  title: string;
+  value: string | Date | null | undefined;
+  isDate?: boolean;
+}
