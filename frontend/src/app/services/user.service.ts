@@ -8,6 +8,7 @@ import { NotificationService } from './notification.service';
 import { catchError } from 'rxjs/operators';
 import { ConfirmService } from './confirm.service';
 import { Validators } from '@angular/forms';
+import { passwordValidators } from '../utils';
 
 @Injectable({
   providedIn: 'root',
@@ -82,5 +83,51 @@ export class UserService {
         this.notificationService.clear(toastId);
       })
     );
+  }
+
+  async openPasswordChangeDialog() {
+    const response = await this.confirmService.confirmOptions(
+      {
+        title: 'Change password',
+        fields: [
+          {name: 'oldPassword', type: 'password', label: 'Current password', validators: passwordValidators},
+          {name: 'newPassword', type: 'password', label: 'New password', validators: passwordValidators},
+          {name: 'confirmNew', type: 'password', label: 'Confirm new password', validators: passwordValidators }
+        ],
+      },
+      {}
+    );
+    if (!response.confirmed) return;
+    const data = response.data;
+    if (data.newPassword !== data.confirmNew) {
+      return this.notificationService.error('Password confirmation invalid');
+    }
+    this.changePassword(data.oldPassword, data.newPassword).subscribe();
+  }
+
+  changePassword(oldPassword: string, newPassword: string) {
+    const toastId = this.notificationService.pending('Changing password...');
+    return this.http.put<void>(this.baseUrl + '/change-password',
+      { oldPassword: oldPassword, newPassword: newPassword },
+      { withCredentials: true }
+    ).pipe(
+      tap(() => {
+        this.notificationService.success('Password changed successfully');
+      }),
+      catchError((err) => {
+        if (err.message === 'INVALID_PASSWORD') {
+          this.notificationService.error('Invalid current password');
+        } else if (err.message === 'SAME_PASSWORD') {
+          this.notificationService.error('New password cannot be the same as the current password');
+        } else {
+          this.notificationService.error('Please try again', 'Failed to change password');
+        }
+
+        return throwError(() => err);
+      }),
+      finalize(() => {
+        this.notificationService.clear(toastId);
+      })
+    )
   }
 }

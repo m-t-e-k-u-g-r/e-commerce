@@ -59,7 +59,7 @@ import { UserService } from '../../services/user.service';
         </mat-card-content>
 
         <mat-card-actions align="end">
-          <button mat-button (click)="this.notificationService.toBeImplemented()">
+          <button mat-button (click)="this.userService.openPasswordChangeDialog()">
             Change Password
           </button>
           <button mat-button (click)="this.userService.openProfileEditor()">
@@ -74,7 +74,6 @@ import { UserService } from '../../services/user.service';
 export class ProfileComponent {
   authService = inject(AuthService);
   userService = inject(UserService);
-  notificationService = inject(NotificationService);
   user = this.authService.user();
 
   getItems(): UserListItem[] {
