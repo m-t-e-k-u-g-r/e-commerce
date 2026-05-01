@@ -7,6 +7,7 @@ import { MatIcon } from '@angular/material/icon';
 import { DatePipe } from '@angular/common';
 import { UserListItem } from '../../models/user.type';
 import { NotificationService } from '../../services/notification.service';
+import { UserService } from '../../services/user.service';
 
 @Component({
   selector: 'app-profile',
@@ -61,7 +62,7 @@ import { NotificationService } from '../../services/notification.service';
           <button mat-button (click)="this.notificationService.toBeImplemented()">
             Change Password
           </button>
-          <button mat-button (click)="this.notificationService.toBeImplemented()">
+          <button mat-button (click)="this.userService.openProfileEditor()">
             Edit Profile
           </button>
         </mat-card-actions>
@@ -72,6 +73,7 @@ import { NotificationService } from '../../services/notification.service';
 })
 export class ProfileComponent {
   authService = inject(AuthService);
+  userService = inject(UserService);
   notificationService = inject(NotificationService);
   user = this.authService.user();
 
