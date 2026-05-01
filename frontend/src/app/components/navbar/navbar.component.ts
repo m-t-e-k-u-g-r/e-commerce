@@ -54,11 +54,7 @@ export type MenuItem = {
             </ul>
           }
         </div>
-        <button
-          matIconButton
-          (click)="this.themeService.toggleTheme()"
-          title="Toggle theme"
-        >
+        <button matIconButton (click)="this.themeService.toggleTheme()" title="Toggle theme">
           @if (this.themeService.theme() == 'light') {
             <mat-icon>dark_mode</mat-icon>
           } @else {
@@ -103,6 +99,12 @@ export class NavbarComponent {
   }
 
   menuItems: MenuItem[] = [
+    {
+      label: 'Profile',
+      icon: 'person',
+      action: () => this.router.navigate(['/profile']),
+      visibleFor: 'user',
+    },
     {
       label: 'My orders',
       icon: 'receipt_long',
