@@ -1,12 +1,13 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogActions, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
-import { MatButton } from '@angular/material/button';
+import { MatButton, MatIconButton } from '@angular/material/button';
 import { FormDialogInput } from '../../models/inputs.type';
 import { MatDivider } from '@angular/material/list';
 import { MatFormField, MatHint, MatInput, MatLabel, MatSuffix } from '@angular/material/input';
 import { MatOption, MatSelect } from '@angular/material/select';
 import { MatDatepicker, MatDatepickerInput, MatDatepickerToggle } from '@angular/material/datepicker';
-import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { MatIcon } from '@angular/material/icon';
 
 @Component({
   selector: 'app-options-dialog',
@@ -27,6 +28,8 @@ import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
     MatDatepicker,
     ReactiveFormsModule,
     MatSuffix,
+    MatIcon,
+    MatIconButton,
   ],
   template: `
     <div class="dialog-container">
@@ -58,6 +61,23 @@ import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
                     [formControlName]="field.name"
                     type="email"
                   />
+                }
+                @case ('password') {
+                  <input
+                    matInput
+                    [type]="isHidden(field.name) ? 'password' : 'text'"
+                    formControlName="field.name"
+                  />
+                  <button
+                    type="button"
+                    mat-icon-button
+                    matSuffix
+                    (click)="toggleVisibility(field.name)"
+                    [attr.aria-label]="'Hide password'"
+                    [attr.aria-pressed]="isHidden(field.name)"
+                  >
+                    <mat-icon>{{ isHidden(field.name) ? 'visibility_off' : 'visibility' }}</mat-icon>
+                  </button>
                 }
                 @case ('textarea') {
                   <textarea
@@ -122,14 +142,28 @@ export class OptionsDialogComponent implements OnInit {
   fields = this.data.fields;
   form!: FormGroup;
 
+  hiddenState: Record<string, boolean> = {};
+
   constructor(public optionDialogRef: MatDialogRef<OptionsDialogComponent>) {}
 
   ngOnInit() {
     const group: any = {};
     this.fields.forEach((field) => {
-      group[field.name] = new FormControl(field.defaultValue || '');
+      group[field.name] = new FormControl(field.defaultValue || '',
+        field.validators ?? []
+      );
+      if (field.toggleable) {
+        this.hiddenState[field.name] = true;
+      }
     });
     this.form = new FormGroup(group);
+  }
+
+  toggleVisibility(fieldName: string) {
+    this.hiddenState[fieldName] = !this.hiddenState[fieldName];
+  }
+  isHidden(fieldName: string) {
+    return this.hiddenState[fieldName];
   }
 
   confirm() {

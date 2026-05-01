@@ -7,6 +7,7 @@ import { AuthService } from './auth.service';
 import { NotificationService } from './notification.service';
 import { catchError } from 'rxjs/operators';
 import { ConfirmService } from './confirm.service';
+import { Validators } from '@angular/forms';
 
 @Injectable({
   providedIn: 'root',
@@ -43,21 +44,19 @@ export class UserService {
           type: 'email',
           label: 'E-Mail',
           defaultValue: user.email,
-          required: true,
+          validators: [Validators.required]
         },
         {
           name: 'forename',
           type: 'text',
           label: 'Forename',
           defaultValue: user.forename,
-          required: false,
         },
         {
           name: 'surname',
           type: 'text',
           label: 'Surname',
           defaultValue: user.surname,
-          required: false
         }
       ],
     });

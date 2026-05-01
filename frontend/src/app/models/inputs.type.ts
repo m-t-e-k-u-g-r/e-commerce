@@ -1,3 +1,5 @@
+import { ValidatorFn } from '@angular/forms';
+
 export interface DialogInput {
   title: string;
   message?: string;
@@ -7,6 +9,7 @@ export interface DialogInput {
 type FieldType =
   | 'text'
   | 'email'
+  | 'password'
   | 'textarea'
   | 'number'
   | 'select'
@@ -17,7 +20,6 @@ export interface Field {
   name: string;
   type: FieldType;
   label: string;
-  required?: boolean;
   placeholder?: string;
   defaultValue?: any;
   disabled?: boolean;
@@ -25,6 +27,8 @@ export interface Field {
     label: string;
     value: any;
   }[];
+  toggleable?: boolean;
+  validators?: ValidatorFn[];
 }
 
 export interface FormDialogInput extends Omit<DialogInput, 'messageType'> {

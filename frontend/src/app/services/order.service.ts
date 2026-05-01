@@ -14,6 +14,7 @@ import { jsonExport, mapToGuestOrderExport } from '../utils';
 import { MatDialog } from '@angular/material/dialog';
 import { OrderDetailsComponent } from '../components/order-details/order-details.component';
 import { AuthService } from './auth.service';
+import { Validators } from '@angular/forms';
 
 @Injectable({
   providedIn: 'root',
@@ -55,8 +56,8 @@ export class OrderService {
       title: 'Retrieve order details',
       message: 'Please enter your order ID and token to retrieve your order details.',
       fields: [
-        { name: 'orderId', type: 'number', label: 'Order ID', required: true },
-        { name: 'token', type: 'text', label: 'Token', required: true }
+        { name: 'orderId', type: 'number', label: 'Order ID', validators: [Validators.required] },
+        { name: 'token', type: 'text', label: 'Token', validators: [Validators.required] }
       ]
     });
     if (response.confirmed) {

@@ -11,6 +11,7 @@ import { ConfirmService } from '../../services/confirm.service';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
 import { NotificationService } from '../../services/notification.service';
+import { Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-shopping-cart',
@@ -184,8 +185,8 @@ export class ShoppingCartComponent {
           name: 'email',
           type: 'email',
           label: 'E-Mail',
-          required: true,
           placeholder: 'example@email.com',
+          validators: [Validators.required, Validators.email],
         },
       ],
     });
