@@ -177,7 +177,7 @@ export class ShoppingCartComponent {
     }
 
     const response = await this.confirmService.confirmOptions({
-      title: '',
+      title: 'Email required',
       message: 'Please enter your email to place an order',
       fields: [
         {
