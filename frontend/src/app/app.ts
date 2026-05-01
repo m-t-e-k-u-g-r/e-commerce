@@ -10,7 +10,6 @@ import { OrderService } from './services/order.service';
 import { ThemeService } from './services/theme.service';
 import { UserService } from './services/user.service';
 import { take } from 'rxjs';
-import { filter, switchMap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -34,23 +33,21 @@ export class App implements OnInit {
   themeService = inject(ThemeService);
 
   constructor() {
-    this.authService.isInitialized$
+    this.authService.ready$
       .pipe(
-        filter(Boolean),
-        take(1),
-        filter(() => this.authService.isLoggedIn()),
-        switchMap(() => this.orderService.getOrders())
-      )
-      .subscribe();
+        take(1)
+      ).subscribe(() => {
+        this.orderService.loadOrders();
+        this.cartService.loadCartItems();
+        this.addressService.loadAddresses();
+      });
   }
 
   ngOnInit() {
     this.userService.getUser().subscribe();
 
-    this.productService.getProducts();
-    this.categoryService.getCategories();
-    this.cartService.getCartItems();
+    this.productService.loadProducts();
+    this.categoryService.loadCategories();
     this.themeService.loadTheme();
-    this.addressService.getAddresses();
   }
 }

@@ -6,6 +6,8 @@ import { ConfirmService } from './confirm.service';
 import { NotificationService } from './notification.service';
 import { AuthService } from './auth.service';
 import { isAddressDto } from '../guards/addressType.guard';
+import { throwError } from 'rxjs';
+import { catchError, tap } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root',
@@ -23,18 +25,20 @@ export class AddressService {
     () => this.addresses().find((a: Address) => a.type === 'BILLING') ?? null,
   );
 
-  getAddresses() {
+  loadAddresses() {
     if (this.authService.isLoggedIn()) {
-      this.http
-        .get<Address[]>(this.baseUrl, { withCredentials: true })
-        .subscribe({
-          next: (addresses) => this._addresses.set(addresses),
-          error: () => this.notificationService.error('Could not load addresses'),
-        });
-      return;
+      this.http.get<Address[]>(this.baseUrl, { withCredentials: true }).pipe(
+        tap((addresses: Address[]) => {
+          this._addresses.set(addresses);
+        }),
+        catchError((err) => {
+          this.notificationService.error('Could not load addresses');
+          return throwError(() => err);
+        }),
+      );
+    } else {
+      this.guestAddress.set(this.getGuestAddress());
     }
-    this.guestAddress.set(this.getGuestAddress());
-    return;
   }
 
   addAddress(address: AddressDto) {
@@ -50,7 +54,7 @@ export class AddressService {
     return this.http
       .post<Address>(this.baseUrl, address, { withCredentials: true })
       .subscribe(() => {
-        this.getAddresses();
+        this.loadAddresses();
         this.notificationService.success('Address added');
       });
   }
@@ -84,7 +88,7 @@ export class AddressService {
     return this.http
       .put<Address>(this.baseUrl + '/' + address.id, address, { withCredentials: true })
       .subscribe(() => {
-        this.getAddresses();
+        this.loadAddresses();
         this.notificationService.success('Address updated');
       });
   }
@@ -108,7 +112,7 @@ export class AddressService {
     return this.http
       .delete<Address>(this.baseUrl + '/' + addressId, { withCredentials: true })
       .subscribe(() => {
-        this.getAddresses();
+        this.loadAddresses();
         this.notificationService.success('Address deleted');
       });
   }

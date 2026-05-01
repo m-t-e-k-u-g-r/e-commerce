@@ -1,12 +1,13 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { environment } from '../../environments/environment.development';
 import { HttpClient } from '@angular/common/http';
-import { catchError, finalize, of, tap, throwError } from 'rxjs';
+import { catchError, finalize, of, shareReplay, take, tap, throwError } from 'rxjs';
 import { NotificationService } from './notification.service';
 import { Router } from '@angular/router';
 import { User } from '../models/user.type';
 import { isAuthError } from '../guards/auth.guard';
 import { toObservable } from '@angular/core/rxjs-interop';
+import { filter } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root',
@@ -19,6 +20,11 @@ export class AuthService {
   isLoggedIn = signal<boolean>(false);
   private _isInitialized = signal<boolean>(false);
   readonly isInitialized$ = toObservable(this._isInitialized);
+  readonly ready$ = this.isInitialized$.pipe(
+    filter(Boolean),
+    take(1),
+    shareReplay(1)
+  );
   loading = signal(false);
   user = signal<User | null>(null);
 

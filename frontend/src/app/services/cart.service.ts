@@ -7,7 +7,7 @@ import { HttpClient } from '@angular/common/http';
 import { NotificationService } from './notification.service';
 import { ConfirmService } from './confirm.service';
 import { catchError, tap } from 'rxjs/operators';
-import { finalize, of } from 'rxjs';
+import { finalize, of, throwError } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -32,19 +32,24 @@ export class CartService {
     }, 0).toFixed(2)
   );
 
-  getCartItems() {
+  loadCartItems() {
     if (this.authService.isLoggedIn()) {
-      return this.http.get<CartItem[]>(this.baseUrl + '/items',
+      this.http.get<CartItem[]>(this.baseUrl + '/items',
         { withCredentials: true }
-      ).subscribe((items: CartItem[]) => {
+      ).pipe(
+        tap((items: CartItem[]) => {
           this._cart.set(items);
-        });
+        }),
+        catchError((err) => {
+          this.notificationService.error('Could not load cart items');
+          return throwError(() => err);
+        })
+      );
     } else {
       const cart = localStorage.getItem('cart');
       if (cart) {
         this._cart.set(JSON.parse(cart));
       }
-      return;
     }
   }
 
@@ -53,7 +58,7 @@ export class CartService {
       return this.http.post(this.baseUrl + '/items/' + productId, {},
         { withCredentials: true }
       ).subscribe(() => {
-        this.getCartItems();
+        this.loadCartItems();
       });
     } else {
       this._cart.update((items) => {
@@ -77,11 +82,11 @@ export class CartService {
           return this.http.put(this.baseUrl + '/items/' + item.id, { quantity: newQuantity },
             { withCredentials: true }
           ).subscribe(() => {
-            this.getCartItems();
+            this.loadCartItems();
           });
         } else {
           this.removeItem(productId);
-          this.getCartItems();
+          this.loadCartItems();
         }
       }
     } else {
@@ -107,7 +112,7 @@ export class CartService {
         return this.http
           .delete(this.baseUrl + '/items/' + item.id, { withCredentials: true })
           .subscribe(() => {
-            this.getCartItems();
+            this.loadCartItems();
           });
       }
     } else {
@@ -130,7 +135,7 @@ export class CartService {
       const toastId = this.notificationService.pending('Clearing cart...');
       this.http.delete(this.baseUrl, { withCredentials: true }).pipe(
         tap(() => {
-          this.getCartItems();
+          this.loadCartItems();
           this.notificationService.success('Cleared cart');
         }),
         catchError(() => {
