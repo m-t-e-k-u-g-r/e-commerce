@@ -7,6 +7,7 @@ import { MatIcon } from '@angular/material/icon';
 import { MatButtonModule, MatButton, MatIconButton } from '@angular/material/button';
 import { MyErrorStateMatcher } from '../../guards/errorMatcher.guard';
 import { passwordValidators } from '../../utils';
+import { MatProgressSpinner } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-login',
@@ -21,6 +22,7 @@ import { passwordValidators } from '../../utils';
     MatButton,
     MatSuffix,
     MatError,
+    MatProgressSpinner,
   ],
   template: `
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
@@ -93,7 +95,11 @@ import { passwordValidators } from '../../utils';
         </mat-form-field>
       }
       <button type="submit" matButton="elevated" [disabled]="loginForm.invalid || this.authService.loading()">
-        {{ isLogin ? 'Login' : 'Signup' }}
+        @if (this.authService.loading()) {
+          <mat-spinner diameter="18"/>
+        } @else {
+          {{ isLogin ? 'Login' : 'Signup' }}
+        }
       </button>
       @if (isLogin) {
         <p>

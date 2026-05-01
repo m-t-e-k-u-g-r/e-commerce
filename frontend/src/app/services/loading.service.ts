@@ -4,13 +4,22 @@ import { Injectable, signal } from '@angular/core';
   providedIn: 'root',
 })
 export class LoadingService {
-  isLoading = signal(false);
+  isLoadingHome = signal(false);
+  isLoadingUserData = signal(false);
 
-  startLoading() {
-    this.isLoading.set(true);
+  startLoading(state: 'home' | 'user') {
+    if (state == 'home') {
+      this.isLoadingHome.set(true);
+    } else {
+      this.isLoadingUserData.set(true);
+    }
   }
 
-  stopLoading() {
-    this.isLoading.set(false);
+  stopLoading(state: 'home' | 'user') {
+    if (state == 'home') {
+      this.isLoadingHome.set(false);
+    } else {
+      this.isLoadingUserData.set(false);
+    }
   }
 }

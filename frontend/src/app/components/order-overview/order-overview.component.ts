@@ -1,46 +1,53 @@
-import { Component, effect } from '@angular/core';
+import { Component, effect, inject } from '@angular/core';
 import { OrderComponent } from '../order/order.component';
 import { OrderService } from '../../services/order.service';
 import { OrderDetailsComponent } from '../order-details/order-details.component';
 import { OrderDto } from '../../models/order.type';
+import { LoadingService } from '../../services/loading.service';
+import { MatProgressSpinner } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-order-overview',
-  imports: [OrderComponent, OrderDetailsComponent],
+  imports: [OrderComponent, OrderDetailsComponent, MatProgressSpinner],
   template: `
     <div class="container">
       <header>
         <h1>My Orders</h1>
       </header>
 
-      <div class="layout-wrapper">
-        <section class="orders-list">
-          <div class="grid-container">
-            @for (order of this.orderService.orders(); track order.id) {
-              <app-order
-                [order]="order"
-                (action)="openDetails($event)"
-                [class.active]="orderDetails?.id === order.id"
-              ></app-order>
-            }
-          </div>
-        </section>
-
-        <aside class="details-panel" [class.visible]="showDetails">
-          @if (showDetails) {
-            <app-order-details [order]="orderDetails" />
-          } @else {
-            <div class="no-selection">
-              <p>Select an order to view details.</p>
+      @if (this.loadingService.isLoadingUserData()) {
+        <mat-spinner class="mat-spinner-global" mode="indeterminate" />
+      } @else {
+        <div class="layout-wrapper">
+          <section class="orders-list">
+            <div class="grid-container">
+              @for (order of this.orderService.orders(); track order.id) {
+                <app-order
+                  [order]="order"
+                  (action)="openDetails($event)"
+                  [class.active]="orderDetails?.id === order.id"
+                ></app-order>
+              }
             </div>
-          }
-        </aside>
-      </div>
+          </section>
+
+          <aside class="details-panel" [class.visible]="showDetails">
+            @if (showDetails) {
+              <app-order-details [order]="orderDetails" />
+            } @else {
+              <div class="no-selection">
+                <p>Select an order to view details.</p>
+              </div>
+            }
+          </aside>
+        </div>
+      }
     </div>
   `,
   styleUrl: './order-overview.component.scss',
 })
 export class OrderOverviewComponent {
+  loadingService = inject(LoadingService);
   showDetails = false;
   orderDetails: OrderDto | undefined = undefined;
   constructor(protected orderService: OrderService) {

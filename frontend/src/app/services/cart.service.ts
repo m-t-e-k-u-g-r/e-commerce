@@ -34,7 +34,7 @@ export class CartService {
 
   loadCartItems() {
     if (this.authService.isLoggedIn()) {
-      this.http.get<CartItem[]>(this.baseUrl + '/items',
+      return this.http.get<CartItem[]>(this.baseUrl + '/items',
         { withCredentials: true }
       ).pipe(
         tap((items: CartItem[]) => {
@@ -44,12 +44,16 @@ export class CartService {
           this.notificationService.error('Could not load cart items');
           return throwError(() => err);
         })
-      ).subscribe();
+      );
     } else {
       const cart = localStorage.getItem('cart');
       if (cart) {
-        this._cart.set(JSON.parse(cart));
+        try {
+          const json = JSON.parse(cart);
+          this._cart.set(json);
+        } catch {}
       }
+      return of(null);
     }
   }
 

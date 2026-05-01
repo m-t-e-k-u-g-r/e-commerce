@@ -6,8 +6,9 @@ import { MatDivider, MatList, MatListItem, MatListItemLine, MatListItemTitle } f
 import { MatIcon } from '@angular/material/icon';
 import { DatePipe } from '@angular/common';
 import { UserListItem } from '../../models/user.type';
-import { NotificationService } from '../../services/notification.service';
 import { UserService } from '../../services/user.service';
+import { LoadingService } from '../../services/loading.service';
+import { MatProgressSpinner } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-profile',
@@ -27,20 +28,23 @@ import { UserService } from '../../services/user.service';
     MatListItemTitle,
     MatListItemLine,
     MatCardAvatar,
+    MatProgressSpinner,
   ],
   template: `
-    @if (user) {
+    @if (this.loadingService.isLoadingUserData()) {
+      <mat-spinner class="mat-spinner-global" mode="indeterminate" />
+    } @else if (this.user()) {
       <mat-card class="profile-container">
         <mat-card-header>
           <mat-icon mat-card-avatar>account_circle</mat-icon>
           <mat-card-title>
-            @if (user.forename || user.surname) {
-              {{ user.forename }} {{ user.surname }}
+            @if (user()?.forename || user()?.surname) {
+              {{ user()?.forename }} {{ user()?.surname }}
             } @else {
-              User #{{ user.id }}
+              User #{{ user()?.id }}
             }
           </mat-card-title>
-          <mat-card-subtitle>{{ user.email }}</mat-card-subtitle>
+          <mat-card-subtitle>{{ user()?.email }}</mat-card-subtitle>
         </mat-card-header>
 
         <mat-divider></mat-divider>
@@ -62,9 +66,7 @@ import { UserService } from '../../services/user.service';
           <button mat-button (click)="this.userService.openPasswordChangeDialog()">
             Change Password
           </button>
-          <button mat-button (click)="this.userService.openProfileEditor()">
-            Edit Profile
-          </button>
+          <button mat-button (click)="this.userService.openProfileEditor()">Edit Profile</button>
         </mat-card-actions>
       </mat-card>
     }
@@ -74,20 +76,21 @@ import { UserService } from '../../services/user.service';
 export class ProfileComponent {
   authService = inject(AuthService);
   userService = inject(UserService);
-  user = this.authService.user();
+  loadingService = inject(LoadingService);
+  user = this.authService.user;
 
   getItems(): UserListItem[] {
-    if (!this.user) return [];
+    if (!this.authService.user()) return [];
     return [
-      { title: 'User ID:', value: this.user?.id },
-      { title: 'Email:', value: this.user?.email },
-      this.user?.forename || this.user?.surname
+      { title: 'User ID:', value: this.user()?.id },
+      { title: 'Email:', value: this.user()?.email },
+      this.user()?.forename || this.user()?.surname
         ? {
             title: 'Name:',
-            value: `${this.user.forename ?? ''} ${this.user.surname ?? ''}`.trim(),
+            value: `${this.user()?.forename ?? ''} ${this.user()?.surname ?? ''}`.trim(),
           }
         : null,
-      { title: 'Last Login:', value: this.user?.lastLogin, isDate: true },
+      { title: 'Last Login:', value: this.user()?.lastLogin, isDate: true },
     ].filter(Boolean) as UserListItem[];
   }
 }

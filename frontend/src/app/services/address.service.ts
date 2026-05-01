@@ -6,7 +6,7 @@ import { ConfirmService } from './confirm.service';
 import { NotificationService } from './notification.service';
 import { AuthService } from './auth.service';
 import { isAddressDto } from '../guards/addressType.guard';
-import { throwError } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 
 @Injectable({
@@ -28,7 +28,7 @@ export class AddressService {
 
   loadAddresses() {
     if (this.authService.isLoggedIn()) {
-      this.http.get<Address[]>(this.baseUrl, { withCredentials: true }).pipe(
+      return this.http.get<Address[]>(this.baseUrl, { withCredentials: true }).pipe(
         tap((addresses: Address[]) => {
           this._addresses.set(addresses);
         }),
@@ -36,9 +36,11 @@ export class AddressService {
           this.notificationService.error('Could not load addresses');
           return throwError(() => err);
         }),
-      ).subscribe();
+      );
     } else {
-      this.guestAddress.set(this.getGuestAddress());
+      const guestAddress = this.getGuestAddress();
+      this.saveGuestAddress(guestAddress);
+      return of([guestAddress]);
     }
   }
 
@@ -84,7 +86,8 @@ export class AddressService {
     return null;
   }
 
-  saveGuestAddress(address: AddressForm) {
+  saveGuestAddress(address: AddressForm | null) {
+    if (address == null) return localStorage.removeItem('guestAddress');
     localStorage.setItem('guestAddress', JSON.stringify(address));
   }
 

@@ -3,26 +3,27 @@ import { ProductService } from '../../services/product.service';
 import { ProductComponent } from '../product/product.component';
 import { SidebarComponent } from '../sidebar/sidebar.component';
 import { ActivatedRoute } from '@angular/router';
-import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { LoadingService } from '../../services/loading.service';
+import { MatProgressSpinner } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-home',
   imports: [ProductComponent, SidebarComponent, MatProgressSpinner],
   template: `
-    <div class="home">
-      @if (this.loadingService.isLoading()) {
-        <mat-spinner class="mat-spinner-global" mode="indeterminate" />
-      }
-      <app-sidebar />
-      <section class="product_list">
-        @for (product of this.productService.products(); track product.id) {
-          @if (categoryId === undefined || product.categoryIds.includes(categoryId)) {
-            <app-product [product]="product" />
+    @if (this.loadingService.isLoadingHome()) {
+      <mat-spinner class="mat-spinner-global" mode="indeterminate" />
+    } @else {
+      <div class="home">
+        <app-sidebar />
+        <section class="product_list">
+          @for (product of this.productService.products(); track product.id) {
+            @if (categoryId === undefined || product.categoryIds.includes(categoryId)) {
+              <app-product [product]="product" />
+            }
           }
-        }
-      </section>
-    </div>
+        </section>
+      </div>
+    }
   `,
   styleUrl: './home.component.scss',
 })

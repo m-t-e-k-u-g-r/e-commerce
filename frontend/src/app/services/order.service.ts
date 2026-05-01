@@ -57,8 +57,18 @@ export class OrderService {
       message: 'Please enter your order ID and token to retrieve your order details.',
       fields: [
         { name: 'orderId', type: 'number', label: 'Order ID', validators: [Validators.required] },
-        { name: 'token', type: 'text', label: 'Token', validators: [Validators.required] }
-      ]
+        {
+          name: 'token',
+          type: 'text',
+          label: 'Token',
+          validators: [
+            Validators.required,
+            Validators.pattern(
+              /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i,
+            ),
+          ],
+        },
+      ],
     });
     if (response.confirmed) {
       const orderId: number = response.data.orderId;

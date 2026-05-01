@@ -36,18 +36,22 @@ export class App implements OnInit {
   loadingService = inject(LoadingService)
 
   constructor() {
+    this.loadingService.startLoading('user')
     this.authService.ready$
-      .pipe(
-        take(1)
-      ).subscribe(() => {
-        this.orderService.loadOrders();
-        this.cartService.loadCartItems();
-        this.addressService.loadAddresses();
+      .pipe(take(1))
+      .subscribe(() => {
+        forkJoin([
+          this.orderService.loadOrders(),
+          this.cartService.loadCartItems(),
+          this.addressService.loadAddresses(),
+        ]).pipe(
+          finalize(() => this.loadingService.stopLoading('user'))
+        ).subscribe();
       });
   }
 
   ngOnInit() {
-    this.loadingService.startLoading();
+    this.loadingService.startLoading('home');
     this.themeService.loadTheme();
 
     forkJoin([
@@ -55,7 +59,7 @@ export class App implements OnInit {
       this.productService.loadProducts(),
       this.categoryService.loadCategories()
     ]).pipe(
-      finalize(() => this.loadingService.stopLoading())
+      finalize(() => this.loadingService.stopLoading('home'))
     ).subscribe();
   }
 }

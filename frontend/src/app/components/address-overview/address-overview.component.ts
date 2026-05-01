@@ -8,6 +8,8 @@ import { MatFabButton, MatMiniFabButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { AuthService } from '../../services/auth.service';
 import { Address } from '../../models/address.type';
+import { LoadingService } from '../../services/loading.service';
+import { MatProgressSpinner } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-address-overview',
@@ -29,71 +31,78 @@ import { Address } from '../../models/address.type';
     MatRowDef,
     MatFooterRow,
     MatFooterRowDef,
+    MatProgressSpinner,
   ],
   template: `
-    <table mat-table [dataSource]="this.data()" class="address_overview">
-      <ng-container matColumnDef="edit">
-        <th mat-header-cell *matHeaderCellDef></th>
-        <td mat-cell *matCellDef="let address">
-          <button mat-mini-fab (click)="this.router.navigate(['/address/e/' + address.id])">
-            <mat-icon>edit</mat-icon>
-          </button>
-        </td>
-        <td mat-footer-cell *matFooterCellDef></td>
-      </ng-container>
+    @if (this.loadingService.isLoadingUserData()) {
+      <mat-spinner class="mat-spinner-global" mode="indeterminate" />
+    } @else {
+      <table mat-table [dataSource]="this.data()" class="address_overview">
+        <ng-container matColumnDef="edit">
+          <th mat-header-cell *matHeaderCellDef></th>
+          <td mat-cell *matCellDef="let address">
+            <button mat-mini-fab (click)="this.router.navigate(['/address/e/' + address.id])">
+              <mat-icon>edit</mat-icon>
+            </button>
+          </td>
+          <td mat-footer-cell *matFooterCellDef></td>
+        </ng-container>
 
-      <ng-container matColumnDef="name">
-        <th mat-header-cell *matHeaderCellDef>Name</th>
-        <td mat-cell *matCellDef="let address">{{ address.forename }} {{ address.surname }}</td>
-        <td mat-footer-cell *matFooterCellDef></td>
-      </ng-container>
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef>Name</th>
+          <td mat-cell *matCellDef="let address">{{ address.forename }} {{ address.surname }}</td>
+          <td mat-footer-cell *matFooterCellDef></td>
+        </ng-container>
 
-      <ng-container matColumnDef="address">
-        <th mat-header-cell *matHeaderCellDef>Address</th>
-        <td mat-cell *matCellDef="let address" class="address_info">
-          {{ address.street }} {{ address.houseNumber }}<br />
-          {{ address.zipCode }} {{ address.city }}<br />
-          {{ address.country }}
-        </td>
-        <td mat-footer-cell *matFooterCellDef></td>
-      </ng-container>
+        <ng-container matColumnDef="address">
+          <th mat-header-cell *matHeaderCellDef>Address</th>
+          <td mat-cell *matCellDef="let address" class="address_info">
+            {{ address.street }} {{ address.houseNumber }}<br />
+            {{ address.zipCode }} {{ address.city }}<br />
+            {{ address.country }}
+          </td>
+          <td mat-footer-cell *matFooterCellDef></td>
+        </ng-container>
 
-      <ng-container matColumnDef="delete">
-        <th mat-header-cell *matHeaderCellDef></th>
-        <td mat-cell *matCellDef="let address">
-          <button
-            mat-mini-fab
-            (click)="this.addressService.deleteAddress(address.id)"
-            [disabled]="disableDelete(address.id)"
-          >
-            <mat-icon>delete</mat-icon>
-          </button>
-        </td>
-      </ng-container>
+        <ng-container matColumnDef="delete">
+          <th mat-header-cell *matHeaderCellDef></th>
+          <td mat-cell *matCellDef="let address">
+            <button
+              mat-mini-fab
+              (click)="this.addressService.deleteAddress(address.id)"
+              [disabled]="disableDelete(address.id)"
+            >
+              <mat-icon>delete</mat-icon>
+            </button>
+          </td>
+        </ng-container>
 
-      <ng-container matColumnDef="footer-add-button">
-        <td mat-footer-cell *matFooterCellDef>
-          <button
-            mat-fab extended
-            (click)="this.router.navigate(['/address/new'])"
-            [disabled]="!authService.isLoggedIn() && this.addressService.guestAddress() !== null"
-          >
-            <mat-icon>add</mat-icon>
-            Add new address
-          </button>
-        </td>
-      </ng-container>
+        <ng-container matColumnDef="footer-add-button">
+          <td mat-footer-cell *matFooterCellDef>
+            <button
+              mat-fab
+              extended
+              (click)="this.router.navigate(['/address/new'])"
+              [disabled]="!authService.isLoggedIn() && this.addressService.guestAddress() !== null"
+            >
+              <mat-icon>add</mat-icon>
+              Add new address
+            </button>
+          </td>
+        </ng-container>
 
-      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
-      <tr mat-footer-row *matFooterRowDef="['footer-add-button']"></tr>
-    </table>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+        <tr mat-footer-row *matFooterRowDef="['footer-add-button']"></tr>
+      </table>
+    }
   `,
   styleUrl: './address-overview.component.scss',
 })
 export class AddressOverviewComponent {
   addressService = inject(AddressService);
   authService = inject(AuthService);
+  loadingService = inject(LoadingService);
   router = inject(Router);
   displayedColumns: string[] = ['edit', 'name', 'address', 'delete'];
   data = computed(() => {
@@ -105,7 +114,6 @@ export class AddressOverviewComponent {
     if (guestAddress !== null) {
       return [guestAddress];
     }
-    console.log('no address')
     return [] as Address[];
   });
   disableDelete(addressId: number) {

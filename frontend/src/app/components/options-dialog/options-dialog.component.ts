@@ -6,7 +6,7 @@ import { MatDivider } from '@angular/material/list';
 import { MatFormField, MatHint, MatInput, MatLabel, MatSuffix } from '@angular/material/input';
 import { MatOption, MatSelect } from '@angular/material/select';
 import { MatDatepicker, MatDatepickerInput, MatDatepickerToggle } from '@angular/material/datepicker';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatIcon } from '@angular/material/icon';
 
 @Component({
@@ -133,7 +133,7 @@ import { MatIcon } from '@angular/material/icon';
       </mat-dialog-content>
 
       <mat-dialog-actions>
-        <button mat-flat-button (click)="confirm()">Confirm</button>
+        <button mat-flat-button (click)="confirm()" [disabled]="this.form.invalid">Confirm</button>
         <button mat-button (click)="cancel()">Cancel</button>
       </mat-dialog-actions>
     </div>

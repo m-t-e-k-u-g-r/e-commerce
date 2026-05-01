@@ -12,99 +12,101 @@ import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
 import { NotificationService } from '../../services/notification.service';
 import { Validators } from '@angular/forms';
+import { LoadingService } from '../../services/loading.service';
+import { MatProgressSpinner } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-shopping-cart',
-  imports: [NgOptimizedImage, MatTableModule, MatButton, CurrencyPipe],
+  imports: [NgOptimizedImage, MatTableModule, MatButton, CurrencyPipe, MatProgressSpinner],
   template: `
-    <h1>Shopping Cart</h1>
-    <div class="shopping_cart">
-      <table mat-table [dataSource]="computedCartItems()">
-        <ng-container matColumnDef="image">
-          <th mat-header-cell *matHeaderCellDef></th>
-          <td mat-cell *matCellDef="let item">
-            <div class="img_wrapper">
-              <img
-                [ngSrc]="item.productInfo.imageUrl"
-                priority
-                width="100"
-                height="100"
-                [alt]="item.productInfo.name"
-              />
-            </div>
-          </td>
-          <td mat-footer-cell *matFooterCellDef></td>
-        </ng-container>
+    @if (this.loadingService.isLoadingUserData()) {
+      <mat-spinner class="mat-spinner-global" mode="indeterminate"/>
+    } @else {
+      <h1>Shopping Cart</h1>
+      <div class="shopping_cart">
+        <table mat-table [dataSource]="computedCartItems()">
+          <ng-container matColumnDef="image">
+            <th mat-header-cell *matHeaderCellDef></th>
+            <td mat-cell *matCellDef="let item">
+              <div class="img_wrapper">
+                <img
+                  [ngSrc]="item.productInfo.imageUrl"
+                  priority
+                  width="100"
+                  height="100"
+                  [alt]="item.productInfo.name"
+                />
+              </div>
+            </td>
+            <td mat-footer-cell *matFooterCellDef></td>
+          </ng-container>
 
-        <ng-container matColumnDef="product">
-          <th mat-header-cell *matHeaderCellDef>Product</th>
-          <td mat-cell *matCellDef="let item">{{ item.productInfo.name }}</td>
-          <td mat-footer-cell *matFooterCellDef></td>
-        </ng-container>
+          <ng-container matColumnDef="product">
+            <th mat-header-cell *matHeaderCellDef>Product</th>
+            <td mat-cell *matCellDef="let item">{{ item.productInfo.name }}</td>
+            <td mat-footer-cell *matFooterCellDef></td>
+          </ng-container>
 
-        <ng-container matColumnDef="quantity">
-          <th mat-header-cell *matHeaderCellDef style="text-align: center;">Quantity</th>
-          <td mat-cell *matCellDef="let item">
-            <div class="center quantity_controls">
-              <button (click)="this.cartService.reduceQuantity(item.productId)">-</button>
-              <span class="quantity_value">{{ item.quantity }} in cart</span>
-              <button (click)="this.cartService.addItem(item.productId)">+</button>
-            </div>
-          </td>
-          <td mat-footer-cell *matFooterCellDef></td>
-        </ng-container>
+          <ng-container matColumnDef="quantity">
+            <th mat-header-cell *matHeaderCellDef style="text-align: center;">Quantity</th>
+            <td mat-cell *matCellDef="let item">
+              <div class="center quantity_controls">
+                <button (click)="this.cartService.reduceQuantity(item.productId)">-</button>
+                <span class="quantity_value">{{ item.quantity }} in cart</span>
+                <button (click)="this.cartService.addItem(item.productId)">+</button>
+              </div>
+            </td>
+            <td mat-footer-cell *matFooterCellDef></td>
+          </ng-container>
 
-        <ng-container matColumnDef="price">
-          <th mat-header-cell *matHeaderCellDef>Price</th>
-          <td mat-cell *matCellDef="let item">
-            {{ (item.productInfo.price * item.quantity).toFixed(2) | currency: 'USD' : 'symbol' }}
-          </td>
-          <td mat-footer-cell *matFooterCellDef>
-            <p class="total_amount">
-              Total: {{ this.cartService.totalAmount() | currency: 'USD' : 'symbol' }}
-            </p>
-          </td>
-        </ng-container>
+          <ng-container matColumnDef="price">
+            <th mat-header-cell *matHeaderCellDef>Price</th>
+            <td mat-cell *matCellDef="let item">
+              {{ (item.productInfo.price * item.quantity).toFixed(2) | currency: 'USD' : 'symbol' }}
+            </td>
+            <td mat-footer-cell *matFooterCellDef>
+              <p class="total_amount">
+                Total: {{ this.cartService.totalAmount() | currency: 'USD' : 'symbol' }}
+              </p>
+            </td>
+          </ng-container>
 
-        <ng-container matColumnDef="header-row-info">
-          <th mat-header-cell *matHeaderCellDef colspan="4">
-            <div class="header">
-              <span>
-                You have {{ this.cartService.totalItems() }} item{{
-                  this.cartService.totalItems() == 1 ? '' : 's'
-                }}
-                in your shopping cart
-              </span>
-              <button
-                (click)="this.cartService.clearCart()"
-                matButton="elevated"
-                [disabled]="this.disabled()"
-              >
-                Clear Shopping Cart
+          <ng-container matColumnDef="header-row-info">
+            <th mat-header-cell *matHeaderCellDef colspan="4">
+              <div class="header">
+                <span>
+                  You have {{ this.cartService.totalItems() }} item{{
+                    this.cartService.totalItems() == 1 ? '' : 's'
+                  }}
+                  in your shopping cart
+                </span>
+                <button
+                  (click)="this.cartService.clearCart()"
+                  matButton="elevated"
+                  [disabled]="this.disabled()"
+                >
+                  Clear Shopping Cart
+                </button>
+              </div>
+            </th>
+          </ng-container>
+
+          <ng-container matColumnDef="footer-row-checkout">
+            <td mat-footer-cell *matFooterCellDef colspan="4">
+              <button (click)="checkout()" matButton="filled" [disabled]="this.disabled()">
+                Check out
               </button>
-            </div>
-          </th>
-        </ng-container>
+            </td>
+          </ng-container>
 
-        <ng-container matColumnDef="footer-row-checkout">
-          <td mat-footer-cell *matFooterCellDef colspan="4">
-            <button
-              (click)="checkout()"
-              matButton="filled"
-              [disabled]="this.disabled()"
-            >
-              Check out
-            </button>
-          </td>
-        </ng-container>
-
-        <tr mat-header-row *matHeaderRowDef="['header-row-info']"></tr>
-        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns" class="divided"></tr>
-        <tr mat-footer-row *matFooterRowDef="displayedColumns; sticky: true"></tr>
-        <tr mat-footer-row *matFooterRowDef="['footer-row-checkout']; sticky: true"></tr>
-      </table>
-    </div>
+          <tr mat-header-row *matHeaderRowDef="['header-row-info']"></tr>
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns" class="divided"></tr>
+          <tr mat-footer-row *matFooterRowDef="displayedColumns; sticky: true"></tr>
+          <tr mat-footer-row *matFooterRowDef="['footer-row-checkout']; sticky: true"></tr>
+        </table>
+      </div>
+    }
   `,
   styleUrl: './shopping-cart.component.scss',
 })
@@ -116,10 +118,11 @@ export class ShoppingCartComponent {
   authService = inject(AuthService);
   confirmService = inject(ConfirmService);
   notificationService = inject(NotificationService);
+  loadingService = inject(LoadingService);
   router = inject(Router);
   displayedColumns: string[] = ['image', 'product', 'quantity', 'price'];
   disabled = computed(() => {
-    return this.computedCartItems().length == 0 || this.orderService.loading()
+    return this.computedCartItems().length == 0 || this.orderService.loading();
   });
 
   computedCartItems: Signal<computedCartItem[]> = computed(() => {
@@ -147,9 +150,9 @@ export class ShoppingCartComponent {
       return;
     }
     const addresses = this.addressService.addresses();
-    const options = addresses.map(a => ({
+    const options = addresses.map((a) => ({
       label: `${a.street} ${a.houseNumber}`,
-      value: a.id
+      value: a.id,
     }));
     const response = await this.confirmService.confirmOptions({
       title: 'Place order',
