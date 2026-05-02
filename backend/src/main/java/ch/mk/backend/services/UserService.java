@@ -56,9 +56,11 @@ public class UserService {
         user.setEmail(dto.getEmail());
         if (dto.getForename() != null) {
             user.setForename(dto.getForename());
+            if (dto.getForename().isEmpty()) user.setForename(null);
         }
         if (dto.getSurname() != null) {
             user.setSurname(dto.getSurname());
+            if (dto.getSurname().isEmpty()) user.setSurname(null);
         }
         userRepository.save(user);
         return userMapper.toDto(user);
