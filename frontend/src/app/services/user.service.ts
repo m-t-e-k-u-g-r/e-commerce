@@ -10,6 +10,7 @@ import { ConfirmService } from './confirm.service';
 import { Validators } from '@angular/forms';
 import { passwordValidators } from '../utils';
 import { API_TARGET } from '../interceptors/refresh-interceptor';
+import { LoadingService } from './loading.service';
 
 @Injectable({
   providedIn: 'root',
@@ -20,6 +21,7 @@ export class UserService {
   authService = inject(AuthService);
   notificationService = inject(NotificationService);
   confirmService = inject(ConfirmService);
+  loadingService = inject(LoadingService);
 
   getUser() {
     return this.http.get<User>(this.baseUrl + '/me',
@@ -69,6 +71,7 @@ export class UserService {
 
   editProfile(updatedUser: EditUser) {
     const toastId = this.notificationService.pending('Updating profile...');
+    this.loadingService.startLoading('user');
     return this.http.put<User>(this.baseUrl + '/profile', updatedUser,
       { withCredentials: true, context: new HttpContext().set(API_TARGET, 'authenticated') }
     ).pipe(
@@ -82,6 +85,7 @@ export class UserService {
       }),
       finalize(() => {
         this.notificationService.clear(toastId);
+        this.loadingService.stopLoading('user');
       })
     );
   }
