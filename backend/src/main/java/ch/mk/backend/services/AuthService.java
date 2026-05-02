@@ -46,7 +46,7 @@ public class AuthService {
         User user = userService.verifyUser(request);
         Boolean rememberMe = Objects.requireNonNullElse(request.getRememberMe(), false);
 
-        ResponseCookie refreshTokenCookie = cookieService.createRefreshTokenCookie(user.getId(), rememberMe);
+        ResponseCookie refreshTokenCookie = cookieService.createRefreshTokenCookie(user, rememberMe);
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString())
@@ -54,7 +54,7 @@ public class AuthService {
     }
 
     public ResponseEntity<TokenDto> refreshAccessToken(String token) {
-        RefreshToken storedToken = refreshTokenRepository.findByToken(token)
+        RefreshToken storedToken = refreshTokenRepository.findByToken(token).stream().findFirst()
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "TOKEN_NOT_FOUND"));
 
         if (storedToken.getRevoked() || storedToken.getExpiresAt().isBefore(Instant.now())) {
@@ -64,7 +64,7 @@ public class AuthService {
         Claims claims = jwtService.extractClaims(token, "refresh");
         boolean rememberMe = claims.get(jwtService.claimName, Boolean.class);
 
-        ResponseCookie refreshTokenCookie = cookieService.createRefreshTokenCookie(user.getId(), rememberMe);
+        ResponseCookie refreshTokenCookie = cookieService.createRefreshTokenCookie(user, rememberMe);
         ResponseCookie accessTokenCookie = cookieService.createAccessTokenCookie(user.getId());
 
         HttpHeaders headers = createHeaders(List.of(refreshTokenCookie.toString(), accessTokenCookie.toString()));

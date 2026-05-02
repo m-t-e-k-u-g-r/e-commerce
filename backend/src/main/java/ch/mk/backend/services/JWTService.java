@@ -3,7 +3,6 @@ package ch.mk.backend.services;
 import ch.mk.backend.entities.RefreshToken;
 import ch.mk.backend.entities.User;
 import ch.mk.backend.repositories.RefreshTokenRepository;
-import ch.mk.backend.repositories.UserRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
@@ -18,10 +17,7 @@ import org.springframework.web.server.ResponseStatusException;
 import javax.crypto.SecretKey;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 @Service
 public class JWTService {
@@ -31,8 +27,6 @@ public class JWTService {
     private String accessTokenSecret;
     @Autowired
     private RefreshTokenRepository refreshTokenRepository;
-    @Autowired
-    private UserRepository userRepository;
 
     public Integer MilliToDays = 24 * 60 * 60 * 1000;
     public Integer MilliToMinutes = 60 * 1000;
@@ -105,22 +99,31 @@ public class JWTService {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public void saveRefreshToken(String tokenString, Integer userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "USER_NOT_FOUND"));
+    public void saveRefreshToken(String tokenString, User user, Boolean isRememberMe) {
+        if (existsByToken(tokenString)) return;
+
         RefreshToken refreshToken = new RefreshToken();
         refreshToken.setUser(user);
         refreshToken.setToken(tokenString);
         refreshToken.setRevoked(false);
-        refreshToken.setExpiresAt(Instant.now().plus(7, ChronoUnit.DAYS));
+
+        if (isRememberMe) {
+            refreshToken.setExpiresAt(Instant.now().plus(30, ChronoUnit.DAYS));
+        } else {
+            refreshToken.setExpiresAt(Instant.now().plus(7, ChronoUnit.DAYS));
+        }
 
         refreshTokenRepository.save(refreshToken);
     }
 
     public void revokeRefreshToken(String token) {
-        RefreshToken storedToken = refreshTokenRepository.findByToken(token)
+        RefreshToken storedToken = refreshTokenRepository.findByToken(token).stream().findFirst()
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "TOKEN_NOT_FOUND"));
         storedToken.setRevoked(true);
         refreshTokenRepository.save(storedToken);
+    }
+
+    public Boolean existsByToken(String token) {
+        return refreshTokenRepository.findByToken(token).stream().findFirst().isPresent();
     }
 }

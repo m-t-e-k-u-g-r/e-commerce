@@ -47,7 +47,7 @@ CREATE TABLE `guests` (
 CREATE TABLE `refresh_tokens` (
     `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     `user_id` INT NOT NULL,
-    `token` VARCHAR(255) NOT NULL,
+    `token` VARCHAR(255) NOT NULL UNIQUE,
     `expires_at` TIMESTAMP NOT NULL,
     `revoked` TINYINT(1) NOT NULL DEFAULT 0,
     FOREIGN KEY `refresh_tokens_idfk` (`user_id`) REFERENCES users (`id`)

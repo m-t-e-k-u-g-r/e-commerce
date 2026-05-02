@@ -1,5 +1,6 @@
 package ch.mk.backend.services;
 
+import ch.mk.backend.entities.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Service;
@@ -20,9 +21,9 @@ public class CookieService {
                 .build();
     }
 
-    public ResponseCookie createRefreshTokenCookie(Integer userId, Boolean isRememberMe) {
-        String token = jwtService.generateRefreshToken(userId, isRememberMe);
-        jwtService.saveRefreshToken(token, userId);
+    public ResponseCookie createRefreshTokenCookie(User user, Boolean isRememberMe) {
+        String token = jwtService.generateRefreshToken(user.getId(), isRememberMe);
+        jwtService.saveRefreshToken(token, user, isRememberMe);
         int maxAge = isRememberMe
                 ? 30 * jwtService.MilliToDays / 1000
                 : 7 * jwtService.MilliToDays / 1000;
