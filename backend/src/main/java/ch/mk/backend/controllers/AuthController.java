@@ -39,6 +39,7 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<TokenDto> registerUser(@RequestBody LoginRequest request) {
+        request.setRememberMe(false);
         try {
             userService.createUser(request.getEmail(), bcryptEncoder.encode(request.getPassword()));
         } catch (Exception e) {
@@ -51,6 +52,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<TokenDto> loginUser(@RequestBody LoginRequest request) {
+        if (request.getRememberMe() == null) request.setRememberMe(false);
         String refreshToken = userService.verifyUser(request);
         return createAuthResponse(refreshToken);
     }

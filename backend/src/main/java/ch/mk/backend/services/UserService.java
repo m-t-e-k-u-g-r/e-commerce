@@ -84,7 +84,7 @@ public class UserService {
         if (authentication.isAuthenticated()) {
             User user = userRepository.findByEmail(request.getEmail())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "USER_NOT_FOUND"));
-            String tokenString = jwtService.generateRefreshToken(user.getId().toString());
+            String tokenString = jwtService.generateRefreshToken(user.getId().toString(), request.getRememberMe());
             saveRefreshToken(tokenString, user);
             user.setLastLogin(Instant.now());
             userRepository.save(user);

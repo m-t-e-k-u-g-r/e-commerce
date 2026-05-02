@@ -20,6 +20,8 @@ public class JWTService {
     @Value("${jwt.access-token-secret}")
     private String accessTokenSecret;
 
+    public Integer MilliToDays = 24 * 60 * 60 * 1000;
+
     public String generateAccessToken(String userId) {
         Map<String, Object> claims = new HashMap<>();
 
@@ -40,15 +42,18 @@ public class JWTService {
         return generateAccessToken(userId);
     }
 
-    public String generateRefreshToken(String userId) {
+    public String generateRefreshToken(String userId, Boolean isRememberMe) {
         Map<String, Object> claims = new HashMap<>();
+        Date expiration = isRememberMe
+                ? new Date(System.currentTimeMillis() + 30L * MilliToDays)
+                : new Date(System.currentTimeMillis() + 7L * MilliToDays);
 
         return Jwts.builder()
                 .claims()
                 .add(claims)
                 .subject(userId)
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + 7 * 24 * 60 * 60 * 1000))
+                .expiration(expiration)
                 .and()
                 .signWith(getRefreshTokenKey())
                 .compact();
