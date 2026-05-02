@@ -31,7 +31,7 @@ import { ProfileSkeletonComponent } from './profile.skeleton.component';
     ProfileSkeletonComponent,
   ],
   template: `
-    @if (true) {
+    @if (this.loadingService.isLoadingUserData()) {
       <app-profile-skeleton/>
     } @else if (this.user()) {
       <mat-card class="profile-container">
