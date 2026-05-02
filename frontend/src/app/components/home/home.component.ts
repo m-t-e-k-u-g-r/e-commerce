@@ -4,14 +4,14 @@ import { ProductComponent } from '../product/product.component';
 import { SidebarComponent } from '../sidebar/sidebar.component';
 import { ActivatedRoute } from '@angular/router';
 import { LoadingService } from '../../services/loading.service';
-import { MatProgressSpinner } from '@angular/material/progress-spinner';
+import { HomeSkeletonComponent } from './home.skeleton.component';
 
 @Component({
   selector: 'app-home',
-  imports: [ProductComponent, SidebarComponent, MatProgressSpinner],
+  imports: [ProductComponent, SidebarComponent, HomeSkeletonComponent],
   template: `
     @if (this.loadingService.isLoadingHome()) {
-      <mat-spinner class="mat-spinner-global" mode="indeterminate" />
+      <app-home-skeleton/>
     } @else {
       <div class="home">
         <app-sidebar />
