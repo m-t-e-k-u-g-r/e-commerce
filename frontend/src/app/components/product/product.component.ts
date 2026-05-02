@@ -17,7 +17,7 @@ import { CurrencyPipe } from '@angular/common';
     CurrencyPipe,
   ],
   template: `
-    <mat-card>
+    <mat-card class="product">
       <img
         mat-card-image
         ngSrc="{{ product.imageUrl }}"
