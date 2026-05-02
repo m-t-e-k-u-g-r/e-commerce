@@ -3,7 +3,8 @@ import { CartItem } from '../models/cartItem.type';
 import { environment } from '../../environments/environment.development';
 import { ProductService } from './product.service';
 import { AuthService } from './auth.service';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpContext } from '@angular/common/http';
+import { API_TARGET } from '../interceptors/refresh-interceptor';
 import { NotificationService } from './notification.service';
 import { ConfirmService } from './confirm.service';
 import { catchError, tap } from 'rxjs/operators';
@@ -35,7 +36,7 @@ export class CartService {
   loadCartItems() {
     if (this.authService.isLoggedIn()) {
       return this.http.get<CartItem[]>(this.baseUrl + '/items',
-        { withCredentials: true }
+        { withCredentials: true, context: new HttpContext().set(API_TARGET, 'authenticated') }
       ).pipe(
         tap((items: CartItem[]) => {
           this._cart.set(items);
@@ -60,7 +61,7 @@ export class CartService {
   addItem(productId: number) {
     if (this.authService.isLoggedIn()) {
       return this.http.post(this.baseUrl + '/items/' + productId, {},
-        { withCredentials: true }
+        { withCredentials: true, context: new HttpContext().set(API_TARGET, 'authenticated') }
       ).subscribe(() => {
         this.loadCartItems();
       });
@@ -84,7 +85,7 @@ export class CartService {
         const newQuantity = item.quantity - 1;
         if (newQuantity > 0) {
           return this.http.put(this.baseUrl + '/items/' + item.id, { quantity: newQuantity },
-            { withCredentials: true }
+            { withCredentials: true, context: new HttpContext().set(API_TARGET, 'authenticated') }
           ).subscribe(() => {
             this.loadCartItems();
           });
@@ -114,8 +115,9 @@ export class CartService {
       const item = this.cart().find((i) => i.productId === productId);
       if (item) {
         return this.http
-          .delete(this.baseUrl + '/items/' + item.id, { withCredentials: true })
-          .subscribe(() => {
+          .delete(this.baseUrl + '/items/' + item.id,
+            { withCredentials: true, context: new HttpContext().set(API_TARGET, 'authenticated') }
+          ).subscribe(() => {
             this.loadCartItems();
           });
       }
@@ -137,7 +139,9 @@ export class CartService {
     }
     if (this.authService.isLoggedIn()) {
       const toastId = this.notificationService.pending('Clearing cart...');
-      this.http.delete(this.baseUrl, { withCredentials: true }).pipe(
+      this.http.delete(this.baseUrl,
+        { withCredentials: true, context: new HttpContext().set(API_TARGET, 'authenticated') }
+      ).pipe(
         tap(() => {
           this.loadCartItems();
           this.notificationService.success('Cleared cart');

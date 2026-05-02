@@ -1,6 +1,6 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { environment } from '../../environments/environment.development';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpContext, HttpParams } from '@angular/common/http';
 import { CreatedGuestOrderDto, GuestOrderDto, OrderDto } from '../models/order.type';
 import { finalize, of, throwError } from 'rxjs';
 import { CartService } from './cart.service';
@@ -15,6 +15,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { OrderDetailsComponent } from '../components/order-details/order-details.component';
 import { AuthService } from './auth.service';
 import { Validators } from '@angular/forms';
+import { API_TARGET } from '../interceptors/refresh-interceptor';
 
 @Injectable({
   providedIn: 'root',
@@ -110,7 +111,7 @@ export class OrderService {
     const toastId = this.notificationService.pending('Placing order...');
     this.loading.set(true);
     return this.http.post<OrderDto>(this.baseUrl, { addressId: addressId },
-      { withCredentials: true }
+      { withCredentials: true, context: new HttpContext().set(API_TARGET, 'authenticated') }
     ).pipe(
       tap((order) => {
         this.cartService.loadCartItems();
@@ -199,7 +200,7 @@ export class OrderService {
 
     const toastId = this.notificationService.pending('Placing order...');
     return this.http.delete<OrderDto>(this.baseUrl + '/' + orderId,
-      { withCredentials: true }
+      { withCredentials: true, context: new HttpContext().set(API_TARGET, 'authenticated') }
     ).pipe(
       tap(order => {
         this.loadOrders();

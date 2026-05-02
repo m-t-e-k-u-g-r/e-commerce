@@ -1,6 +1,7 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { environment } from '../../environments/environment.development';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpContext } from '@angular/common/http';
+import { API_TARGET } from '../interceptors/refresh-interceptor';
 import { Address, AddressDto, AddressForm } from '../models/address.type';
 import { ConfirmService } from './confirm.service';
 import { NotificationService } from './notification.service';
@@ -28,7 +29,10 @@ export class AddressService {
 
   loadAddresses() {
     if (this.authService.isLoggedIn()) {
-      return this.http.get<Address[]>(this.baseUrl, { withCredentials: true }).pipe(
+      return this.http.get<Address[]>(this.baseUrl, {
+        withCredentials: true,
+        context: new HttpContext().set(API_TARGET, 'authenticated'),
+      }).pipe(
         tap((addresses: Address[]) => {
           this._addresses.set(addresses);
         }),
@@ -55,7 +59,10 @@ export class AddressService {
       this.guestAddress.set(saveAddress);
     }
     this.http
-      .post<Address>(this.baseUrl, address, { withCredentials: true })
+      .post<Address>(this.baseUrl, address, {
+        withCredentials: true,
+        context: new HttpContext().set(API_TARGET, 'authenticated'),
+      })
       .pipe(
         tap(() => {
           this.loadAddresses();
@@ -96,7 +103,10 @@ export class AddressService {
       return this.saveGuestAddress(address);
     }
     this.http
-      .put<Address>(this.baseUrl + '/' + address.id, address, { withCredentials: true })
+      .put<Address>(this.baseUrl + '/' + address.id, address, {
+        withCredentials: true,
+        context: new HttpContext().set(API_TARGET, 'authenticated')
+      })
       .pipe(
         tap(() => {
           this.loadAddresses();

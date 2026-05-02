@@ -1,6 +1,6 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { environment } from '../../environments/environment.development';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpContext } from '@angular/common/http';
 import { catchError, finalize, of, shareReplay, take, tap, throwError } from 'rxjs';
 import { NotificationService } from './notification.service';
 import { Router } from '@angular/router';
@@ -8,6 +8,7 @@ import { User } from '../models/user.type';
 import { isAuthError } from '../guards/auth.guard';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { filter } from 'rxjs/operators';
+import { API_TARGET } from '../interceptors/refresh-interceptor';
 
 @Injectable({
   providedIn: 'root',
@@ -90,22 +91,27 @@ export class AuthService {
   }
 
   logout() {
-    const toastId = this.notificationService.pending('Logging out user...')
-    return this.http.delete(this.baseUrl + '/logout', { withCredentials: true }).pipe(
-      tap(() => {
-        this.isLoggedIn.set(false);
-        this.user.set(null);
-        this.router.navigate(['/'])
-        this.notificationService.success('Logout successful');
-      }),
-      catchError(err => {
-        this.notificationService.error('Logout failed. Please try again.');
-        return throwError(() => err);
-      }),
-      finalize(() => {
-        this.notificationService.clear(toastId)
+    const toastId = this.notificationService.pending('Logging out user...');
+    return this.http
+      .delete(this.baseUrl + '/logout', {
+        withCredentials: true,
+        context: new HttpContext().set(API_TARGET, 'authenticated'),
       })
-    );
+      .pipe(
+        tap(() => {
+          this.isLoggedIn.set(false);
+          this.user.set(null);
+          this.router.navigate(['/']);
+          this.notificationService.success('Logout successful');
+        }),
+        catchError((err) => {
+          this.notificationService.error('Logout failed. Please try again.');
+          return throwError(() => err);
+        }),
+        finalize(() => {
+          this.notificationService.clear(toastId);
+        }),
+      );
   }
 
   refresh() {

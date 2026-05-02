@@ -2,13 +2,14 @@ import { inject, Injectable } from '@angular/core';
 import { environment } from '../../environments/environment.development';
 import { EditUser, User } from '../models/user.type';
 import { finalize, tap, throwError } from 'rxjs';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpContext } from '@angular/common/http';
 import { AuthService } from './auth.service';
 import { NotificationService } from './notification.service';
 import { catchError } from 'rxjs/operators';
 import { ConfirmService } from './confirm.service';
 import { Validators } from '@angular/forms';
 import { passwordValidators } from '../utils';
+import { API_TARGET } from '../interceptors/refresh-interceptor';
 
 @Injectable({
   providedIn: 'root',
@@ -107,27 +108,32 @@ export class UserService {
 
   changePassword(oldPassword: string, newPassword: string) {
     const toastId = this.notificationService.pending('Changing password...');
-    return this.http.put<void>(this.baseUrl + '/change-password',
-      { oldPassword: oldPassword, newPassword: newPassword },
-      { withCredentials: true }
-    ).pipe(
-      tap(() => {
-        this.notificationService.success('Password changed successfully');
-      }),
-      catchError((err) => {
-        if (err.message === 'INVALID_PASSWORD') {
-          this.notificationService.error('Invalid current password');
-        } else if (err.message === 'SAME_PASSWORD') {
-          this.notificationService.error('New password cannot be the same as the current password');
-        } else {
-          this.notificationService.error('Please try again', 'Failed to change password');
-        }
+    return this.http
+      .put<void>(
+        this.baseUrl + '/change-password',
+        { oldPassword: oldPassword, newPassword: newPassword },
+        { withCredentials: true, context: new HttpContext().set(API_TARGET, 'authenticated') },
+      )
+      .pipe(
+        tap(() => {
+          this.notificationService.success('Password changed successfully');
+        }),
+        catchError((err) => {
+          if (err.message === 'INVALID_PASSWORD') {
+            this.notificationService.error('Invalid current password');
+          } else if (err.message === 'SAME_PASSWORD') {
+            this.notificationService.error(
+              'New password cannot be the same as the current password',
+            );
+          } else {
+            this.notificationService.error('Please try again', 'Failed to change password');
+          }
 
-        return throwError(() => err);
-      }),
-      finalize(() => {
-        this.notificationService.clear(toastId);
-      })
-    )
+          return throwError(() => err);
+        }),
+        finalize(() => {
+          this.notificationService.clear(toastId);
+        }),
+      );
   }
 }
