@@ -7,7 +7,7 @@ import { Router } from '@angular/router';
 import { User } from '../models/user.type';
 import { isAuthError } from '../guards/auth.guard';
 import { toObservable } from '@angular/core/rxjs-interop';
-import { filter } from 'rxjs/operators';
+import { filter, switchMap } from 'rxjs/operators';
 import { API_TARGET } from '../interceptors/refresh-interceptor';
 
 @Injectable({
@@ -36,9 +36,15 @@ export class AuthService {
       .post(
         this.baseUrl + '/register',
         { email: email, password: password },
-        { observe: 'response', withCredentials: true },
+        { observe: 'response',
+          withCredentials: true,
+          context: new HttpContext().set(API_TARGET, 'signup')
+        },
       )
       .pipe(
+        switchMap(() =>
+          this.login(email, password)
+        ),
         tap(() => {
           this.isLoggedIn.set(true);
           this.notificationService.success('Registration successful');
@@ -65,9 +71,13 @@ export class AuthService {
         {
           observe: 'response',
           withCredentials: true,
+          context: new HttpContext().set(API_TARGET, 'login'),
         },
       )
       .pipe(
+        switchMap(() =>
+          this.refresh(),
+        ),
         tap(() => {
           this.isLoggedIn.set(true);
           this.notificationService.success('Login successful');
