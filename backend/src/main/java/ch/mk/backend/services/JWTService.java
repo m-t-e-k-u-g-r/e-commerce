@@ -1,17 +1,27 @@
 package ch.mk.backend.services;
 
+import ch.mk.backend.entities.RefreshToken;
+import ch.mk.backend.entities.User;
+import ch.mk.backend.repositories.RefreshTokenRepository;
+import ch.mk.backend.repositories.UserRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.crypto.SecretKey;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 @Service
 public class JWTService {
@@ -19,31 +29,32 @@ public class JWTService {
     private String refreshTokenSecret;
     @Value("${jwt.access-token-secret}")
     private String accessTokenSecret;
+    @Autowired
+    private RefreshTokenRepository refreshTokenRepository;
+    @Autowired
+    private UserRepository userRepository;
 
     public Integer MilliToDays = 24 * 60 * 60 * 1000;
+    public Integer MilliToMinutes = 60 * 1000;
+    public String claimName = "rememberMe";
 
-    public String generateAccessToken(String userId) {
+    public String generateAccessToken(Integer userId) {
         Map<String, Object> claims = new HashMap<>();
 
         return Jwts.builder()
                 .claims()
                 .add(claims)
-                .subject(userId)
+                .subject(String.valueOf(userId))
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + 10 * 60 * 1000))
+                .expiration(new Date(System.currentTimeMillis() + 10L * MilliToMinutes))
                 .and()
                 .signWith(getAccessTokenKey())
                 .compact();
     }
 
-    public String createAccessTokenFromRefreshToken(String refreshToken) {
-        Jws<Claims> claims = checkRefreshToken(refreshToken);
-        String userId = claims.getPayload().getSubject();
-        return generateAccessToken(userId);
-    }
-
-    public String generateRefreshToken(String userId, Boolean isRememberMe) {
+    public String generateRefreshToken(Integer userId, Boolean isRememberMe) {
         Map<String, Object> claims = new HashMap<>();
+        claims.put(claimName, isRememberMe);
         Date expiration = isRememberMe
                 ? new Date(System.currentTimeMillis() + 30L * MilliToDays)
                 : new Date(System.currentTimeMillis() + 7L * MilliToDays);
@@ -51,12 +62,23 @@ public class JWTService {
         return Jwts.builder()
                 .claims()
                 .add(claims)
-                .subject(userId)
+                .subject(String.valueOf(userId))
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(expiration)
                 .and()
                 .signWith(getRefreshTokenKey())
                 .compact();
+    }
+
+    public Claims extractClaims(String token, String signingKey) {
+        SecretKey key = getAccessTokenKey();
+        if (Objects.equals(signingKey, "refresh")) key = getRefreshTokenKey();
+
+        return Jwts.parser()
+                .verifyWith(key)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
     }
 
     public Jws<Claims> checkRefreshToken(String refreshToken) {
@@ -81,5 +103,24 @@ public class JWTService {
     private SecretKey getRefreshTokenKey() {
         byte[] keyBytes = Decoders.BASE64.decode(refreshTokenSecret);
         return Keys.hmacShaKeyFor(keyBytes);
+    }
+
+    public void saveRefreshToken(String tokenString, Integer userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "USER_NOT_FOUND"));
+        RefreshToken refreshToken = new RefreshToken();
+        refreshToken.setUser(user);
+        refreshToken.setToken(tokenString);
+        refreshToken.setRevoked(false);
+        refreshToken.setExpiresAt(Instant.now().plus(7, ChronoUnit.DAYS));
+
+        refreshTokenRepository.save(refreshToken);
+    }
+
+    public void revokeRefreshToken(String token) {
+        RefreshToken storedToken = refreshTokenRepository.findByToken(token)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "TOKEN_NOT_FOUND"));
+        storedToken.setRevoked(true);
+        refreshTokenRepository.save(storedToken);
     }
 }

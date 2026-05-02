@@ -1,12 +1,16 @@
 package ch.mk.backend.services;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Service;
 
 @Service
 public class CookieService {
+    @Autowired
+    private JWTService jwtService;
 
-    public ResponseCookie createAccessTokenCookie(String token) {
+    public ResponseCookie createAccessTokenCookie(Integer userId) {
+        String token = jwtService.generateAccessToken(userId);
         return ResponseCookie.from("accessToken", token)
                 .httpOnly(true)
                 .secure(false)
@@ -16,12 +20,18 @@ public class CookieService {
                 .build();
     }
 
-    public ResponseCookie createRefreshTokenCookie(String token) {
+    public ResponseCookie createRefreshTokenCookie(Integer userId, Boolean isRememberMe) {
+        String token = jwtService.generateRefreshToken(userId, isRememberMe);
+        jwtService.saveRefreshToken(token, userId);
+        int maxAge = isRememberMe
+                ? 30 * jwtService.MilliToDays / 1000
+                : 7 * jwtService.MilliToDays / 1000;
+
         return ResponseCookie.from("refreshToken", token)
                 .httpOnly(true)
                 .secure(false)
                 .path("/")
-                .maxAge(7 * 24 * 60 * 60)
+                .maxAge(maxAge)
                 .sameSite("Strict")
                 .build();
     }

@@ -8,7 +8,10 @@ import ch.mk.backend.mappers.AddressMapper;
 import ch.mk.backend.repositories.AddressRepository;
 import ch.mk.backend.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
@@ -51,12 +54,32 @@ public class AddressService {
         addressRepository.save(address);
     }
 
+    public ResponseEntity<Void> editAddress(Integer userId, Integer addressId, CreateAddressDto addressDto) {
+        Optional<Address> address = addressRepository.findByUserIdAndId(userId, addressId);
+        if (address.isPresent()) {
+            updateAddressFields(address.get(), addressDto);
+            addressRepository.save(address.get());
+
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+    public ResponseEntity<Void> deleteAddress(Integer userId, Integer addressId) {
+        Optional<Address> address = addressRepository.findByUserIdAndId(userId, addressId);
+        if (address.isPresent()) {
+            addressRepository.delete(address.get());
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.notFound().build();
+    }
+
     private Address createNewAddressEntity(Integer userId, CreateAddressDto addressDto) {
         Address address = new Address();
         address.setType(addressDto.getType());
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "USER_NOT_FOUND"));
         address.setUser(user);
 
         return address;

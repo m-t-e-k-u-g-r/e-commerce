@@ -12,13 +12,12 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/cart")
 @AllArgsConstructor
 public class CartController {
-    CartItemService cartItemService;
+    private final CartItemService cartItemService;
     private final CartItemMapper cartItemMapper;
     private final CartItemRepository cartItemRepository;
 
@@ -39,36 +38,16 @@ public class CartController {
             @PathVariable int productId,
             @AuthenticationPrincipal User user
     ) {
-        Optional<CartItem> existingItem = cartItemService.findCartItemByProductId(productId, user.getId());
-
-        if (existingItem.isPresent()) {
-            existingItem.get().setQuantity(existingItem.get().getQuantity() + 1);
-            cartItemRepository.save(existingItem.get());
-        } else {
-            cartItemService.createCartItem(user.getId(), productId);
-        }
-        return ResponseEntity.noContent().build();
+        return cartItemService.increaseQuantity(user.getId(), productId);
     }
 
     @PutMapping("/items/{id}")
-    public ResponseEntity<Void> updateCartItemQuantity(
+    public ResponseEntity<Void> setQuantity(
             @AuthenticationPrincipal User user,
             @PathVariable int id,
             @RequestBody UpdateQuantityRequest request
     ) {
-        var cartItem = cartItemRepository.findById(id);
-        int quantity = request.quantity();
-
-        if (cartItem.isPresent() && cartItemService.cartItemBelongsToUser(cartItem.get(), user.getId())) {
-            if (quantity <= 0) {
-                cartItemRepository.deleteById(id);
-            } else {
-                cartItem.get().setQuantity(quantity);
-                cartItemRepository.save(cartItem.get());
-            }
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.notFound().build();
+        return cartItemService.updateQuantity(user.getId(), id, request);
     }
 
     @DeleteMapping("/items/{id}")
@@ -76,14 +55,7 @@ public class CartController {
             @AuthenticationPrincipal User user,
             @PathVariable int id
     ) {
-        var cartItem = cartItemRepository.findById(id);
-        if (cartItem.isPresent() && cartItemService.cartItemBelongsToUser(cartItem.get(), user.getId())) {
-            cartItemRepository.deleteById(id);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
-
-        return ResponseEntity.noContent().build();
+        return cartItemService.removeItem(user.getId(), id);
     }
 
     @DeleteMapping
