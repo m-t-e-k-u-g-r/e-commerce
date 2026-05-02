@@ -1,7 +1,11 @@
 @use 'variables';
 
-body {
+html, body {
+  height: 100%;
   margin: 0;
+}
+
+body {
   font-family: Roboto, "Helvetica Neue", sans-serif;
   background-color: var(--bg-color);
   color: var(--text-color);
@@ -12,6 +16,14 @@ main {
   margin-left: clamp(1rem, 4vw, 2rem);
   margin-right: clamp(1rem, 6vw, 5rem);
   margin-bottom: clamp(2rem, 5vw, 5rem);
+}
+
+.mat-spinner-global {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
 }
 
 *,

@@ -1,5 +1,9 @@
 .order-card {
   margin-bottom: 1.5rem;
+  box-shadow: var(--box-shadow);
+  &:hover {
+    box-shadow: var(--box-shadow-hover);
+  }
 
   mat-card-header {
     border-bottom: 1px solid var(--border-color);

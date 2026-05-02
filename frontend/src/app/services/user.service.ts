@@ -45,7 +45,7 @@ export class UserService {
           type: 'email',
           label: 'E-Mail',
           defaultValue: user.email,
-          validators: [Validators.required]
+          validators: [Validators.required, Validators.email]
         },
         {
           name: 'forename',

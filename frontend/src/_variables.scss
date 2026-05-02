@@ -4,13 +4,13 @@
   --accent-color: #ff4081;
 
   // Light Mode Colors
-  --bg-color: #ffffff;
+  --bg-color: #f7f8fa;
   --surface-color: #ffffff;
   --text-color: #000000;
   --text-secondary: rgba(0, 0, 0, 0.6);
   --border-color: rgba(0, 0, 0, 0.12);
-  --nav-bg: #f5f5f5;
-  --card-bg: #ffffff;
+  --box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  --box-shadow-hover: 0 6px 16px rgba(0, 0, 0, 0.15);
 
   // Forms & Inputs
   --form-bg: #ffffff;
@@ -27,13 +27,13 @@
 
 
 :root[data-theme='dark'] {
-  --bg-color: #121212;
-  --surface-color: #1e1e1e;
+  --bg-color: #1e1e1e;
+  --surface-color: #121212;
   --text-color: #ffffff;
   --text-secondary: rgba(255, 255, 255, 0.7);
   --border-color: rgba(255, 255, 255, 0.12);
-  --nav-bg: #1f1f1f;
-  --card-bg: #1e1e1e;
+  --box-shadow: 0 2px 8px rgba(255, 255, 255, 0.12);
+  --box-shadow-hover: 0 6px 16px rgba(255, 255, 255, 0.15);
 
   --form-bg: #2d2d2d;
   --form-border: #444;

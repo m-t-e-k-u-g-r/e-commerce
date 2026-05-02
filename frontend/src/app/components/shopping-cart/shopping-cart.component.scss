@@ -1,6 +1,11 @@
 .shopping_cart {
   margin-top: 2rem;
   overflow-x: auto;
+  border-radius: 12px;
+  box-shadow: var(--box-shadow);
+  &:hover {
+    box-shadow: var(--box-shadow-hover);
+  }
 }
 
 table {
