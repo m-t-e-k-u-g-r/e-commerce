@@ -95,7 +95,6 @@ export class AuthService {
     return this.http
       .delete(this.baseUrl + '/logout', {
         withCredentials: true,
-        context: new HttpContext().set(API_TARGET, 'authenticated'),
       })
       .pipe(
         tap(() => {

@@ -40,7 +40,7 @@ export class OrderService {
       return;
     }
     this.http.get<OrderDto[]>(this.baseUrl,
-      { withCredentials: true }
+      { withCredentials: true, context: new HttpContext().set(API_TARGET, 'authenticated') }
     ).pipe(
       tap(orders => {
         this._orders.set(orders);

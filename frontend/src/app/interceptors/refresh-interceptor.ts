@@ -14,7 +14,7 @@ export const refreshInterceptor: HttpInterceptorFn = (req, next) => {
   return next(req).pipe(
     catchError((err: HttpErrorResponse) => {
       if (err.status === 401 || err.status === 403) {
-        if (target === 'authenticated') return throwError(() => err);
+        if (target !== 'authenticated') return throwError(() => err);
 
         if (!isRefreshing) {
           isRefreshing = true;

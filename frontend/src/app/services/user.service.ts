@@ -70,7 +70,7 @@ export class UserService {
   editProfile(updatedUser: EditUser) {
     const toastId = this.notificationService.pending('Updating profile...');
     return this.http.put<User>(this.baseUrl + '/profile', updatedUser,
-      { withCredentials: true }
+      { withCredentials: true, context: new HttpContext().set(API_TARGET, 'authenticated') }
     ).pipe(
       tap((user: User) => {
         this.authService.user.set(user);
