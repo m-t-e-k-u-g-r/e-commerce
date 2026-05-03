@@ -1,6 +1,6 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { of } from 'rxjs';
+import { map, of } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import { environment } from '../../environments/environment.development';
 import { Product } from '../models/product.type';
@@ -15,6 +15,12 @@ export class ProductService {
 
   loadProducts() {
     return this.http.get<Product[]>(this.baseUrl).pipe(
+      map((products) =>
+        products.map(p => ({
+          ...p,
+          imageUrl: `http://localhost:8080/api/images/${p.imageUrl}`
+        }))
+      ),
       tap(products => this.products.set(products)),
         catchError(err => {
           console.error('Failed to load products', err);
