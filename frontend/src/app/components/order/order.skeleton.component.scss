@@ -1,0 +1,22 @@
+.order-skeleton {
+  padding-right: 1rem;
+}
+
+.header-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.address-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin: 0;
+}
+
+.button-container-skeleton {
+  display: flex;
+  justify-content: flex-end;
+  gap: 24px;
+}
