@@ -32,7 +32,13 @@ export class CartService {
       return total + item.quantity * price;
     }, 0).toFixed(2)
   );
-  loadingProduct = signal<number | null>(null);
+  loadingProducts = signal<number[] | null>(null);
+  private setProductLoading(productId: number) {
+    this.loadingProducts.update((current) => [...(current ?? []), productId]);
+  }
+  private setProductNotLoading(productId: number) {
+    this.loadingProducts.update((current) => current?.filter((id) => id !== productId) ?? null);
+  }
 
   loadCartItems() {
     if (this.authService.isLoggedIn()) {
@@ -61,7 +67,7 @@ export class CartService {
 
   addItem(productId: number) {
     if (this.authService.isLoggedIn()) {
-      this.loadingProduct.set(productId);
+      this.setProductLoading(productId);
       this.http.post(this.baseUrl + '/items/' + productId, {},
         { withCredentials: true, context: new HttpContext().set(API_TARGET, 'authenticated') }
       ).pipe(
@@ -70,7 +76,7 @@ export class CartService {
           this.notificationService.error('Could not add item to cart');
           return throwError(() => err)
         }),
-        finalize(() => this.loadingProduct.set(null))
+        finalize(() => this.setProductNotLoading(productId))
       ).subscribe();
     } else {
       this._cart.update((items) => {
@@ -91,7 +97,7 @@ export class CartService {
       if (item) {
         const newQuantity = item.quantity - 1;
         if (newQuantity > 0) {
-          this.loadingProduct.set(productId);
+          this.setProductLoading(productId);
           return this.http.put(this.baseUrl + '/items/' + item.id, { quantity: newQuantity },
             { withCredentials: true, context: new HttpContext().set(API_TARGET, 'authenticated') }
           ).pipe(
@@ -100,7 +106,7 @@ export class CartService {
               this.notificationService.error('Could not reduce quantity. Please try again');
               return throwError(() => err);
             }),
-            finalize(() => this.loadingProduct.set(null))
+            finalize(() => this.setProductNotLoading(productId))
           ).subscribe();
         } else {
           this.removeItem(productId);

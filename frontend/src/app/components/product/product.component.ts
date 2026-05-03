@@ -70,7 +70,7 @@ export class ProductComponent {
   itemInCart = computed(() =>
     this.cartService.cart().find((ci) => ci.productId === this.product?.id),
   );
-  loading = computed(() => this.cartService.loadingProduct() == this.product.id);
+  loading = computed(() => this.cartService.loadingProducts()?.includes(this.product.id) ?? false);
 
   addToCart() {
     this.cartService.addItem(this.product.id);
