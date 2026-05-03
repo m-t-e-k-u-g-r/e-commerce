@@ -7,7 +7,7 @@ import { HttpClient, HttpContext } from '@angular/common/http';
 import { API_TARGET } from '../interceptors/refresh-interceptor';
 import { NotificationService } from './notification.service';
 import { ConfirmService } from './confirm.service';
-import { catchError, tap } from 'rxjs/operators';
+import { catchError, switchMap, tap } from 'rxjs/operators';
 import { finalize, of, throwError } from 'rxjs';
 
 @Injectable({
@@ -32,6 +32,7 @@ export class CartService {
       return total + item.quantity * price;
     }, 0).toFixed(2)
   );
+  loadingProduct = signal<number | null>(null);
 
   loadCartItems() {
     if (this.authService.isLoggedIn()) {
@@ -60,11 +61,17 @@ export class CartService {
 
   addItem(productId: number) {
     if (this.authService.isLoggedIn()) {
-      return this.http.post(this.baseUrl + '/items/' + productId, {},
+      this.loadingProduct.set(productId);
+      this.http.post(this.baseUrl + '/items/' + productId, {},
         { withCredentials: true, context: new HttpContext().set(API_TARGET, 'authenticated') }
-      ).subscribe(() => {
-        this.loadCartItems();
-      });
+      ).pipe(
+        switchMap(() => this.loadCartItems()),
+        catchError((err) => {
+          this.notificationService.error('Could not add item to cart');
+          return throwError(() => err)
+        }),
+        finalize(() => this.loadingProduct.set(null))
+      ).subscribe();
     } else {
       this._cart.update((items) => {
         const index = items.findIndex((i) => i.productId === productId);
@@ -84,14 +91,20 @@ export class CartService {
       if (item) {
         const newQuantity = item.quantity - 1;
         if (newQuantity > 0) {
+          this.loadingProduct.set(productId);
           return this.http.put(this.baseUrl + '/items/' + item.id, { quantity: newQuantity },
             { withCredentials: true, context: new HttpContext().set(API_TARGET, 'authenticated') }
-          ).subscribe(() => {
-            this.loadCartItems();
-          });
+          ).pipe(
+            switchMap(() => this.loadCartItems()),
+            catchError((err) => {
+              this.notificationService.error('Could not reduce quantity. Please try again');
+              return throwError(() => err);
+            }),
+            finalize(() => this.loadingProduct.set(null))
+          ).subscribe();
         } else {
           this.removeItem(productId);
-          this.loadCartItems();
+          return this.loadCartItems();
         }
       }
     } else {
@@ -117,9 +130,13 @@ export class CartService {
         return this.http
           .delete(this.baseUrl + '/items/' + item.id,
             { withCredentials: true, context: new HttpContext().set(API_TARGET, 'authenticated') }
-          ).subscribe(() => {
-            this.loadCartItems();
-          });
+          ).pipe(
+            switchMap(() => this.loadCartItems()),
+            catchError((err) => {
+              this.notificationService.error('Could not remove product. Please try again');
+              return throwError(() => throwError(() => err));
+            })
+          ).subscribe();
       }
     } else {
       this._cart.update((items) => items.filter((item) => item.productId !== productId));
@@ -139,21 +156,24 @@ export class CartService {
     }
     if (this.authService.isLoggedIn()) {
       const toastId = this.notificationService.pending('Clearing cart...');
-      this.http.delete(this.baseUrl,
-        { withCredentials: true, context: new HttpContext().set(API_TARGET, 'authenticated') }
-      ).pipe(
-        tap(() => {
-          this.loadCartItems();
-          this.notificationService.success('Cleared cart');
-        }),
-        catchError(() => {
-          this.notificationService.error('Failed to clear cart');
-          return of(null);
-        }),
-        finalize(() => {
-          this.notificationService.clear(toastId);
+      this.http
+        .delete(this.baseUrl, {
+          withCredentials: true,
+          context: new HttpContext().set(API_TARGET, 'authenticated'),
         })
-      );
+        .pipe(
+          switchMap(() => {
+            this.notificationService.success('Cleared cart');
+            return this.loadCartItems();
+          }),
+          catchError(() => {
+            this.notificationService.error('Failed to clear cart');
+            return of(null);
+          }),
+          finalize(() => {
+            this.notificationService.clear(toastId);
+          }),
+        ).subscribe();
     } else {
       this._cart.set([]);
       this.saveToLocalStorage();
