@@ -13,17 +13,23 @@ import { Router } from '@angular/router';
 import { NotificationService } from '../../services/notification.service';
 import { Validators } from '@angular/forms';
 import { LoadingService } from '../../services/loading.service';
-import { MatProgressSpinner } from '@angular/material/progress-spinner';
+import { ShoppingCartSkeletonComponent } from './shopping-cart.skeleton.component';
 
 @Component({
   selector: 'app-shopping-cart',
-  imports: [NgOptimizedImage, MatTableModule, MatButton, CurrencyPipe, MatProgressSpinner],
+  imports: [
+    NgOptimizedImage,
+    MatTableModule,
+    MatButton,
+    CurrencyPipe,
+    ShoppingCartSkeletonComponent,
+  ],
   template: `
-    @if (this.loadingService.isLoadingUserData()) {
-      <mat-spinner class="mat-spinner-global" mode="indeterminate"/>
-    } @else {
-      <h1>Shopping Cart</h1>
-      <div class="shopping_cart">
+    <h1>Shopping Cart</h1>
+    <div class="shopping_cart">
+      @if (this.loadingService.isLoadingUserData()) {
+        <app-shopping-cart-skeleton />
+      } @else {
         <table mat-table [dataSource]="computedCartItems()">
           <ng-container matColumnDef="image">
             <th mat-header-cell *matHeaderCellDef></th>
@@ -105,8 +111,8 @@ import { MatProgressSpinner } from '@angular/material/progress-spinner';
           <tr mat-footer-row *matFooterRowDef="displayedColumns; sticky: true"></tr>
           <tr mat-footer-row *matFooterRowDef="['footer-row-checkout']; sticky: true"></tr>
         </table>
-      </div>
-    }
+      }
+    </div>
   `,
   styleUrl: './shopping-cart.component.scss',
 })
