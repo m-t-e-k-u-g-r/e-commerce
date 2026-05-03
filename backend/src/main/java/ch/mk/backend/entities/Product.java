@@ -30,8 +30,8 @@ public class Product {
     @Column(name = "price", nullable = false, precision = 10, scale = 2)
     private BigDecimal price;
 
-    @Column(name = "image_url")
-    private String imageUrl;
+    @Column(name = "image_id")
+    private String imageId;
 
     @ColumnDefault("current_timestamp()")
     @Column(name = "created_at", nullable = false)
