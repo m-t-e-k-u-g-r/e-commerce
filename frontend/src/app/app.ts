@@ -58,6 +58,7 @@ export class App implements OnInit {
       this.authService.refresh().pipe(
         switchMap(() => this.userService.getUser()),
         catchError(() => of(null)),
+        finalize(() => this.authService.setInitialized(true)),
       ),
       this.productService.loadProducts(),
       this.categoryService.loadCategories()
