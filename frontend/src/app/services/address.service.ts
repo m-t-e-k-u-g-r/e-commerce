@@ -57,6 +57,7 @@ export class AddressService {
       };
       this.saveGuestAddress(saveAddress);
       this.guestAddress.set(saveAddress);
+      return;
     }
     this.http
       .post<Address>(this.baseUrl, address, {
@@ -84,7 +85,7 @@ export class AddressService {
         if (result.isAddressDto) {
           return result.object;
         }
-        throw new Error('Invalid format');
+        return null;
       } catch {
         this.notificationService.warning('Could not parse address data', 'Invalid format');
         return null;

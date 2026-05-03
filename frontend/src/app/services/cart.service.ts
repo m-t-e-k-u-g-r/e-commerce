@@ -59,6 +59,7 @@ export class CartService {
         try {
           const json = JSON.parse(cart);
           this._cart.set(json);
+          return of(json);
         } catch {}
       }
       return of(null);

@@ -67,6 +67,10 @@ export class UserService {
   }
 
   editProfile(updatedUser: EditUser) {
+    if (!this.authService.isLoggedIn()) {
+      this.notificationService.error('Cannot edit profile. Please log in.');
+      return throwError(() => 'Failed to edit profile. User is not logged in.');
+    }
     const toastId = this.notificationService.pending('Updating profile...');
     this.loadingService.startLoading('user');
     return this.http.put<User>(this.baseUrl + '/profile', updatedUser,
@@ -108,6 +112,10 @@ export class UserService {
   }
 
   changePassword(oldPassword: string, newPassword: string) {
+    if (!this.authService.isLoggedIn()) {
+      this.notificationService.error('Cannot change password. Please log in.');
+      return throwError(() => 'Failed to change password. User is not logged in.');
+    }
     const toastId = this.notificationService.pending('Changing password...');
     return this.http
       .put<void>(

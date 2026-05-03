@@ -104,10 +104,16 @@ export class OrderService {
           this.notificationService.clear(toastId);
           this.loading.set(false);
         }),
-      ).subscribe();
+      )
+      .subscribe();
   }
 
   createOrder(addressId: number) {
+    if (!this.authService.isLoggedIn()) {
+      this.notificationService.error('Failed to place order');
+      this.notificationService.info('Please create an order as guest or log in.');
+      return;
+    }
     const toastId = this.notificationService.pending('Placing order...');
     this.loading.set(true);
     return this.http.post<OrderDto>(this.baseUrl, { addressId: addressId },
@@ -131,11 +137,7 @@ export class OrderService {
     ).subscribe();
   }
 
-  createGuestOrder(
-    email: string,
-    address: AddressDto,
-    items: CartItem[]
-  ) {
+  createGuestOrder(email: string, address: AddressDto, items: CartItem[]) {
     const toastId = this.notificationService.pending('Placing order...');
     this.loading.set(true);
     return this.http
@@ -187,11 +189,15 @@ export class OrderService {
         finalize(() => {
           this.notificationService.clear(toastId);
           this.loading.set(false);
-        })
+        }),
       );
   }
 
   async cancelOrder(orderId: number) {
+    if (!this.authService.isLoggedIn()) {
+      this.notificationService.error('Cannot cancel order. Please log in.');
+      return throwError(() => 'Failed to cancel order. User is not logged in.');
+    }
     const confirmed = await this.confirmService.confirm({
       title: `Cancel order #${orderId}`,
       message: 'Are you sure you want to cancel this order?',
@@ -199,21 +205,24 @@ export class OrderService {
     if (!confirmed) return;
 
     const toastId = this.notificationService.pending('Placing order...');
-    return this.http.delete<OrderDto>(this.baseUrl + '/' + orderId,
-      { withCredentials: true, context: new HttpContext().set(API_TARGET, 'authenticated') }
-    ).pipe(
-      tap(order => {
-        this.loadOrders();
-        this.notificationService.success(`Order #${order.id} cancelled`);
-      }),
-      catchError(() => {
-        this.notificationService.error(`Failed to cancel order #${orderId}`);
-        return of(null);
-      }),
-      finalize(() => {
-        this.notificationService.clear(toastId);
+    return this.http
+      .delete<OrderDto>(this.baseUrl + '/' + orderId, {
+        withCredentials: true,
+        context: new HttpContext().set(API_TARGET, 'authenticated'),
       })
-    );
+      .pipe(
+        tap((order) => {
+          this.loadOrders();
+          this.notificationService.success(`Order #${order.id} cancelled`);
+        }),
+        catchError(() => {
+          this.notificationService.error(`Failed to cancel order #${orderId}`);
+          return of(null);
+        }),
+        finalize(() => {
+          this.notificationService.clear(toastId);
+        }),
+      );
   }
 
   openGuestOrder(order: GuestOrderDto) {
@@ -221,7 +230,7 @@ export class OrderService {
       data: order,
       panelClass: 'order-dialog',
       minWidth: '40vw',
-      maxHeight: '90vh'
+      maxHeight: '90vh',
     });
   }
 }
