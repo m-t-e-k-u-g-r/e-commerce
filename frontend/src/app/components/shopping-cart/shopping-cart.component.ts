@@ -56,7 +56,7 @@ import { ShoppingCartSkeletonComponent } from './shopping-cart.skeleton.componen
           <ng-container matColumnDef="quantity">
             <th mat-header-cell *matHeaderCellDef style="text-align: center;">Quantity</th>
             <td mat-cell *matCellDef="let item">
-              <div class="center quantity_controls">
+              <div class="quantity_controls">
                 <button (click)="this.cartService.reduceQuantity(item.productId)">-</button>
                 <span class="quantity_value">{{ item.quantity }} in cart</span>
                 <button (click)="this.cartService.addItem(item.productId)">+</button>

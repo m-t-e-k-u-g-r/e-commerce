@@ -9,35 +9,20 @@ import { NgxSkeletonLoaderComponent } from 'ngx-skeleton-loader';
     <mat-card class="profile-container">
       <div class="profile-skeleton">
         <div class="profile-header-skeleton">
-          <ngx-skeleton-loader
-            appearance="circle"
-            [theme]="{ width: '64px', height: '64px' }"
-          >
-          </ngx-skeleton-loader>
+          <ngx-skeleton-loader appearance="circle" [theme]="{ width: '64px', height: '64px' }" />
 
           <div class="header-text">
-            <ngx-skeleton-loader
-              [theme]="{ width: '220px', height: '24px' }"
-            >
-            </ngx-skeleton-loader>
-
-            <ngx-skeleton-loader
-              [theme]="{ width: '140px', height: '18px' }"
-            >
-            </ngx-skeleton-loader>
+            <ngx-skeleton-loader [theme]="{ width: '220px', height: '24px' }" />
+            <ngx-skeleton-loader [theme]="{ width: '140px', height: '18px' }" />
           </div>
         </div>
 
         <div class="profile-body-skeleton">
-          <ngx-skeleton-loader [count]="3">
-          </ngx-skeleton-loader>
+          <ngx-skeleton-loader [count]="3"/>
 
           <div class="button-row">
-            <ngx-skeleton-loader [theme]="{ width: '100px', height: '36px' }">
-            </ngx-skeleton-loader>
-
-            <ngx-skeleton-loader [theme]="{ width: '100px', height: '36px' }">
-            </ngx-skeleton-loader>
+            <ngx-skeleton-loader [theme]="{ width: '100px', height: '36px' }"/>
+            <ngx-skeleton-loader [theme]="{ width: '100px', height: '36px' }"/>
           </div>
         </div>
       </div>

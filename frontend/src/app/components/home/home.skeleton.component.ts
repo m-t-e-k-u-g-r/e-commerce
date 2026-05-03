@@ -10,7 +10,7 @@ import { ProductSkeletonComponent } from '../product/product.skeleton.component'
       <app-sidebar-skeleton />
       <section class="product_list">
         @for (item of items; track item) {
-          <app-product-skeleton/>
+          <app-product-skeleton />
         }
       </section>
     </div>
@@ -18,5 +18,5 @@ import { ProductSkeletonComponent } from '../product/product.skeleton.component'
   styleUrls: ['home.skeleton.component.scss', 'home.component.scss'],
 })
 export class HomeSkeletonComponent {
-  items = Array.from({ length: 12 });
+  items = Array.from({ length: 12 }, (_, i) => i);
 }

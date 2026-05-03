@@ -7,14 +7,12 @@ import { NgxSkeletonLoaderComponent } from 'ngx-skeleton-loader';
   template: `
     <div class="toggle-group-skeleton">
       @for (item of items; track item) {
-        <ngx-skeleton-loader>
-          appearance="line"
-        </ngx-skeleton-loader>
+        <ngx-skeleton-loader appearance="line" />
       }
     </div>
   `,
   styleUrls: ['sidebar.skeleton.component.scss', 'sidebar.component.scss'],
 })
 export class SidebarSkeletonComponent {
-  items = Array.from({ length: 10 });
+  items = Array.from({ length: 10 }, (_, i) => i);
 }
