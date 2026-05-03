@@ -9,7 +9,7 @@ import { MatIcon } from '@angular/material/icon';
 import { AuthService } from '../../services/auth.service';
 import { Address } from '../../models/address.type';
 import { LoadingService } from '../../services/loading.service';
-import { MatProgressSpinner } from '@angular/material/progress-spinner';
+import { AddressOverviewSkeletonComponent } from './address-overview.skeleton.component';
 
 @Component({
   selector: 'app-address-overview',
@@ -31,11 +31,11 @@ import { MatProgressSpinner } from '@angular/material/progress-spinner';
     MatRowDef,
     MatFooterRow,
     MatFooterRowDef,
-    MatProgressSpinner,
+    AddressOverviewSkeletonComponent,
   ],
   template: `
     @if (this.loadingService.isLoadingUserData()) {
-      <mat-spinner class="mat-spinner-global" mode="indeterminate" />
+      <app-address-overview-skeleton/>
     } @else {
       <table mat-table [dataSource]="this.data()" class="address_overview">
         <ng-container matColumnDef="edit">
