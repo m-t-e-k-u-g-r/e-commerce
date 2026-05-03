@@ -1,5 +1,6 @@
 .order-card {
   margin-bottom: 1.5rem;
+  background-color: var(--surface-color) !important;
   box-shadow: var(--box-shadow);
   &:hover {
     box-shadow: var(--box-shadow-hover);

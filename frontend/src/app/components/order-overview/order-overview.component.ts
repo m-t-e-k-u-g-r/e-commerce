@@ -4,11 +4,11 @@ import { OrderService } from '../../services/order.service';
 import { OrderDetailsComponent } from '../order-details/order-details.component';
 import { OrderDto } from '../../models/order.type';
 import { LoadingService } from '../../services/loading.service';
-import { MatProgressSpinner } from '@angular/material/progress-spinner';
+import { OrderOverviewSkeletonComponent } from './order-overview.skeleton.component';
 
 @Component({
   selector: 'app-order-overview',
-  imports: [OrderComponent, OrderDetailsComponent, MatProgressSpinner],
+  imports: [OrderComponent, OrderDetailsComponent, OrderOverviewSkeletonComponent],
   template: `
     <div class="container">
       <header>
@@ -16,7 +16,7 @@ import { MatProgressSpinner } from '@angular/material/progress-spinner';
       </header>
 
       @if (this.loadingService.isLoadingUserData()) {
-        <mat-spinner class="mat-spinner-global" mode="indeterminate" />
+        <app-order-overview-skeleton />
       } @else {
         <div class="layout-wrapper">
           <section class="orders-list">

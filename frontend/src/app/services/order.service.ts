@@ -37,9 +37,9 @@ export class OrderService {
 
   loadOrders() {
     if (!this.authService.isLoggedIn()) {
-      return;
+      return of(null);
     }
-    this.http.get<OrderDto[]>(this.baseUrl,
+    return this.http.get<OrderDto[]>(this.baseUrl,
       { withCredentials: true, context: new HttpContext().set(API_TARGET, 'authenticated') }
     ).pipe(
       tap(orders => {
@@ -49,7 +49,7 @@ export class OrderService {
         this.notificationService.error('Failed to load orders');
         return throwError(() => err);
       })
-    ).subscribe();
+    );
   }
 
   async checkGuestOrder() {

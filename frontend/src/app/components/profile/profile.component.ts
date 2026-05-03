@@ -8,7 +8,7 @@ import { DatePipe } from '@angular/common';
 import { UserListItem } from '../../models/user.type';
 import { UserService } from '../../services/user.service';
 import { LoadingService } from '../../services/loading.service';
-import { MatProgressSpinner } from '@angular/material/progress-spinner';
+import { ProfileSkeletonComponent } from './profile.skeleton.component';
 
 @Component({
   selector: 'app-profile',
@@ -28,11 +28,11 @@ import { MatProgressSpinner } from '@angular/material/progress-spinner';
     MatListItemTitle,
     MatListItemLine,
     MatCardAvatar,
-    MatProgressSpinner,
+    ProfileSkeletonComponent,
   ],
   template: `
     @if (this.loadingService.isLoadingUserData()) {
-      <mat-spinner class="mat-spinner-global" mode="indeterminate" />
+      <app-profile-skeleton/>
     } @else if (this.user()) {
       <mat-card class="profile-container">
         <mat-card-header>
