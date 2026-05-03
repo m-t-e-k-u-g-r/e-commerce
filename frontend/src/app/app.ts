@@ -10,7 +10,7 @@ import { OrderService } from './services/order.service';
 import { ThemeService } from './services/theme.service';
 import { UserService } from './services/user.service';
 import { finalize, forkJoin, of, take } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { catchError, switchMap } from 'rxjs/operators';
 import { LoadingService } from './services/loading.service';
 
 @Component({
@@ -55,7 +55,10 @@ export class App implements OnInit {
     this.themeService.loadTheme();
 
     forkJoin([
-      this.userService.getUser().pipe(catchError(() => of(null))),
+      this.authService.refresh().pipe(
+        switchMap(() => this.userService.getUser()),
+        catchError(() => of(null)),
+      ),
       this.productService.loadProducts(),
       this.categoryService.loadCategories()
     ]).pipe(
