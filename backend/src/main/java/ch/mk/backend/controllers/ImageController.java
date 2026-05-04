@@ -19,14 +19,14 @@ import java.nio.file.Paths;
 @AllArgsConstructor
 public class ImageController {
 
-    @GetMapping("/{image_id}")
+    @GetMapping("/products/{image_id}")
     public ResponseEntity<Resource> getImageById(@PathVariable String image_id) {
-        Path path = Paths.get("uploads/products/product_" + image_id + ".png");
+        Path path = Paths.get("uploads/products/webp/product_" + image_id + ".webp");
 
         try {
             Resource resource = new UrlResource(path.toUri());
             return ResponseEntity.ok()
-                    .contentType(MediaType.IMAGE_PNG)
+                    .contentType(MediaType.parseMediaType("image/webp"))
                     .body(resource);
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
