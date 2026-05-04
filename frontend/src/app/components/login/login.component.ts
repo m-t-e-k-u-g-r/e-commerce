@@ -8,6 +8,7 @@ import { MatButtonModule, MatButton, MatIconButton } from '@angular/material/but
 import { MyErrorStateMatcher } from '../../guards/errorMatcher.guard';
 import { passwordValidators } from '../../utils';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
+import { MatCheckbox } from '@angular/material/checkbox';
 
 @Component({
   selector: 'app-login',
@@ -23,6 +24,7 @@ import { MatProgressSpinner } from '@angular/material/progress-spinner';
     MatSuffix,
     MatError,
     MatProgressSpinner,
+    MatCheckbox,
   ],
   template: `
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
@@ -94,6 +96,11 @@ import { MatProgressSpinner } from '@angular/material/progress-spinner';
           }
         </mat-form-field>
       }
+      @if (isLogin) {
+        <mat-checkbox formControlName="rememberMe" value="true">
+          Remember me
+        </mat-checkbox>
+      }
       <button type="submit" matButton="elevated" [disabled]="loginForm.invalid || this.authService.loading()">
         @if (this.authService.loading()) {
           <mat-spinner diameter="18"/>
@@ -126,6 +133,7 @@ export class LoginComponent {
     email: FormControl<string | null>;
     password: FormControl<string | null>;
     confirmPassword: FormControl<string | null>;
+    rememberMe: FormControl<boolean | null>;
   }> = new FormGroup({
     email: new FormControl('', [Validators.required, Validators.email]),
     password: new FormControl('', [
@@ -134,6 +142,7 @@ export class LoginComponent {
       Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$/),
     ]),
     confirmPassword: new FormControl('', []),
+    rememberMe: new FormControl(false),
   });
   hide = signal(true);
   hideConfirm = signal(true);
@@ -160,7 +169,9 @@ export class LoginComponent {
     const data = this.loginForm.value;
     if (typeof data.email !== 'string' || typeof data.password !== 'string') return;
     if (this.isLogin) {
-      this.authService.login(data.email, data.password).subscribe();
+      let rememberMe = data.rememberMe;
+      if (rememberMe == null) rememberMe = false;
+      this.authService.login(data.email, data.password, rememberMe).subscribe();
     } else {
       if (data.password !== data.confirmPassword) return;
       this.authService.signup(data.email, data.password).subscribe({

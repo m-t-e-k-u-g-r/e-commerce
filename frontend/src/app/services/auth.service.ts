@@ -61,13 +61,13 @@ export class AuthService {
       );
   }
 
-  login(email: string, password: string) {
+  login(email: string, password: string, rememberMe: boolean = false) {
     this.loading.set(true);
     const toastId = this.notificationService.pending('Logging in user...');
     return this.http
       .post(
         this.baseUrl + '/login',
-        { email: email, password: password },
+        { email: email, password: password, rememberMe: rememberMe },
         {
           observe: 'response',
           withCredentials: true,
