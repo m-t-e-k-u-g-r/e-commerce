@@ -75,9 +75,6 @@ export class AuthService {
         },
       )
       .pipe(
-        switchMap(() =>
-          this.refresh(),
-        ),
         tap(() => {
           this.isLoggedIn.set(true);
           this.notificationService.success('Login successful');

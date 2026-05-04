@@ -47,9 +47,12 @@ public class AuthService {
         Boolean rememberMe = Objects.requireNonNullElse(request.getRememberMe(), false);
 
         ResponseCookie refreshTokenCookie = cookieService.createRefreshTokenCookie(user, rememberMe);
+        ResponseCookie accessTokenCookie = cookieService.createAccessTokenCookie(user.getId());
+
+        HttpHeaders headers = createHeaders(List.of(refreshTokenCookie.toString(), accessTokenCookie.toString()));
 
         return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString())
+                .headers(headers)
                 .build();
     }
 

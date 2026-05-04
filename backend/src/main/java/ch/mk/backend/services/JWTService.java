@@ -54,6 +54,7 @@ public class JWTService {
                 : new Date(System.currentTimeMillis() + 7L * MilliToDays);
 
         return Jwts.builder()
+                .id(UUID.randomUUID().toString())
                 .claims()
                 .add(claims)
                 .subject(String.valueOf(userId))
