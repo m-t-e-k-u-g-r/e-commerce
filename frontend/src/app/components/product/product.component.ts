@@ -23,6 +23,7 @@ import { MatProgressSpinner } from '@angular/material/progress-spinner';
       <img
         mat-card-image
         ngSrc="{{ product.imageUrl }}"
+        priority
         width="16"
         height="9"
         alt="{{ product.name }}"

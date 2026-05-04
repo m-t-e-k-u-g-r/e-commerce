@@ -36,6 +36,13 @@ button {
   cursor: pointer;
 }
 
+:root[data-theme='dark'] {
+  img {
+    opacity: 0.8;
+    filter: brightness(0.8);
+  }
+}
+
 .cdk-overlay-pane.mat-mdc-dialog-panel {
   min-width: 360px;
   width: 90% !important;
