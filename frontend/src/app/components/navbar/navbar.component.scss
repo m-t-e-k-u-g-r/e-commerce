@@ -1,0 +1,73 @@
+nav {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  height: 64px;
+  padding: 1rem 2rem;
+  margin-bottom: 2rem;
+  background-color: var(--surface-color);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  border-bottom: 1px solid var(--border-color);
+  box-shadow: var(--box-shadow);
+}
+
+.nav-right {
+  display: flex;
+  gap: 1rem;
+}
+
+.user_info {
+  position: relative;
+}
+
+.profile_button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-color);
+  margin-top: 0.5rem;
+  font-weight: 500;
+}
+
+.info_menu {
+  position: absolute;
+  min-width: 10rem;
+  top: 100%;
+  right: 0;
+  margin: 0.5rem 0 0 0;
+  padding: 0.5rem 0;
+  list-style: none;
+  background: var(--surface-color);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
+.info_menu li {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  color: var(--text-color);
+  transition: background-color 0.2s;
+}
+
+.info_menu li:hover {
+  background-color: var(--border-color);
+}
+
+a {
+  color: var(--text-color);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+}
+
+mat-icon {
+  color: var(--text-color);
+}

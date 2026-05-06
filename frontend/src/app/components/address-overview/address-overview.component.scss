@@ -1,0 +1,43 @@
+.address_overview {
+  width: 100%;
+  margin-top: 2rem;
+  padding: 0 2rem;
+  border-radius: 12px;
+  box-shadow: var(--box-shadow);
+  &:hover {
+    box-shadow: var(--box-shadow-hover);
+  }
+}
+
+.address_info {
+  line-height: 1.6;
+  padding: 1rem 0;
+}
+
+.mat-mdc-footer-cell {
+  padding: 2rem 0;
+}
+
+button[mat-fab] {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+button[mat-mini-fab] {
+  background-color: var(--surface-color);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+  box-shadow: none;
+
+  &:hover:not(:disabled) {
+    background-color: var(--border-color);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+  }
+}
+
+mat-icon {
+  color: inherit;
+}

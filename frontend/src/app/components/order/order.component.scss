@@ -1,0 +1,76 @@
+.order-card {
+  margin-bottom: 1.5rem;
+  background-color: var(--surface-color) !important;
+  box-shadow: var(--box-shadow);
+  &:hover {
+    box-shadow: var(--box-shadow-hover);
+  }
+
+  mat-card-header {
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+  }
+}
+
+.status-container {
+  margin-bottom: 1rem;
+}
+
+.address {
+  line-height: 1.5;
+  margin-bottom: 1rem;
+  color: var(--text-color);
+}
+
+.total {
+  font-size: 1.1rem;
+  margin-bottom: 1.5rem;
+  color: var(--primary-color);
+}
+
+.preview-items {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+
+  .preview-img {
+    border-radius: 4px;
+    border: 1px solid var(--border-color);
+  }
+
+  .more-items {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+  }
+}
+
+.pending {
+  background-color: #fff9c4 !important;
+  color: #f57f17 !important;
+}
+
+.cancelled {
+  background-color: #ffcdd2 !important;
+  color: #c62828 !important;
+}
+
+
+:root[data-theme='dark'] {
+  .pending {
+    background-color: #3e2723 !important;
+    color: #fff176 !important;
+  }
+
+  .cancelled {
+    background-color: #b71c1c !important;
+    color: #ffcdd2 !important;
+  }
+}
+
+mat-card-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}

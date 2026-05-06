@@ -1,0 +1,22 @@
+.product_skeleton {
+  height: 100%;
+  padding-bottom: 1rem;
+}
+
+.img_skeleton {
+  aspect-ratio: 16/9;
+}
+
+.product_detail_skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-left: 1rem;
+}
+
+.button_skeleton {
+  height: 40px;
+  width: 100%;
+  padding: 0.5rem 1rem;
+  flex: 1;
+}

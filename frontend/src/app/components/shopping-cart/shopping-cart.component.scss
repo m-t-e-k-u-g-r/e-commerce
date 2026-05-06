@@ -1,0 +1,81 @@
+.shopping_cart {
+  margin-top: 2rem;
+  overflow-x: auto;
+  border-radius: 12px;
+  box-shadow: var(--box-shadow);
+  &:hover {
+    box-shadow: var(--box-shadow-hover);
+  }
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.img_wrapper {
+  padding: 0.5rem;
+  img {
+    border-radius: 4px;
+    object-fit: cover;
+  }
+}
+
+.quantity_controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  justify-content: center;
+
+  button {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 1px solid var(--border-color);
+    background: var(--surface-color);
+    color: var(--text-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+
+    &:hover {
+      background-color: var(--border-color);
+    }
+  }
+}
+
+.quantity_value {
+  min-width: 80px;
+  text-align: center;
+  color: var(--text-color);
+}
+
+.total_amount {
+  font-weight: bold;
+  font-size: 1.2rem;
+  color: var(--primary-color);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  color: var(--text-color);
+}
+
+h1 {
+  color: var(--text-color);
+}
+
+.mat-mdc-footer-cell {
+  padding: 1rem;
+}
+
+button[matButton="filled"] {
+  width: 100%;
+  padding: 1rem;
+  font-size: 1.1rem;
+  font-weight: bold;
+}

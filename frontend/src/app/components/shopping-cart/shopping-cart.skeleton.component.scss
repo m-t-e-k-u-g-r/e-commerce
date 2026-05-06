@@ -1,0 +1,61 @@
+.table-skeleton {
+  width: 100%;
+  border-collapse: collapse;
+  padding: 0 2rem;
+}
+
+.table-header-skeleton {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-right: 1rem;
+  padding-top: 1rem;
+  padding-right: 3rem;
+}
+
+.table-body-skeleton {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin: 1rem;
+  margin-top: 0 !important;
+  padding-right: 15rem;
+  gap: 1rem;
+}
+
+.cart-item-skeleton {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--surface-border);
+
+  > :nth-child(2) {
+    margin-right: 3rem;
+  }
+  > :nth-child(3) {
+    margin-left: 1rem;
+  }
+  > :nth-child(4) {
+    margin-left: 1rem;
+    margin-right: 3rem;
+  }
+}
+
+.table-row-element-skeleton {
+  width: 70px;
+  height: 25px;
+}
+
+.price-skeleton {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+  padding-right: 13rem;
+}
+
+.button-skeleton {
+  width: 30px;
+  height: 30px;
+}
