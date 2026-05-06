@@ -44,4 +44,9 @@
   --toast-info: #64d2ff;
   --toast-warning: #ffd60a;
   --toast-pending: #8e8e93;
+
+  // Ngx-Skeleton-Loader Dark Mode Overrides
+  div.skeleton-loader {
+    --ngx-skeleton-loader-base-color: #333333 !important;
+  }
 }
