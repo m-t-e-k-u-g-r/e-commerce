@@ -1,0 +1,16 @@
+name: e-commerce
+services:
+  database:
+      image: postgres:18-alpine
+      environment:
+        POSTGRES_USER: ${DB_USER}
+        POSTGRES_PASSWORD: ${DB_PASSWORD}
+        POSTGRES_DB: ${DATABASE}
+      ports:
+        - "5432:5432"
+      volumes:
+        - data:/var/lib/postgresql/docker
+        - ./database:/docker-entrypoint-initdb.d
+
+volumes:
+  data:
