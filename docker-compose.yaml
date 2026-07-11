@@ -1,0 +1,51 @@
+name: e-commerce
+services:
+  web:
+    depends_on:
+      - server
+    build: ./frontend
+    image: ghcr.io/m-t-e-k-u-g-r/e-commerce-web:latest
+    ports:
+      - "80:80"
+    networks:
+      - frontend
+
+  server:
+    depends_on:
+      - database
+    build: ./backend
+    image: ghcr.io/m-t-e-k-u-g-r/e-commerce-server:latest
+    environment:
+      FRONTEND_URL: ${FRONTEND_URL}
+      DB_DRIVER: ${DB_DRIVER}
+      DB_URL: ${DB_URL}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      ACCESS_TOKEN_SECRET: ${ACCESS_TOKEN_SECRET}
+      REFRESH_TOKEN_SECRET: ${REFRESH_TOKEN_SECRET}
+    ports:
+      - "8080:8080"
+    networks:
+      - frontend
+      - backend
+
+  database:
+      image: postgres:18-alpine
+      environment:
+        POSTGRES_USER: ${DB_USER}
+        POSTGRES_PASSWORD: ${DB_PASSWORD}
+        POSTGRES_DB: ${DATABASE}
+      ports:
+        - "5432:5432"
+      volumes:
+        - data:/var/lib/postgresql/docker
+        - ./database:/docker-entrypoint-initdb.d
+      networks:
+        - backend
+
+volumes:
+  data:
+
+networks:
+  frontend:
+  backend:
