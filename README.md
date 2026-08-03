@@ -1,5 +1,14 @@
 # E-Commerce
 
+## Description
+This is a fullstack e-commerce application that supports
+user authentication, product display and purchase (only mocked, no real payment).
+
+### Technologies
+- [Postgresql](https://www.postgresql.org)
+- [Spring Boot](https://spring.io/projects/spring-boot)
+- [Angular](https://angular.dev)
+
 ## Setup
 You need the following application.properties for the backend:
 - spring.datasource.url
