@@ -119,7 +119,7 @@ public class OrderService {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-    public OrderDto updateOrderStatus(Integer orderId, Integer userId, String status) {
+    public OrderDto updateOrderStatus(Integer orderId, Integer userId, Status status) {
         Order order = orderRepository.findByIdAndUserId(orderId, userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "ORDER_NOT_FOUND"));
         order.setStatus(status);
@@ -130,13 +130,13 @@ public class OrderService {
     public void cancelOrder(Integer orderId, Integer userId) {
         Order order = orderRepository.findByIdAndUserId(orderId, userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "ORDER_NOT_FOUND"));
-        order.setStatus("CANCELLED");
+        order.setStatus(Status.CANCELLED);
         orderRepository.save(order);
     }
 
     private Order createOrderEntity(BigDecimal totalPrice) {
         Order order = new Order();
-        order.setStatus("PENDING");
+        order.setStatus(Status.PENDING);
         order.setTotalPrice(totalPrice);
         return order;
     }

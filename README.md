@@ -50,5 +50,5 @@ Default is ERROR.
 
 ## Image information
 - The project includes 31 example images in the WebP format for products.
-- These can be found in the folder `uploads/products/webp`
+- These can be found in the folder `backend/src/main/resources/uploads/products/webp`
 - The images have been created with the use of Google's Gemini AI

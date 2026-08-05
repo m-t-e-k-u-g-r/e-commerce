@@ -33,9 +33,9 @@ public class OrderAddress {
     @Column(name = "city", nullable = false)
     private String city;
 
-    @Lob
-    @Column(name = "country")
-    private String country;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "country", nullable = false, length = 2)
+    private Country country;
 
     @ColumnDefault("current_timestamp()")
     @Column(name = "created_at", nullable = false)
