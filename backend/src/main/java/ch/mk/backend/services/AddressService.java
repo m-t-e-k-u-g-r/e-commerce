@@ -3,6 +3,7 @@ package ch.mk.backend.services;
 import ch.mk.backend.dtos.AddressDto;
 import ch.mk.backend.dtos.CreateAddressDto;
 import ch.mk.backend.entities.Address;
+import ch.mk.backend.entities.AddressType;
 import ch.mk.backend.entities.User;
 import ch.mk.backend.mappers.AddressMapper;
 import ch.mk.backend.repositories.AddressRepository;
@@ -38,13 +39,13 @@ public class AddressService {
     public Optional<Address> getBillingAddress(Integer userId) {
         return addressRepository.findByUserId(userId)
                 .stream()
-                .filter(address -> address.getType().equals("BILLING"))
+                .filter(address -> address.getType().equals(AddressType.BILLING))
                 .findFirst();
     }
 
     public void createAddress(Integer userId, CreateAddressDto addressDto) {
         Address address;
-        if (addressDto.getType().equals("BILLING")) {
+        if (addressDto.getType().equals(AddressType.BILLING)) {
             Optional<Address> existingBillingAddress = getBillingAddress(userId);
             address = existingBillingAddress.orElseGet(() -> createNewAddressEntity(userId, addressDto));
         } else {

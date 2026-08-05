@@ -1,6 +1,7 @@
 package ch.mk.backend.controllers;
 
 import ch.mk.backend.dtos.*;
+import ch.mk.backend.entities.Status;
 import ch.mk.backend.entities.User;
 import ch.mk.backend.services.OrderService;
 import lombok.AllArgsConstructor;
@@ -62,7 +63,7 @@ public class OrderController {
     public ResponseEntity<OrderDto> updateOrderStatus(
             @AuthenticationPrincipal User user,
             @PathVariable Number orderId,
-            @RequestParam String status
+            @RequestParam Status status
     ) {
         OrderDto orderDto = orderService.updateOrderStatus(orderId.intValue(), user.getId(), status);
         return new ResponseEntity<>(orderDto, HttpStatus.OK);

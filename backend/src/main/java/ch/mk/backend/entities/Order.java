@@ -30,9 +30,9 @@ public class Order {
     @Column(name = "access_token_hash")
     private String accessTokenHash;
 
-    @Lob
-    @Column(name = "status")
-    private String status;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private Status status;
 
     @Column(name = "total_price", nullable = false, precision = 10, scale = 2)
     private BigDecimal totalPrice;
