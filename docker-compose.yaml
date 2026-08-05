@@ -17,14 +17,15 @@ services:
     image: ghcr.io/m-t-e-k-u-g-r/e-commerce-server:latest
     environment:
       FRONTEND_URL: ${FRONTEND_URL}
-      DB_DRIVER: ${DB_DRIVER}
-      DB_URL: ${DB_URL}
+      DB_URL: jdbc:postgresql://database:5432/${DATABASE}
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
       ACCESS_TOKEN_SECRET: ${ACCESS_TOKEN_SECRET}
       REFRESH_TOKEN_SECRET: ${REFRESH_TOKEN_SECRET}
     ports:
       - "8080:8080"
+    volumes:
+      - ./uploads:/app/uploads
     networks:
       - frontend
       - backend
@@ -39,7 +40,6 @@ services:
         - "5432:5432"
       volumes:
         - data:/var/lib/postgresql/docker
-        - ./database:/docker-entrypoint-initdb.d
       networks:
         - backend
 

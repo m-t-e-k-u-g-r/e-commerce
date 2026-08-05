@@ -21,13 +21,13 @@ public class Address {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Lob
+    @Enumerated(EnumType.STRING)
     @Column(name = "type", nullable = false)
-    private String type;
+    private AddressType type;
 
-    @Lob
-    @Column(name = "salutation", nullable = false)
-    private String salutation;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "salutation", nullable = false, length = 2)
+    private Salutation salutation;
 
     @Column(name = "forename", nullable = false)
     private String forename;
@@ -47,9 +47,9 @@ public class Address {
     @Column(name = "city", nullable = false)
     private String city;
 
-    @Lob
-    @Column(name = "country")
-    private String country;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "country", nullable = false, length = 2)
+    private Country country;
 
     @ColumnDefault("current_timestamp()")
     @Column(name = "created_at", nullable = false)
