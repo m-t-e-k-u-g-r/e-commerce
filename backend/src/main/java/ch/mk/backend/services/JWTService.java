@@ -9,7 +9,6 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -21,13 +20,10 @@ import java.util.*;
 
 @Service
 public class JWTService {
-    @Value("${jwt.refresh-token-secret}")
-    private String refreshTokenSecret;
-    @Value("${jwt.access-token-secret}")
-    private String accessTokenSecret;
+    @Autowired
+    private SecretsService secretsService;
     @Autowired
     private RefreshTokenRepository refreshTokenRepository;
-
     public Integer MilliToDays = 24 * 60 * 60 * 1000;
     public Integer MilliToMinutes = 60 * 1000;
     public String claimName = "rememberMe";
@@ -91,11 +87,13 @@ public class JWTService {
     }
 
     private SecretKey getAccessTokenKey() {
+        String accessTokenSecret = secretsService.getAccessTokenSecret();
         byte[] keyBytes = Decoders.BASE64.decode(accessTokenSecret);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
     private SecretKey getRefreshTokenKey() {
+        String refreshTokenSecret = secretsService.getRefreshTokenSecret();
         byte[] keyBytes = Decoders.BASE64.decode(refreshTokenSecret);
         return Keys.hmacShaKeyFor(keyBytes);
     }

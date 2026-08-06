@@ -13,10 +13,6 @@ spring:
         error:
             include-message: always
 
-jwt:
-    refresh-token-secret: ${REFRESH_TOKEN_SECRET}
-    access-token-secret: ${ACCESS_TOKEN_SECRET}
-
 server:
     servlet:
         context-path: /api
