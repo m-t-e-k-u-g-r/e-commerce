@@ -20,6 +20,21 @@ cd e-commerce
 docker-compose up
 ```
 
+### Public Deployment on [Render](https://render.com/)
+The file render.yaml contains the necessary configuration to deploy the application on Render.
+The configuration file is complete and can be used with a free account on Render.
+If you would like to adjust the configuration, you can check out the [Blueprint specification](https://render.com/docs/blueprint-spec).
+
+To deploy on Render, follow these steps:
+1. Visit the [Render site](https://dashboard.render.com/select-repo?type=blueprint)
+2. Scroll down and enter `https://github.com/m-t-e-k-u-g-r/e-commerce` in *Public Git Repository*
+3. Click *Continue*
+4. Enter a name for the Blueprint
+5. Click *Deploy Blueprint*
+
+Wait a few moments until the service has started and Render will tell you
+where to find the application
+
 ### Requirements
 **Development:**
 - Java 25
@@ -29,20 +44,15 @@ docker-compose up
 
 *Versions have been used during development*
 
-**Deployment:**
+**Local Deployment:**
 - Docker
 - Docker Compose
 
 ### Environment variables
 The following environment variables are required:
 - DATABASE
-- DB_URL
-- DB_DRIVER
 - DB_USER
 - DB_PASSWORD
-- REFRESH_TOKEN_SECRET
-- ACCESS_TOKEN_SECRET
-- FRONTEND_URL
 
 Optionally, the variable LOG_LEVEL can be set to adjust the logging level of Spring Boot.
 

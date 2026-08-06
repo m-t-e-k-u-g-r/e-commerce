@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/categories")
+@RequestMapping("/api/categories")
 @AllArgsConstructor
 public class CategoryController {
     private final CategoryRepository categoryRepository;

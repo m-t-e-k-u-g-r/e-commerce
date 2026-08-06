@@ -1,24 +1,21 @@
 spring:
     datasource:
-        url: ${DB_URL}
+        url: jdbc:postgresql://${DB_HOST}:${DB_PORT:5432}/${DATABASE}
         driver-class-name: org.postgresql.Driver
         username: ${DB_USER}
         password: ${DB_PASSWORD}
     jpa:
         hibernate:
             ddl-auto: validate
+    profiles:
+        active: ${PROFILE:development}
     web:
         error:
             include-message: always
 
-jwt:
-    refresh-token-secret: ${REFRESH_TOKEN_SECRET}
-    access-token-secret: ${ACCESS_TOKEN_SECRET}
-
 server:
-    frontend-url: ${FRONTEND_URL}
     servlet:
-        context-path: /api
+        context-path: /
 
 logging:
     level:

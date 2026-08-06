@@ -7,73 +7,22 @@ on:
       - "frontend/**"
       - "backend/**"
 env:
-  FRONTEND_IMAGE: ghcr.io/m-t-e-k-u-g-r/e-commerce-frontend
-  BACKEND_IMAGE: ghcr.io/m-t-e-k-u-g-r/e-commerce-backend
+  IMAGE: ghcr.io/m-t-e-k-u-g-r/e-commerce
 jobs:
-  check-changes:
-    name: Check if frontend or backend changed
-    runs-on: ubuntu-latest
-    outputs:
-      frontend: ${{ steps.check-changes.outputs.frontend }}
-      backend: ${{ steps.check-changes.outputs.backend }}
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
-
-      - name: Check what changed
-        uses: dorny/paths-filter@v2
-        id: check-changes
-        with:
-          filters: |
-            frontend:
-              - 'frontend/**'
-            backend:
-              - 'backend/**'
-
-  deploy-frontend:
-    name: Deploy frontend
-    needs: check-changes
-    if: ${{ needs.check-changes.outputs.frontend }}
+  deploy-app:
+    name: Deploy Application
     runs-on: ubuntu-latest
     environment: env
     steps:
       - uses: actions/checkout@v4
 
       - name: Login to GitHub Container Registry
-        run: |
-          echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io \
-            -u ${{ github.actor }} \
-            --password-stdin
-
-      - name: Build and push frontend
-        uses: docker/build-push-action@v4
+        uses: ./.github/actions/ghcr-login
         with:
-          context: ./frontend
-          push: true
-          tags: |
-            ${{ env.FRONTEND_IMAGE }}:${{ github.ref_name }}
-            ${{ env.FRONTEND_IMAGE }}:latest
+          token: ${{ secrets.GHCR_TOKEN }}
 
-  deploy-backend:
-    name: Deploy backend
-    needs: check-changes
-    if: ${{ needs.check-changes.outputs.backend }}
-    runs-on: ubuntu-latest
-    environment: env
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Login to GitHub Container Registry
-        run: |
-          echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io \
-            -u ${{ github.actor }} \
-            --password-stdin
-
-      - name: Build and push backend
-        uses: docker/build-push-action@v4
+      - name: Build and push
+        uses: ./.github/actions/build-n-push
         with:
-          context: ./backend
-          push: true
-          tags: |
-            ${{ env.BACKEND_IMAGE }}:${{ github.ref_name }}
-            ${{ env.BACKEND_IMAGE }}:latest
+          image: ${{ env.IMAGE }}
+          context: .

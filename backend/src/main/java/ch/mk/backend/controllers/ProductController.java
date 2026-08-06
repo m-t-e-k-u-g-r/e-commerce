@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Set;
 
 @RestController
-@RequestMapping("/products")
+@RequestMapping("/api/products")
 @AllArgsConstructor
 public class ProductController {
     private final ProductMapper productMapper;
