@@ -1,0 +1,40 @@
+# This is a deployment configuration for Render.com.
+# Defines the services, environment variables,
+# and build settings required to run the application.
+services:
+  - name: e-commerce
+    type: web
+    runtime: docker
+    repo: https://github.com/m-t-e-k-u-g-r/e-commerce.git
+    plan: free
+    envVars:
+      - key: PROFILE
+        value: production
+      - key: DATABASE
+        fromDatabase:
+          name: e-commerce-database
+          property: database
+      - key: DB_HOST
+        fromDatabase:
+          name: e-commerce-database
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: e-commerce-database
+          property: port
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: e-commerce-database
+          property: password
+      - key: DB_USER
+        fromDatabase:
+          name: e-commerce-database
+          property: user
+    autoDeployTrigger: commit
+
+databases:
+  - name: e-commerce-database
+    user: e_commerce_user
+    plan: free
+    ipAllowList: []
+    postgresMajorVersion: "18"
