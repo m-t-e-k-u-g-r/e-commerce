@@ -36,13 +36,8 @@ docker-compose up
 ### Environment variables
 The following environment variables are required:
 - DATABASE
-- DB_URL
-- DB_DRIVER
 - DB_USER
 - DB_PASSWORD
-- REFRESH_TOKEN_SECRET
-- ACCESS_TOKEN_SECRET
-- FRONTEND_URL
 
 Optionally, the variable LOG_LEVEL can be set to adjust the logging level of Spring Boot.
 
