@@ -18,7 +18,7 @@ export class ProductService {
       map((products: DB_Product[]) =>
         products.map((p: DB_Product) => ({
           ...p,
-          imageUrl: `http://localhost:8080/api/images/products/${p.imageId}`
+          imageUrl: `/api/images/products/${p.imageId}`
         }))
       ),
       tap((products: Product[]) => this.products.set(products)),
