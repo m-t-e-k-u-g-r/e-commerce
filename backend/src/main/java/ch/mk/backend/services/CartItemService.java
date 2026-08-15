@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -19,7 +20,7 @@ public class CartItemService {
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
 
-    public ResponseEntity<Void> increaseQuantity(Integer userId, Integer productId) {
+    public ResponseEntity<Void> increaseQuantity(UUID userId, UUID productId) {
         Optional<CartItem> existingItem = findCartItemByProductId(productId, userId);
 
         if (existingItem.isPresent()) {
@@ -31,7 +32,7 @@ public class CartItemService {
         return ResponseEntity.noContent().build();
     }
 
-    public ResponseEntity<Void> updateQuantity(Integer userId, Integer productId, CartController.UpdateQuantityRequest request) {
+    public ResponseEntity<Void> updateQuantity(UUID userId, Integer productId, CartController.UpdateQuantityRequest request) {
         var cartItem = cartItemRepository.findById(productId);
         int quantity = request.quantity();
 
@@ -47,7 +48,7 @@ public class CartItemService {
         return ResponseEntity.notFound().build();
     }
 
-    public ResponseEntity<Void> removeItem(Integer userId, Integer itemId) {
+    public ResponseEntity<Void> removeItem(UUID userId, Integer itemId) {
         var cartItem = cartItemRepository.findById(itemId);
         if (cartItem.isPresent() && cartItemBelongsToUser(cartItem.get(), userId)) {
             cartItemRepository.deleteById(itemId);
@@ -58,18 +59,18 @@ public class CartItemService {
         return ResponseEntity.noContent().build();
     }
 
-    private Boolean cartItemBelongsToUser(CartItem cartItem, Integer userId) {
+    private Boolean cartItemBelongsToUser(CartItem cartItem, UUID userId) {
         return cartItem.getUser().getId().equals(userId);
     }
 
-    private Optional<CartItem> findCartItemByProductId(Integer productId, Integer userId) {
+    private Optional<CartItem> findCartItemByProductId(UUID productId, UUID userId) {
         var cartItems = cartItemRepository.findByUserId(userId);
         return cartItems.stream()
                 .filter(item -> Objects.equals(item.getProduct().getId(), productId))
                 .findFirst();
     }
 
-    private void createCartItem(Integer userId, Integer productId) {
+    private void createCartItem(UUID userId, UUID productId) {
         var cartItem = new CartItem();
         cartItem.setQuantity(1);
         if (userRepository.findById(userId).isPresent() && productRepository.findById(productId).isPresent()) {

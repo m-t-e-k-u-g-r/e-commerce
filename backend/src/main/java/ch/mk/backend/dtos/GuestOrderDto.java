@@ -7,13 +7,14 @@ import lombok.Setter;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.UUID;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
 public class GuestOrderDto {
-    private Integer id;
+    private UUID id;
     private String status;
     private Double totalPrice;
     private OrderAddressDto address;

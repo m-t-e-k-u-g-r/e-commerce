@@ -16,6 +16,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -25,25 +26,25 @@ public class AddressService {
     private final AddressMapper addressMapper;
     private final UserRepository userRepository;
 
-    public Optional<Address> getAddressByIdAndUserId(Integer addressId, Integer userId) {
+    public Optional<Address> getAddressByIdAndUserId(UUID addressId, UUID userId) {
         return addressRepository.findByUserIdAndId(userId, addressId);
     }
 
-    public List<AddressDto> getAddressDtosByUserId(Integer userId) {
+    public List<AddressDto> getAddressDtosByUserId(UUID userId) {
         return addressRepository.findByUserId(userId)
                 .stream()
                 .map(addressMapper::toDto)
                 .toList();
     }
 
-    public Optional<Address> getBillingAddress(Integer userId) {
+    public Optional<Address> getBillingAddress(UUID userId) {
         return addressRepository.findByUserId(userId)
                 .stream()
                 .filter(address -> address.getType().equals(AddressType.BILLING))
                 .findFirst();
     }
 
-    public void createAddress(Integer userId, CreateAddressDto addressDto) {
+    public void createAddress(UUID userId, CreateAddressDto addressDto) {
         Address address;
         if (addressDto.getType().equals(AddressType.BILLING)) {
             Optional<Address> existingBillingAddress = getBillingAddress(userId);
@@ -55,7 +56,7 @@ public class AddressService {
         addressRepository.save(address);
     }
 
-    public ResponseEntity<Void> editAddress(Integer userId, Integer addressId, CreateAddressDto addressDto) {
+    public ResponseEntity<Void> editAddress(UUID userId, UUID addressId, CreateAddressDto addressDto) {
         Optional<Address> address = addressRepository.findByUserIdAndId(userId, addressId);
         if (address.isPresent()) {
             updateAddressFields(address.get(), addressDto);
@@ -66,7 +67,7 @@ public class AddressService {
         return ResponseEntity.notFound().build();
     }
 
-    public ResponseEntity<Void> deleteAddress(Integer userId, Integer addressId) {
+    public ResponseEntity<Void> deleteAddress(UUID userId, UUID addressId) {
         Optional<Address> address = addressRepository.findByUserIdAndId(userId, addressId);
         if (address.isPresent()) {
             addressRepository.delete(address.get());
@@ -75,7 +76,7 @@ public class AddressService {
         return ResponseEntity.notFound().build();
     }
 
-    private Address createNewAddressEntity(Integer userId, CreateAddressDto addressDto) {
+    private Address createNewAddressEntity(UUID userId, CreateAddressDto addressDto) {
         Address address = new Address();
         address.setType(addressDto.getType());
 

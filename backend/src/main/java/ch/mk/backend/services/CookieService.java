@@ -5,12 +5,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
 public class CookieService {
     @Autowired
     private JWTService jwtService;
 
-    public ResponseCookie createAccessTokenCookie(Integer userId) {
+    public ResponseCookie createAccessTokenCookie(UUID userId) {
         String token = jwtService.generateAccessToken(userId);
         return ResponseCookie.from("accessToken", token)
                 .httpOnly(true)

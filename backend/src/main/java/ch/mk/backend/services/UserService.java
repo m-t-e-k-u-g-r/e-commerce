@@ -18,6 +18,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.UUID;
+
 @Service
 public class UserService {
     @Autowired
@@ -69,7 +71,7 @@ public class UserService {
 
     public User getUserFromRefreshToken(String refreshToken) {
         Jws<Claims> claims = jwtService.checkRefreshToken(refreshToken);
-        Integer userId = Integer.valueOf(claims.getPayload().getSubject());
+        UUID userId = UUID.fromString(claims.getPayload().getSubject());
         return userRepository.findById(userId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "USER_NOT_FOUND"));
     }
 

@@ -7,14 +7,15 @@ import lombok.Setter;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.UUID;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
 public class OrderDto {
-    private Integer id;
-    private Integer userId;
+    private UUID id;
+    private UUID userId;
     private String status;
     private Double totalPrice;
     private OrderAddressDto address;

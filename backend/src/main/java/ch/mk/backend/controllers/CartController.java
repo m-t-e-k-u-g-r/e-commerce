@@ -12,6 +12,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/cart")
@@ -35,7 +36,7 @@ public class CartController {
 
     @PostMapping("/items/{productId}")
     public ResponseEntity<Void> addToCart(
-            @PathVariable int productId,
+            @PathVariable UUID productId,
             @AuthenticationPrincipal User user
     ) {
         return cartItemService.increaseQuantity(user.getId(), productId);

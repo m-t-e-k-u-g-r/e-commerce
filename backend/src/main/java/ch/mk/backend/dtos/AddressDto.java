@@ -7,12 +7,14 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.UUID;
+
 @AllArgsConstructor
 @Getter
 @Setter
 public class AddressDto {
-    private Integer id;
-    private Integer userId;
+    private UUID id;
+    private UUID userId;
     private AddressType type;
     private Salutation salutation;
     private String forename;

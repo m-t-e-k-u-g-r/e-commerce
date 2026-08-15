@@ -28,7 +28,7 @@ public class JWTService {
     public Integer MilliToMinutes = 60 * 1000;
     public String claimName = "rememberMe";
 
-    public String generateAccessToken(Integer userId) {
+    public String generateAccessToken(UUID userId) {
         Map<String, Object> claims = new HashMap<>();
 
         return Jwts.builder()
@@ -42,7 +42,7 @@ public class JWTService {
                 .compact();
     }
 
-    public String generateRefreshToken(Integer userId, Boolean isRememberMe) {
+    public String generateRefreshToken(UUID userId, Boolean isRememberMe) {
         Map<String, Object> claims = new HashMap<>();
         claims.put(claimName, isRememberMe);
         Date expiration = isRememberMe
