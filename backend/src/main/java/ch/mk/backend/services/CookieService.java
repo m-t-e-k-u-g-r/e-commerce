@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Service;
 
-import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.UUID;
 
 @Service
@@ -33,7 +33,7 @@ public class CookieService {
                 ? 30 * jwtService.MilliToDays / 1000
                 : 7 * jwtService.MilliToDays / 1000;
 
-        String token = new String(tokenBytes, StandardCharsets.UTF_8);
+        String token = Base64.getUrlEncoder().encodeToString(tokenBytes);
         return ResponseCookie.from("refreshToken", token)
                 .httpOnly(true)
                 .secure(false)

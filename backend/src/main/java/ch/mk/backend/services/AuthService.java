@@ -17,6 +17,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Base64;
 import java.util.List;
 import java.util.Objects;
 
@@ -59,7 +60,7 @@ public class AuthService {
     }
 
     public ResponseEntity<TokenDto> refreshAccessToken(String token) {
-        byte[] tokenBytes = token.getBytes();
+        byte[] tokenBytes = Base64.getUrlDecoder().decode(token);
         byte[] hashed = refreshService.generateSHA256Hash(tokenBytes);
         RefreshToken storedToken = refreshTokenRepository.findByTokenHash(hashed).stream().findFirst()
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "TOKEN_NOT_FOUND"));
