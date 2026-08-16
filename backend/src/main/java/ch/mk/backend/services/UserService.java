@@ -7,8 +7,6 @@ import ch.mk.backend.dtos.UserDto;
 import ch.mk.backend.entities.User;
 import ch.mk.backend.mappers.UserMapper;
 import ch.mk.backend.repositories.UserRepository;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -22,8 +20,6 @@ import org.springframework.web.server.ResponseStatusException;
 public class UserService {
     @Autowired
     private UserRepository userRepository;
-    @Autowired
-    private JWTService jwtService;
     @Autowired
     private AuthenticationManager authenticationManager;
     @Autowired
@@ -65,12 +61,6 @@ public class UserService {
 
         user.setPasswordHash(bcryptEncoder.encode(dto.getNewPassword()));
         userRepository.save(user);
-    }
-
-    public User getUserFromRefreshToken(String refreshToken) {
-        Jws<Claims> claims = jwtService.checkRefreshToken(refreshToken);
-        Integer userId = Integer.valueOf(claims.getPayload().getSubject());
-        return userRepository.findById(userId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "USER_NOT_FOUND"));
     }
 
     public User verifyUser(LoginRequest request) {

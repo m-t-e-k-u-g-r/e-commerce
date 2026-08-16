@@ -21,8 +21,11 @@ public class RefreshToken {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(name = "token", nullable = false)
-    private String token;
+    @Column(name = "token_hash", nullable = false)
+    private byte[] tokenHash;
+
+    @Column(name = "createdAt", nullable = false)
+    private Instant createdAt;
 
     @Column(name = "expires_at", nullable = false)
     private Instant expiresAt;
@@ -31,5 +34,8 @@ public class RefreshToken {
     @Column(name = "revoked", nullable = false)
     private Boolean revoked;
 
-
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = Instant.now();
+    }
 }

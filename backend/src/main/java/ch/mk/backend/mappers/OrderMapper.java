@@ -8,6 +8,8 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
 
+import java.util.UUID;
+
 @Mapper(componentModel = "spring", uses = {OrderItemMapper.class, OrderAddressMapper.class})
 public interface OrderMapper {
     @Mapping(source = "user.id", target = "userId")
@@ -20,7 +22,7 @@ public interface OrderMapper {
             @Mapping(target = "guestId", source = "guestId"),
             @Mapping(target = "accessToken", source = "accessToken"),
     })
-    GuestOrderCreatedDto toGuestOrderDto(OrderDto orderDto, Integer guestId, String accessToken);
+    GuestOrderCreatedDto toGuestOrderDto(OrderDto orderDto, UUID guestId, String accessToken);
 
     @Mapping(source = "createdAt", target = "createdAt")
     GuestOrderDto getGuestOrderDto(Order order);

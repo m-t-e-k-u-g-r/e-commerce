@@ -15,6 +15,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.UUID;
 import java.util.function.Consumer;
 
 @Service
@@ -34,14 +35,14 @@ public class OrderService {
     private final GuestRepository guestRepository;
     private final BCryptPasswordEncoder bcryptEncoder;
 
-    public List<OrderDto> getOrdersByUserId(Integer userId) {
+    public List<OrderDto> getOrdersByUserId(UUID userId) {
         return orderRepository.findByUserId(userId)
                 .stream()
                 .map(orderMapper::toDto)
                 .toList();
     }
 
-    public GuestOrderDto getGuestOrderById(Integer orderId, String accessToken) {
+    public GuestOrderDto getGuestOrderById(UUID orderId, String accessToken) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "ORDER_NOT_FOUND"));
 
@@ -52,7 +53,7 @@ public class OrderService {
     }
 
     @Transactional
-    public OrderDto createUserOrder(Integer userId, Integer addressId) {
+    public OrderDto createUserOrder(UUID userId, UUID addressId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "USER_NOT_FOUND"));
 
@@ -119,7 +120,7 @@ public class OrderService {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-    public OrderDto updateOrderStatus(Integer orderId, Integer userId, Status status) {
+    public OrderDto updateOrderStatus(UUID orderId, UUID userId, Status status) {
         Order order = orderRepository.findByIdAndUserId(orderId, userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "ORDER_NOT_FOUND"));
         order.setStatus(status);
@@ -127,7 +128,7 @@ public class OrderService {
         return orderMapper.toDto(order);
     }
 
-    public void cancelOrder(Integer orderId, Integer userId) {
+    public void cancelOrder(UUID orderId, UUID userId) {
         Order order = orderRepository.findByIdAndUserId(orderId, userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "ORDER_NOT_FOUND"));
         order.setStatus(Status.CANCELLED);

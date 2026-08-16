@@ -5,12 +5,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Service;
 
+import java.util.Base64;
+import java.util.UUID;
+
 @Service
 public class CookieService {
     @Autowired
     private JWTService jwtService;
+    @Autowired
+    private RefreshService refreshService;
 
-    public ResponseCookie createAccessTokenCookie(Integer userId) {
+    public ResponseCookie createAccessTokenCookie(UUID userId) {
         String token = jwtService.generateAccessToken(userId);
         return ResponseCookie.from("accessToken", token)
                 .httpOnly(true)
@@ -22,12 +27,13 @@ public class CookieService {
     }
 
     public ResponseCookie createRefreshTokenCookie(User user, Boolean isRememberMe) {
-        String token = jwtService.generateRefreshToken(user.getId(), isRememberMe);
-        jwtService.saveRefreshToken(token, user, isRememberMe);
+        byte[] tokenBytes = refreshService.generateRefreshToken();
+        refreshService.saveRefreshToken(tokenBytes, user, isRememberMe);
         int maxAge = isRememberMe
                 ? 30 * jwtService.MilliToDays / 1000
                 : 7 * jwtService.MilliToDays / 1000;
 
+        String token = Base64.getUrlEncoder().encodeToString(tokenBytes);
         return ResponseCookie.from("refreshToken", token)
                 .httpOnly(true)
                 .secure(false)

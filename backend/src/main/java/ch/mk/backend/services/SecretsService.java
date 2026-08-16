@@ -28,20 +28,6 @@ public class SecretsService {
         }
     }
 
-    public String getRefreshTokenSecret() {
-        Optional<ApplicationConfig> config = applicationConfigRepository.findByKey("jwt.refresh.secret");
-        if (config.isPresent()) {
-            return config.get().getValue();
-        } else {
-            String secret = generateSecret(64);
-            ApplicationConfig newConfig = new ApplicationConfig();
-            newConfig.setKey("jwt.refresh.secret");
-            newConfig.setValue(secret);
-            applicationConfigRepository.save(newConfig);
-            return secret;
-        }
-    }
-
     private String generateSecret(int bytes) {
         SecureRandom random = new SecureRandom();
 

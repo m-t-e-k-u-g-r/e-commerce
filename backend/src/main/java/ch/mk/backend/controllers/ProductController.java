@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/products")
@@ -33,7 +34,7 @@ public class ProductController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProductDto> findProductById(@PathVariable int id) {
+    public ResponseEntity<ProductDto> findProductById(@PathVariable UUID id) {
         return productRepository.findById(id)
                 .map(productMapper::toDto)
                 .map(ResponseEntity::ok)

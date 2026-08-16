@@ -32,7 +32,7 @@ public class OrderController {
             @AuthenticationPrincipal User user,
             @RequestBody CreateOrderDto dto
     ) {
-        Integer addressId = dto.getAddressId();
+        UUID addressId = dto.getAddressId();
         OrderDto orderDto = orderService.createUserOrder(user.getId(), addressId);
 
         return new ResponseEntity<>(orderDto, HttpStatus.CREATED);
@@ -51,10 +51,10 @@ public class OrderController {
 
     @GetMapping("/guest/{orderId}")
     public ResponseEntity<GuestOrderDto> getGuestOrder(
-            @PathVariable Number orderId,
+            @PathVariable UUID orderId,
             @RequestParam String token
     ) {
-        GuestOrderDto order = this.orderService.getGuestOrderById(orderId.intValue(), token);
+        GuestOrderDto order = this.orderService.getGuestOrderById(orderId, token);
 
         return new ResponseEntity<>(order, HttpStatus.OK);
     }
@@ -62,19 +62,19 @@ public class OrderController {
     @PutMapping("/{orderId}")
     public ResponseEntity<OrderDto> updateOrderStatus(
             @AuthenticationPrincipal User user,
-            @PathVariable Number orderId,
+            @PathVariable UUID orderId,
             @RequestParam Status status
     ) {
-        OrderDto orderDto = orderService.updateOrderStatus(orderId.intValue(), user.getId(), status);
+        OrderDto orderDto = orderService.updateOrderStatus(orderId, user.getId(), status);
         return new ResponseEntity<>(orderDto, HttpStatus.OK);
     }
 
     @DeleteMapping("/{orderId}")
     public ResponseEntity<Void> cancelOrder(
             @AuthenticationPrincipal User user,
-            @PathVariable Number orderId
+            @PathVariable UUID orderId
     ) {
-        orderService.cancelOrder(orderId.intValue(), user.getId());
+        orderService.cancelOrder(orderId, user.getId());
         return ResponseEntity.noContent().build();
     }
 }

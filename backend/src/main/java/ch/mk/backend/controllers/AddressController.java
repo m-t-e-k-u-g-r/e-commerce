@@ -10,6 +10,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/addresses")
@@ -37,7 +38,7 @@ public class AddressController {
     @PutMapping("/{addressId}")
     public ResponseEntity<Void> updateAddress(
             @AuthenticationPrincipal User user,
-            @PathVariable int addressId,
+            @PathVariable UUID addressId,
             @RequestBody CreateAddressDto addressDto
     ) {
         return addressService.editAddress(user.getId(), addressId, addressDto);
@@ -46,7 +47,7 @@ public class AddressController {
     @DeleteMapping("/{addressId}")
     public ResponseEntity<Void> deleteAddress(
             @AuthenticationPrincipal User user,
-            @PathVariable int addressId
+            @PathVariable UUID addressId
     ) {
         return addressService.deleteAddress(user.getId(), addressId);
     }
