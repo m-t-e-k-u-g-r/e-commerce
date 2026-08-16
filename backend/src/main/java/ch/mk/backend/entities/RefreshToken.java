@@ -34,5 +34,8 @@ public class RefreshToken {
     @Column(name = "revoked", nullable = false)
     private Boolean revoked;
 
-
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = Instant.now();
+    }
 }
